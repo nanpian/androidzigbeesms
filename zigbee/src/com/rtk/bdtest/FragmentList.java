@@ -226,7 +226,7 @@ public class FragmentList extends Fragment {
         if(bundle!=null) {
             send = bundle.getString("send");
         }
-        
+        MainActivity.instance.getselfInfo();
         dbDeviceHelper = new DbDeviceHelper(getActivity());
 		deviceList = (ListView) getActivity().findViewById(R.id.device_list);
 		devices = new ArrayList<Device>();

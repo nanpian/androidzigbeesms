@@ -56,6 +56,8 @@ public class MapActivity extends Fragment implements MKOfflineMapListener{
 	private static final int MSG_UPDATE_SELF_GPS= 0;
 	private static final int MSG_UPDATE_OTHER_GPS  = 1;
 	private static int count  = 0;
+	//默认南京经纬度
+	private static float[] jingwei = {32.03f , 118.46f};
 
 	static BitmapDescriptor bdA = BitmapDescriptorFactory
 			.fromResource(R.drawable.icon_marka);
@@ -70,6 +72,21 @@ public class MapActivity extends Fragment implements MKOfflineMapListener{
 	BitmapDescriptor bdGround = BitmapDescriptorFactory
 			.fromResource(R.drawable.ground_overlay);
 	
+	Runnable gpsselfRunnable = new Runnable() {
+		public void run() {
+			BitmapDescriptor bdC = BitmapDescriptorFactory
+					.fromResource(R.drawable.icon_marka);
+				LatLng jingwei = new LatLng(39.33, 116.400244);
+				OverlayOptions selfgps = new MarkerOptions().position(jingwei)
+						.icon(bdC).perspective(false).anchor(0.5f, 0.5f)
+						.rotate(30).zIndex(7);
+				mMarkerE = (Marker) (mBaiduMap.addOverlay(selfgps));
+				MapStatusUpdate status = MapStatusUpdateFactory
+						.newLatLng(jingwei);
+
+		}
+	};
+
 	Handler gpsHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
@@ -77,25 +94,15 @@ public class MapActivity extends Fragment implements MKOfflineMapListener{
 			switch (msg.what) {
 			case MSG_UPDATE_SELF_GPS:
 				BitmapDescriptor bdC = BitmapDescriptorFactory
-						.fromResource(R.drawable.icon_marka);
-
-				if (count > 0) {
-					LatLng ll = mMarkerE.getPosition();
-					LatLng llNew = new LatLng(ll.latitude + 0.005,
-							ll.longitude + 0.005);
-					mMarkerE.setPosition(llNew);
-				} else {
-					LatLng jingwei = new LatLng(39.33, 116.400244);
-					OverlayOptions selfgps = new MarkerOptions().position(jingwei)
-							.icon(bdC).perspective(false).anchor(0.5f, 0.5f)
-							.rotate(30).zIndex(7);
-				    mMarkerE = (Marker) (mBaiduMap.addOverlay(selfgps));
-				MapStatusUpdate status = MapStatusUpdateFactory.newLatLng(jingwei);
-				mMapView.getMap().animateMapStatus(status);
-				}
-				count++;
-				gpsHandler.sendEmptyMessageDelayed(MSG_UPDATE_SELF_GPS, 3000);
-				break;
+				.fromResource(R.drawable.icon_marka);
+			LatLng jingwei2 = new LatLng(jingwei[1], jingwei[0]);
+			OverlayOptions selfgps = new MarkerOptions().position(jingwei2)
+					.icon(bdC).perspective(false).anchor(0.5f, 0.5f)
+					.rotate(30).zIndex(7);
+			mMarkerE = (Marker) (mBaiduMap.addOverlay(selfgps));
+			MapStatusUpdate status = MapStatusUpdateFactory
+					.newLatLng(jingwei2);
+                     break;
 			}
 
 			super.handleMessage(msg);
@@ -116,10 +123,11 @@ public class MapActivity extends Fragment implements MKOfflineMapListener{
 			// 收到gps intent以后，发给gps刷新handler，ui显示
 			if (gpsIntent.getAction().equals("ACTION_UPDATE_SELF_GPS")) {
 				String id = ""; // 得到gps所属的id
-				String longitude = gpsIntent.getExtras().getString("longitude");
-				String latitude = gpsIntent.getExtras().getString("longitude");
+				float longitude = gpsIntent.getExtras().getFloat("longitude");
+				float latitude = gpsIntent.getExtras().getFloat("latitude");
 				Log.i(Tag,"update self gps info the longitude is " + longitude + "the latitude is " +latitude );
-				String[] jingwei = {longitude,latitude};
+				jingwei[0] = longitude;
+				jingwei[1] = latitude;
 				Message gpsMessage = new Message();
 				gpsMessage.what = MSG_UPDATE_SELF_GPS;
 				gpsMessage.obj = jingwei;
@@ -158,10 +166,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener{
 		
 		
 		initOverlay();
-		// for test use 
-		Message gpsMessage = new Message();
-		gpsMessage.what = MSG_UPDATE_SELF_GPS;
-		gpsHandler.sendMessageDelayed(gpsMessage, 3000);
+		
 		mBaiduMap.setOnMarkerClickListener(new OnMarkerClickListener() {
 			public boolean onMarkerClick(final Marker marker) {
 				Button button = new Button(getActivity());
@@ -255,7 +260,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener{
 	public void onPause() {
 		// TODO Auto-generated method stub
 		mMapView.onPause();
-		gpsHandler.removeMessages(MSG_UPDATE_SELF_GPS);
+		gpsHandler.removeCallbacks(gpsselfRunnable);
 		getActivity().unregisterReceiver(receiver);
 		super.onPause();
 	}
@@ -266,7 +271,9 @@ public class MapActivity extends Fragment implements MKOfflineMapListener{
 		mMapView.onResume();
 		super.onResume();
 		IntentFilter filter = new IntentFilter("com.rtk.bdtest.service.BDService.broadcast");
+		filter.addAction("ACTION_UPDATE_SELF_GPS");
 		getActivity().registerReceiver(receiver, filter);
+		gpsHandler.postDelayed(gpsselfRunnable, 1000);
 	}
 
 	@Override

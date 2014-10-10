@@ -28,7 +28,7 @@ import android.widget.TextView;
 
 public class ZigbeeSerivce extends Service {
 
-	private static final String TAG = "BDTEST";
+	private static final String TAG = "ZigbeeService";
 	private static final String WRITE_ID_SUCCESS = "AA";
 	private static final String WRITE_ID_FAIL = "55";
 	public static final String WRITE_SUCCESS = "00";
@@ -37,6 +37,7 @@ public class ZigbeeSerivce extends Service {
 	public static final String CMD_ENABLE_RUNNING_MODE = "FE004D034E";
 	public static final String CMD_HAND_SHAKE_SUCCESS = "FE014D8400C8";
 	public static final String CMD_ENABLE_RUNNING_MODE_SUCCESS = "FE014D8300CF";
+	private static final String GET_FIRMWARE_INFO = "8003";
 
 	private static ZigbeeApplication mApplication;
 	private SerialPort mZigbeeSerialPort;
@@ -83,12 +84,36 @@ public class ZigbeeSerivce extends Service {
 	private String firmwareUpdateString = "";
 	private boolean isVerifyData = false;
 	
+	//得到自己这个路由平板的设备id、设备短地址
+	public void getselfInfo( ) {
+		sendData2Zigbee(CharConverter.hexStringToBytes(GET_FIRMWARE_INFO));
+	}
+	public  void sendData2Zigbee(byte[] data) {
+		try {
+			if (null != mZigbeeOutputStream) {
+				Log.d(TAG, "write data = " + new String(data));
+				mZigbeeOutputStream.write(data);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+	
+	
 	//发送短信，发送短信成功的标志是什么？？？
 	public void sendsms2Zigbee(String data) {
-		 Message msg = new Message();
+		 /*Message msg = new Message();
 		 msg.what = MSG_SEND_SMS;
 		 msg.obj = data;
-		handler.sendMessage(msg);
+		handler.sendMessage(msg);*/
+		Log.i(Tag, "send sms!");
+		try {
+			sendData2Zigbee(data.getBytes("UTF-8"));
+			//sendData2Zigbee(data.getBytes("Unicode"));
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
 	}
 	
 	Runnable gpsRunnable = new Runnable () {
@@ -163,7 +188,7 @@ public class ZigbeeSerivce extends Service {
 			case MSG_REDUCE_DEVICE_COUNT:
 				break;
 			case MSG_SEND_SMS:
-				Log.i(Tag, "send sms!");
+
                 break;
 			case MSG_SEND_GPS_TOALL:
 				Log.i(Tag,"send gps to all");
@@ -241,105 +266,15 @@ public class ZigbeeSerivce extends Service {
 					e.printStackTrace();
 				}
 				if (len > 0) {
-					String receivedData = CharConverter.byteToHexString(
-							zigbeeBuffer, len);
+					String receivedData = CharConverter.byteToHexString(zigbeeBuffer, len);
 					Log.d(TAG, "zigbee data = " + receivedData);
-					if (isVerifyData) {
-						firmwareUpdateString = firmwareUpdateString
-								+ receivedData;
-						if (firmwareUpdateString.length() == 144) {
-							isVerifyData = false;
-							handleUpdate(firmwareUpdateString);
-							firmwareUpdateString = "";
-						} else if (firmwareUpdateString.length() > 144) {
-							isVerifyData = false;
-							firmwareUpdateString = "";
-						}
-					} else if ((receivedData.length() >= 4)
-							&& receivedData.substring(0, 4).equals("FE43")) {
-						isVerifyData = true;
-						firmwareUpdateString = firmwareUpdateString
-								+ receivedData;
-					} else if (receivedData.substring(0, 2).equals("FE")) {
-						handleUpdate(receivedData);
-					} else {
-						handleData(receivedData, zigbeeBuffer);
+					handleData(receivedData, zigbeeBuffer);
 					}
 				}
 			}
 		}
-	}
 
-	public boolean checkVerifyReceivedData(String data) {
-		String temp = data.substring(14, 142);
-		String verifyString = "";
-		for (int i = 0; i < 64; i++) {
-			verifyString = verifyString
-					+ CharConverter.intToHexString(res[verifyIndex + i]);
-		}
-		if (temp.equals(verifyString)) {
-			return true;
-		}
-		return false;
-	}
 
-	public void handleUpdate(String data) {
-		try {
-			if (currentMode.equals(MODE_WRITE)) {
-				if (data.length() != 12) {
-					handler.sendEmptyMessage(MSG_UPDATE_ERROR);
-				} else {
-					if (data.substring(8, 10).equals(WRITE_SUCCESS)) {
-						handler.removeMessages(MSG_CONTINUE_WRITE);
-						if (resIndex + 64 < res.length) {
-							resIndex = resIndex + 64;
-							handler.sendEmptyMessage(MSG_CONTINUE_WRITE);
-						} else {
-							// write finish, need to verify
-							resIndex = 0;// restore index
-							verifyIndex = 0;
-							handler.sendEmptyMessage(MSG_CONTINUE_VERIFY);
-							handler.sendEmptyMessage(MSG_DISMISS_CHECK_BIN);
-							handler.sendEmptyMessage(MSG_SHOW_VERIFY_DIALOG);
-							Log.d(TAG, "finish write , start verify");
-						}
-					}
-				}
-			} else if (currentMode.equals(MODE_VERIFY)) {
-				if (data.length() != 144) {
-					handler.sendEmptyMessage(MSG_UPDATE_ERROR);
-				} else {
-					handler.removeMessages(MSG_CONTINUE_VERIFY);
-					if (checkVerifyReceivedData(data)) {
-						if (verifyIndex + 64 < res.length) {
-							verifyIndex = verifyIndex + 64;
-							handler.sendEmptyMessage(MSG_CONTINUE_VERIFY);
-						} else {
-							// verify finish
-							currentMode = MODE_NORMAL;
-							verifyIndex = 0;
-							resIndex = 0;
-							handler.sendEmptyMessage(MSG_DISMISS_CHECK_BIN);
-							handler.sendEmptyMessage(MSG_TURN_TO_RUNNING_MODE);
-							Log.d(TAG, "verify success !!!");
-						}
-					} else {
-						handler.sendEmptyMessage(MSG_UPDATE_ERROR);
-					}
-				}
-			} else if (currentMode.equals(MODE_NORMAL)) {
-				if (data.equals(CMD_HAND_SHAKE_SUCCESS)) {
-					resIndex = 0;
-					handler.sendEmptyMessage(MSG_CONTINUE_WRITE);
-					handler.sendEmptyMessage(MSG_DISMISS_CHECK_BIN);
-					handler.sendEmptyMessage(MSG_SHOW_UPDATE_PROGRESS_DIALOG);
-				}
-			}
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
-	}
 
 	private void initZigbeeSerialPort() {
 		try {
@@ -362,8 +297,10 @@ public class ZigbeeSerivce extends Service {
 	public void onCreate() {
 		// TODO Auto-generated method stub
 		super.onCreate();
-		initZigbeeSerialPort();
+		Log.i(Tag,"zigbeeservice created!");
 		mApplication = (ZigbeeApplication) getApplicationContext();
+		initZigbeeSerialPort();
+		
 		mZigbeeThread = new ZigbeeThread();
 		mZigbeeThread.setRunFlag(true);
 		mZigbeeThread.start();
@@ -424,6 +361,7 @@ public class ZigbeeSerivce extends Service {
 	@Override
 	public IBinder onBind(Intent arg0) {
 		// TODO Auto-generated method stub
+		Log.i(Tag, "zigbee servcie onbind!");
 		return new ZigbeeBinder();
 	}
 

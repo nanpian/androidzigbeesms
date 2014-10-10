@@ -60,7 +60,7 @@
              android:name="com.rtk.bdtest.service.BDService">
         </service>
         <service 
-            android:name="com.rtk.bdtest.service.ZigbeeService">
+            android:name="com.rtk.bdtest.service.ZigbeeSerivce">
         </service>
     </application>
     

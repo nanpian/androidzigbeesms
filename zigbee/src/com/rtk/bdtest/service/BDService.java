@@ -23,7 +23,7 @@ import android.widget.TextView;
 
 public class BDService extends Service{
 	
-	private static final String TAG = "BDService";
+	private static final String Tag = "BDService";
 	public static final String WRITE_SUCCESS = "00";
 	public static final String CMD_MODE_UPDATE = "80FF";
 	public static final String CMD_HAND_SHAKE = "FE004D0449";
@@ -78,9 +78,14 @@ public class BDService extends Service{
 			switch (msg.what) {
 			case MSG_UPDATE_SELF_GPS:
 				Intent gpsintent = new Intent("com.rtk.bdtest.service.BDService.broadcast");
-				gpsintent.setAction("ACTION_UPDATE_SELF_GPS".toString());
-				gpsintent.putExtra("longitude", defaultLongitude);
-				gpsintent.putExtra("longitude", defaultLatitude);
+				gpsintent.setAction("ACTION_UPDATE_SELF_GPS");
+				String longitude = defaultLatitude.split(",")[2];
+				String latitude = defaultLatitude.split(",")[0];
+				float longitudef = Float.parseFloat(longitude)*0.01f;
+				float latitudef = Float.parseFloat(latitude)*0.01f;
+				gpsintent.putExtra("longitude", longitudef);
+				gpsintent.putExtra("latitude", latitudef);
+				Log.i(Tag,"The longitude is " +longitudef + " The latitude is " +latitudef );
 				sendBroadcast(gpsintent);
 				break;
 			case MSG_SHOW_BD_DATA:
@@ -166,7 +171,7 @@ public class BDService extends Service{
 				}
 				if (len != 0) {
 					String s = new String(bdBuffer);
-					Log.d(TAG, "s = " + s);
+					Log.d(Tag, "s = " + s);
 					if (len > 0) {
 						Message message = handler
 								.obtainMessage(MSG_SHOW_BD_DATA);
@@ -220,11 +225,21 @@ public class BDService extends Service{
 	public void onCreate() {
 		// TODO Auto-generated method stub
 		super.onCreate();
-		initBDSerialPort();
+		Log.i(Tag,"bdservice create");
 		mApplication = (ZigbeeApplication) getApplicationContext();
+		initBDSerialPort();
+		
 		bdThread = new BDThread();
 		bdThread.setRunFlag(true);
 		bdThread.start();
+	}
+	
+	
+
+	@Override
+	public boolean onUnbind(Intent intent) {
+		// TODO Auto-generated method stub
+		return super.onUnbind(intent);
 	}
 
 	@Override
@@ -268,6 +283,7 @@ public class BDService extends Service{
 	@Override
 	public IBinder onBind(Intent arg0) {
 		// TODO Auto-generated method stub
+		Log.i(Tag,"bdservice binded!");
 		return new BDBinder();
 	}
 	
