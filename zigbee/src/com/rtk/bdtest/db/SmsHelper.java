@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class SmsHelper extends SQLiteOpenHelper {
-	//短信数据库
+	//短信数据库 初期版本
 	private final static String DATABASE_NAME="zigbee_db2"; 
 	private final static int DATABASE_VERSION=6;
 	private final static String TABLE_NAME="zigbee_sms"; 
