@@ -63,7 +63,6 @@ public class ZigbeeApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		// ��ʹ�� SDK �����֮ǰ��ʼ�� context ��Ϣ������ ApplicationContext
 		SDKInitializer.initialize(this);
 	}
 

@@ -35,12 +35,18 @@ public class HistoryActivity extends Fragment {
 		Log.d(Tag,Tag+"created!");
 		Bundle bundle = getArguments();
 		boolean isSend = bundle.getBoolean("issend",false);
+		String username = bundle.getString("record_name",null);
 		Log.i(Tag, "The argument issend is " + isSend);
 		List<String> list = new ArrayList<String>();
 		smsHelper = new SmsHelper(getActivity());
 		list.clear();
 		if (isSend) {
-			Cursor cursor = smsHelper.selectsend("true");
+			Cursor cursor = null;
+			if (username != null) {
+				cursor = smsHelper.select(username , "true");
+			} else {
+				cursor = smsHelper.selectsend("true");
+			}
 			if (cursor != null) {
 				while (cursor.moveToNext()) {
 					String name = cursor.getString(1);
@@ -50,7 +56,12 @@ public class HistoryActivity extends Fragment {
 				}
 			}
 		} else {
-			Cursor cursor = smsHelper.selectsend("false");
+			Cursor cursor = null;
+			if (username != null) {
+				cursor = smsHelper.select(username , "false");
+			} else {
+				cursor = smsHelper.selectsend("false");
+			}
 			if (cursor != null) {
 				while (cursor.moveToNext()) {
 					String name = cursor.getString(1);

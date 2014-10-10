@@ -214,11 +214,19 @@ public class FragmentList extends Fragment {
 	};
 	
 	private DbDeviceHelper dbDeviceHelper;
+	private String send;
 	
     @Override  
     public void onActivityCreated(Bundle savedInstanceState) {  
         super.onActivityCreated(savedInstanceState);  
         Log.i(Tag,"FragmentList oncreate");
+        
+        Bundle bundle = getArguments();  
+        Log.i(Tag, "bundle is " +bundle);
+        if(bundle!=null) {
+            send = bundle.getString("send");
+        }
+        
         dbDeviceHelper = new DbDeviceHelper(getActivity());
 		deviceList = (ListView) getActivity().findViewById(R.id.device_list);
 		devices = new ArrayList<Device>();
@@ -231,26 +239,61 @@ public class FragmentList extends Fragment {
 			public void onItemClick(AdapterView<?> arg0, View arg1, int count,
 					long arg3) {
                 Toast.makeText(getActivity(), "The item count" +count+ "is clicked!", Toast.LENGTH_SHORT);
-            	mInput2 = new EditText(getActivity());
-				mInput2.setMaxLines(4);
-				String  name2 = namelist.get(count);
-				AlertDialog dialog2 = new AlertDialog.Builder(getActivity())
-						.setTitle("给"+name2+"发送短信息:")
-						.setView(mInput2)
-						.setPositiveButton("回复",
-								new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										String smstmp = mInput2.getText()
-												.toString();
-										String head  =  null;
-										String sms = head+smstmp;
-										MainActivity.instance.sendSMS(sms);
-									}
-								}).setNegativeButton(R.string.cancel, null)
-						.create();
-				dialog2.show();
+				if (send == null) {
+					mInput2 = new EditText(getActivity());
+					mInput2.setMaxLines(4);
+					String name2 = namelist.get(count);
+					AlertDialog dialog2 = new AlertDialog.Builder(getActivity())
+							.setTitle("给" + name2 + "发送短信息:")
+							.setView(mInput2)
+							.setPositiveButton("回复",
+									new DialogInterface.OnClickListener() {
+										@Override
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											String smstmp = mInput2.getText()
+													.toString();
+											String head = null;
+											String sms = head + smstmp;
+											MainActivity.instance.sendSMS(sms);
+										}
+									}).setNegativeButton(R.string.cancel, null)
+							.create();
+					dialog2.show();
+				} else {
+					if (send.equals("true")) {
+						String name2 = namelist.get(count);
+						Fragment detailFragment = new HistoryActivity();
+						// 从列表页面传递需要的参数到详情页面
+						Bundle mBundle = new Bundle();
+						mBundle.putString("record_name", name2);
+						mBundle.putString("record_send", "true");
+						detailFragment.setArguments(mBundle);
+						final FragmentManager fragmentManager = getActivity()
+								.getSupportFragmentManager();
+						final FragmentTransaction fragmentTransaction = fragmentManager
+								.beginTransaction();
+						fragmentTransaction.replace(R.id.detail_container,
+								detailFragment);
+
+						Toast.makeText(getActivity(), "查找"+name2 +"发送短信息记录", Toast.LENGTH_SHORT);
+					} else {
+						String name2 = namelist.get(count);
+						Fragment detailFragment = new HistoryActivity();
+						Bundle mBundle = new Bundle();
+						mBundle.putString("record_name", name2);
+						mBundle.putString("record_send", "false");
+						detailFragment.setArguments(mBundle);
+						final FragmentManager fragmentManager = getActivity()
+								.getSupportFragmentManager();
+						final FragmentTransaction fragmentTransaction = fragmentManager
+								.beginTransaction();
+						fragmentTransaction.replace(R.id.detail_container,
+								detailFragment);
+						Toast.makeText(getActivity(), "查找"+name2 +"接收短信息记录", Toast.LENGTH_SHORT);
+					}
+				}
                 
                 
 			}

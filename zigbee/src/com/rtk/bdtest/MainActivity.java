@@ -151,6 +151,14 @@ public class MainActivity extends FragmentActivity implements BindActivity.OnBin
 	        final FragmentManager fragmentManager = this.getSupportFragmentManager();  
 	        final FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();  
 	        fragmentTransaction.replace(R.id.detail_container, detailFragment);  
+	        
+	        
+	        Bundle arguments2 = new Bundle();
+			arguments.putString("send", "true");
+	        Fragment listFragment = new FragmentList();  
+	        listFragment.setArguments(arguments2);
+	        fragmentTransaction.replace(R.id.list_container, listFragment);  
+	        
 	        fragmentTransaction.commit();  
 			} break;
 		case R.id.settings3:{
@@ -158,9 +166,17 @@ public class MainActivity extends FragmentActivity implements BindActivity.OnBin
 			arguments2.putBoolean("issend", false);
 	        Fragment detailFragment = new HistoryActivity();  
 	        detailFragment.setArguments(arguments2);
+	        
+	        Bundle arguments3 = new Bundle();
+			arguments3.putString("send"," false");
+	        Fragment listFragment = new FragmentList();  
+	        listFragment.setArguments(arguments3);
+	        
+	        
 	        final FragmentManager fragmentManager = this.getSupportFragmentManager();  
 	        final FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();  
 	        fragmentTransaction.replace(R.id.detail_container, detailFragment);  
+	        fragmentTransaction.replace(R.id.list_container, listFragment);  
 	        fragmentTransaction.commit();  
 			} break;
 		case R.id.settings4:{
