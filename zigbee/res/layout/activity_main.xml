@@ -1,0 +1,39 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    tools:context=".MainActivity2" >
+
+    <fragment
+        android:id="@+id/fragment1"
+        android:name=""
+        android:layout_width="100dip"
+        android:layout_height="match_parent"
+
+        tools:layout="@layout/listview" />
+
+    <View
+        android:id="@+id/view1"
+        android:background="@android:color/background_dark"
+        android:layout_width="2dip"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+         />
+
+  
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="请选择绑定的姓名"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="确定" />
+
+</LinearLayout>

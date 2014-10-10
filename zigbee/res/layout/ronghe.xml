@@ -1,0 +1,39 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    tools:context=".MainActivity2" >
+
+    <fragment
+        android:id="@+id/onlineFragment"
+        android:name=""
+        android:layout_width="100dip"
+        android:layout_height="match_parent"
+
+        tools:layout="@layout/listview" />
+
+    <View
+        android:id="@+id/view1"
+        android:background="@android:color/background_dark"
+        android:layout_width="2dip"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+         />
+    <RelativeLayout 
+            android:layout_width="match_parent"
+    android:layout_height="match_parent"
+        >
+
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="android.support.v4.app.DialogFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true" />
+
+    
+</RelativeLayout>
+
+</LinearLayout>

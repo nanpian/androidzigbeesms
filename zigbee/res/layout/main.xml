@@ -1,0 +1,39 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+    xmlns:tools="http://schemas.android.com/tools"  
+    android:layout_width="match_parent"  
+    android:layout_height="match_parent" >  
+      
+    <!-- 装载列表的Fragment 的容器 -->  
+    <LinearLayout   
+        android:orientation="vertical"
+        android:id="@+id/list_container"  
+        android:layout_width="match_parent"  
+        android:layout_height="match_parent"  
+        android:layout_weight="3">  
+    </LinearLayout>  
+      
+    <View
+        android:id="@+id/view1"
+        android:background="@android:color/background_dark"
+        android:layout_width="2dip"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+         />
+    <!-- 装载详情的Fragment 的容器 -->  
+    <LinearLayout   
+        android:orientation="vertical"
+        android:id="@+id/detail_container"  
+        android:layout_width="match_parent"  
+        android:layout_height="match_parent"  
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/mapinfo"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.0"
+            android:gravity="center"
+            android:text="百度地图显示" />
+    </LinearLayout>
+  
+</LinearLayout>  

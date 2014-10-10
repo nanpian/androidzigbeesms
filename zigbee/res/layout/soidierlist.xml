@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+  android:id="@+id/rlFavorite" 
+  android:layout_width="fill_parent"         
+  android:layout_height="wrap_content" 
+  android:paddingBottom="4dip" 
+  android:paddingLeft="3dip" 
+  android:paddingRight="3dip" 
+ >
+<LinearLayout  android:id="@+id/llFavoriteItem"   android:orientation="horizontal" android:layout_width="fill_parent"  android:layout_height="wrap_content">
+    <TextView
+  		 android:id="@+id/tvClassname" 
+         android:layout_height="wrap_content" 
+         android:layout_width="wrap_content" 
+         android:text=""
+         android:textColor="#000"
+         android:gravity="center"
+         android:textSize="16dip" 
+         android:layout_weight="3" 
+           android:maxWidth="100dip" 
+          />
+     <TextView
+		 android:id="@+id/tvQuestion"
+         android:layout_height="wrap_content" 
+         android:layout_width="wrap_content" 
+         android:text=""
+         android:textColor="#000"
+         android:gravity="center"
+         android:textSize="16dip" 
+         android:layout_weight="3"   
+          android:maxWidth="130dip" 
+          />
+     
+     <!-- 
+      <TextView
+         android:id="@+id/tvPlay"
+         android:layout_height="wrap_content" 
+         android:layout_width="wrap_content" 
+         android:text="播放"
+         android:textColor="#000"
+         android:gravity="center"
+         android:textSize="16dip" 
+         android:layout_weight="1"  
+         />
+          
+       <ImageView
+        android:id="@+id/ivPlay"
+        android:layout_width="32dip"
+        android:layout_height="32dip"
+        android:layout_marginLeft="0dip"       
+       android:contentDescription=""
+       android:src="@drawable/laba"
+         />
+       -->
+        <Button android:text="确定" 
+               android:id="@+id/btnPlay"
+               android:layout_width="40dip"
+      			 android:layout_height="40dip"
+      			 android:textColor="#fffff0"
+               android:background="@drawable/smssdk_btn_disenable"        
+               android:textSize="14dip"         
+              /> 
+
+</LinearLayout>
+</RelativeLayout>
