@@ -34,6 +34,9 @@ import android.widget.EditText;
 import android.widget.LinearLayout;  
 import android.widget.ListView;  
 import android.widget.Toast;
+
+//将zigbee终端id与用户名绑定 
+
 public class BindActivity extends Fragment {  
 
 	    private static final String Tag = "BindActivity";
@@ -79,7 +82,7 @@ public class BindActivity extends Fragment {
 			// TODO Auto-generated method stub
 			mHandler.removeCallbacks(runnableUI);
 			super.onPause();
-			readThread.interrupt();
+			//readThread.interrupt();
 		}
 
 		@Override
@@ -117,9 +120,9 @@ public class BindActivity extends Fragment {
 	        dbDeviceHelper = new DbDeviceHelper(getActivity());
 	        namelist = new ArrayList<String>();  
 	        handler = new Handler();
-	        readThread = new Thread(new Runnable() {
-				@Override
-				public void run() {
+	        //readThread = new Thread(new Runnable() {
+			//	@Override
+			//	public void run() {
 					File SDFile = android.os.Environment.getExternalStorageDirectory();  
 				    String path= SDFile.getAbsolutePath()+File.separator+ "name.txt";
 				    Log.d(Tag,"soldier file path is : " + path);
@@ -151,10 +154,10 @@ public class BindActivity extends Fragment {
 				                e.printStackTrace();
 				        }
 				
-				}  	
-	        }
-	        );
-	        readThread.start();
+		//		}  	
+	     //   }
+	     //   );
+	        //readThread.start();
 	        LinearLayout layout = (LinearLayout) getActivity().findViewById(R.id.detail_container);  
 	          
 	        ListView listView = (ListView) getActivity().findViewById(R.id.fragment_detail);  

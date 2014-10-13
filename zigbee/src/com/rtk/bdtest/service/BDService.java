@@ -157,7 +157,8 @@ public class BDService extends Service{
 		public void run() {
 			while (bIsRunning) {
 				try {
-					Thread.sleep(0);
+				  //Thread.sleep(0);
+					Thread.sleep(10);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -165,6 +166,8 @@ public class BDService extends Service{
 				try {
 					if(mBDInputStream!=null) {
 					    len = mBDInputStream.read(bdBuffer);
+					} else {
+						Log.i(Tag,"mBDInputStream isn null ,len is null");
 					}
 				} catch (IOException e) {
 					e.printStackTrace();

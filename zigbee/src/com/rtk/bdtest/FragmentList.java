@@ -13,6 +13,7 @@ import java.util.List;
 
 import com.rtk.bdtest.adapter.DeviceListAdapter;
 import com.rtk.bdtest.db.DbDeviceHelper;
+import com.rtk.bdtest.db.SmsHelper;
 import com.rtk.bdtest.util.Device;
   
 import android.app.AlertDialog;
@@ -214,7 +215,7 @@ public class FragmentList extends Fragment {
 	};
 	
 	private DbDeviceHelper dbDeviceHelper;
-	private String send;
+	private boolean send;
 	
     @Override  
     public void onActivityCreated(Bundle savedInstanceState) {  
@@ -224,7 +225,10 @@ public class FragmentList extends Fragment {
         Bundle bundle = getArguments();  
         Log.i(Tag, "bundle is " +bundle);
         if(bundle!=null) {
-            send = bundle.getString("send");
+            send = bundle.getBoolean("issend");
+            Log.i(Tag,"the bundle is not null ,and the argement sendi is " + send);
+        } else {
+        	Log.i(Tag,"the bundle is null");
         }
         MainActivity.instance.getselfInfo();
         dbDeviceHelper = new DbDeviceHelper(getActivity());
@@ -238,8 +242,12 @@ public class FragmentList extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int count,
 					long arg3) {
-                Toast.makeText(getActivity(), "The item count" +count+ "is clicked!", Toast.LENGTH_SHORT);
-				if (send == null) {
+				Toast.makeText(getActivity(), "The item count" + count
+						+ "is clicked!", Toast.LENGTH_SHORT);
+				FragmentManager rightfm = getActivity()
+						.getSupportFragmentManager();
+				Fragment rfm = rightfm.findFragmentById(R.id.detail_container);
+				if (rfm instanceof MapActivity) {
 					mInput2 = new EditText(getActivity());
 					mInput2.setMaxLines(4);
 					String name2 = namelist.get(count);
@@ -261,41 +269,69 @@ public class FragmentList extends Fragment {
 									}).setNegativeButton(R.string.cancel, null)
 							.create();
 					dialog2.show();
-				} else {
-					if (send.equals("true")) {
+				} else if (rfm instanceof HistoryActivity) {
+					if (send) {
 						String name2 = namelist.get(count);
-						Fragment detailFragment = new HistoryActivity();
+						//Fragment detailFragment = new HistoryActivity();
+						SmsHelper smsHelper = new SmsHelper(getActivity());
 						// 从列表页面传递需要的参数到详情页面
-						Bundle mBundle = new Bundle();
-						mBundle.putString("record_name", name2);
-						mBundle.putString("record_send", "true");
-						detailFragment.setArguments(mBundle);
-						final FragmentManager fragmentManager = getActivity()
-								.getSupportFragmentManager();
-						final FragmentTransaction fragmentTransaction = fragmentManager
-								.beginTransaction();
-						fragmentTransaction.replace(R.id.detail_container,
-								detailFragment);
-
-						Toast.makeText(getActivity(), "查找"+name2 +"发送短信息记录", Toast.LENGTH_SHORT);
+						//Bundle mBundle = new Bundle();
+						//mBundle.putString("record_name", name2);
+						//mBundle.putString("record_send", "true");
+						//detailFragment.setArguments(mBundle);
+						//final FragmentManager fragmentManager = getActivity()
+						//		.getSupportFragmentManager();
+						//final FragmentTransaction fragmentTransaction = fragmentManager
+						//		.beginTransaction();
+						//fragmentTransaction.replace(R.id.detail_container,
+						//		detailFragment);
+						Cursor cursor = smsHelper.select(name2 , "true");
+						ArrayList<String> list = new ArrayList<String>();
+						list.clear();
+						while (cursor.moveToNext()) {
+							String name = cursor.getString(1);
+							String time = cursor.getString(2);
+							String text = cursor.getString(3);
+							list.add("姓名:" + name + "  时间:" + time + " 内容:" + text);
+						}
+						HistoryActivity rfma = (HistoryActivity)rfm;
+						rfma.selectbyname(list);
+						Toast.makeText(getActivity(), "查找" + name2 + "发送短信息记录",
+								Toast.LENGTH_SHORT).show();
 					} else {
 						String name2 = namelist.get(count);
-						Fragment detailFragment = new HistoryActivity();
-						Bundle mBundle = new Bundle();
-						mBundle.putString("record_name", name2);
-						mBundle.putString("record_send", "false");
-						detailFragment.setArguments(mBundle);
-						final FragmentManager fragmentManager = getActivity()
-								.getSupportFragmentManager();
-						final FragmentTransaction fragmentTransaction = fragmentManager
-								.beginTransaction();
-						fragmentTransaction.replace(R.id.detail_container,
-								detailFragment);
-						Toast.makeText(getActivity(), "查找"+name2 +"接收短信息记录", Toast.LENGTH_SHORT);
+						//Fragment detailFragment = new HistoryActivity();
+						SmsHelper smsHelper = new SmsHelper(getActivity());
+						Cursor cursor = smsHelper.select(name2 , "false");
+						ArrayList<String> list = new ArrayList<String>();
+						list.clear();
+						while (cursor.moveToNext()) {
+							String name = cursor.getString(1);
+							String time = cursor.getString(2);
+							String text = cursor.getString(3);
+							list.add("姓名:" + name + "  时间:" + time + " 内容:" + text);
+						}
+						HistoryActivity rfma = (HistoryActivity)rfm;
+						
+						rfma.selectbyname(list);
+						//Fragment detailFragment = new HistoryActivity();
+						//Bundle mBundle = new Bundle();
+						//mBundle.putString("record_name", name2);
+						//mBundle.putString("record_send", "false");
+						//detailFragment.setArguments(mBundle);
+						//final FragmentManager fragmentManager = getActivity()
+						//		.getSupportFragmentManager();
+						//final FragmentTransaction fragmentTransaction = fragmentManager
+						//		.beginTransaction();
+						//fragmentTransaction.replace(R.id.detail_container,
+						//		detailFragment);
+						Toast.makeText(getActivity(), "查找" + name2 + "接收短信息记录",
+								Toast.LENGTH_SHORT).show();
 					}
+				} else {
+
 				}
-                
-                
+
 			}
 		});
 		Bundle bindbundle = getArguments();

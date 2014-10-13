@@ -55,14 +55,14 @@ public class DeviceListAdapter extends BaseAdapter {
 		holder.id = (TextView) convertView.findViewById(R.id.device_id);
 		holder.parentAddress = (TextView) convertView
 				.findViewById(R.id.parent_address);
-        holder.name.setText("设备名:"+list.get(position).deviceName);
+        holder.name.setText("姓名:"+list.get(position).deviceName);
 
         holder.online.setText("离线");
 		holder.address.setText(context.getString(R.string.device_address)
 				+ list.get(position).deviceAddress);
 		holder.type.setText(context.getString(R.string.device_type)
 				+ list.get(position).deviceType);
-		holder.id.setText(context.getString(R.string.device_id)
+		holder.id.setText("ID:"
 				+ list.get(position).deviceID);
 		holder.parentAddress.setText(context
 				.getString(R.string.device_parent_address)

@@ -9,6 +9,7 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,9 @@ public class HistoryActivity extends Fragment {
 
 	private final static String Tag = "HistoryActivity";
 	private SmsHelper smsHelper;
+	private ArrayAdapter historyAdater;
+	public static  ArrayList<String> list;
+	public static HistoryActivity instance;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -32,12 +36,16 @@ public class HistoryActivity extends Fragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		FragmentManager rightfm = getActivity()
+				.getSupportFragmentManager();
+		instance  = (HistoryActivity) rightfm.findFragmentById(R.id.detail_container);
 		Log.d(Tag,Tag+"created!");
 		Bundle bundle = getArguments();
 		boolean isSend = bundle.getBoolean("issend",false);
 		String username = bundle.getString("record_name",null);
 		Log.i(Tag, "The argument issend is " + isSend);
-		List<String> list = new ArrayList<String>();
+		Log.i(Tag,"The argument name is " + username);
+		list = new ArrayList<String>();
 		smsHelper = new SmsHelper(getActivity());
 		list.clear();
 		if (isSend) {
@@ -97,16 +105,24 @@ public class HistoryActivity extends Fragment {
 
 		LinearLayout layout = (LinearLayout) getActivity().findViewById(
 				R.id.detail_container);
+		
+	   historyAdater = 	new ArrayAdapter(getActivity(),android.R.layout.simple_list_item_1, list);
 
 		ListView listView = (ListView) getActivity().findViewById(
 				R.id.fragment_detail);
-		listView.setAdapter(new ArrayAdapter(getActivity(),
-				android.R.layout.simple_list_item_1, list));
+		listView.setAdapter(historyAdater);
 
-		Configuration configuration = getActivity().getResources()
-				.getConfiguration();
-		int ori = configuration.orientation;
 
+
+	}
+	
+	public void selectbyname ( ArrayList<String> list2) {
+		list.clear();
+		list = (ArrayList<String>) list2.clone();
+		
+		historyAdater.notifyDataSetChanged();
+		Log.i(Tag,"notify the data change because the user click fragmentlist");
+		
 	}
 
 }
