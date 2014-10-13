@@ -67,6 +67,10 @@ public class DeviceListAdapter extends BaseAdapter {
 		holder.parentAddress.setText(context
 				.getString(R.string.device_parent_address)
 				+ list.get(position).parentAddress);
+		//在线和不在线颜色不同
+		if(!(list.get(position).online)){
+		    convertView.setBackgroundColor(this.context.getResources().getColor(R.color.ivory));
+		}
 		return convertView;
 	}
 
