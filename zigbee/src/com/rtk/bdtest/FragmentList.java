@@ -59,6 +59,26 @@ public class FragmentList extends Fragment {
 	public static final int MSG_REDUCE_DEVICE_COUNT = 17;
 	public static boolean isBind = false;
 	
+	public void reduceDeviceCount() {
+		try {
+			if ((null != devices) && (devices.size() > 0)) {
+				for (int i = 0; i < devices.size(); i++) {
+					devices.get(i).count--;
+					if (devices.get(i).count <= 0) {
+						devices.get(i).online = false;
+						adapter.notifyDataSetChanged();
+					}
+				}
+			}
+
+			mHandler.sendEmptyMessageDelayed(MSG_REDUCE_DEVICE_COUNT, 3 * 1000);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+
+	}
+	
 	private  Handler mHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
@@ -68,6 +88,9 @@ public class FragmentList extends Fragment {
         	     Toast toast = Toast.makeText(getActivity(), "没有导入相关战士姓名数据，请导入", 1000);
         	     toast.show();
         	     break;
+			case MSG_REDUCE_DEVICE_COUNT:
+				reduceDeviceCount();
+				break;
 			}
 		}
 		
@@ -87,7 +110,7 @@ public class FragmentList extends Fragment {
 				AlertDialog dialog = new AlertDialog.Builder(getActivity())
 						.setTitle("收到短信息")
 						.setView(mInput)
-						.setPositiveButton("回复",
+						.setPositiveButton("发送",
 								new DialogInterface.OnClickListener() {
 									@Override
 									public void onClick(DialogInterface dialog,
@@ -104,13 +127,37 @@ public class FragmentList extends Fragment {
 			} else if (intent.getAction().equalsIgnoreCase("ACTION_NOTIFY_DEVICE"))  {
 			   String data = intent.getExtras().getString("zigbee_devicelist");
 			   Log.i(Tag,"Receive device notify broadcast"+data);
+			   notifyDeviceList(data) ;
 			}			
 			//notifyDeviceList(data) ;
 		}     
 	};
 
-	
-	public void notifyDeviceList(String data) {
+	public void notifyDeviceList (String data ) {
+		try {
+			if(devices.size()<=0)Toast.makeText(getActivity(), "未导入战士文件或者导入错误", Toast.LENGTH_SHORT);
+			for (int i = 0; i < devices.size(); i++) {
+				if (devices.get(i).deviceID.equals(data.substring(6,
+						10))) {
+					devices.get(i).deviceID = data.substring(10, 14);
+					devices.get(i).deviceType = data.substring(4, 6);
+					devices.get(i).parentAddress = data.substring(14, 18);
+					devices.get(i).online =true;
+					if (devices.get(i).count < 5) {
+						devices.get(i).count++;
+					} else {
+						devices.get(i).count = 5;
+					}
+					adapter.notifyDataSetChanged();
+				}
+			}
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+	}
+	public void notifyDeviceList2(String data) {
 		boolean isContain = false;
 		try {
 			if (devices.size() > 0) {
@@ -346,9 +393,9 @@ public class FragmentList extends Fragment {
 					+ bindbundle + " The bindname is " + bindname
 					+ " The bind id is " + bindid);
 		}
-		Thread readThread = new Thread(new Runnable() {
-			@Override
-			public void run() {
+		//Thread readThread = new Thread(new Runnable() {
+		//	@Override
+		//	public void run() {
 				File SDFile = android.os.Environment
 						.getExternalStorageDirectory();
 				String path = SDFile.getAbsolutePath() + File.separator
@@ -377,9 +424,9 @@ public class FragmentList extends Fragment {
 					e.printStackTrace();
 				}
 
-			}
-		});
-		readThread.start();
+		//	}
+	//	});
+	//	readThread.start();
 		
         /*  
         for(int i=0, count=20; i<count; i++){  
