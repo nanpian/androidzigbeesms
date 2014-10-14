@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;  
 
+import com.rtk.bdtest.adapter.DeviceExpandableListAdapter;
 import com.rtk.bdtest.adapter.DeviceListAdapter;
 import com.rtk.bdtest.db.DbDeviceHelper;
 import com.rtk.bdtest.db.SmsHelper;
@@ -39,6 +40,8 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;  
 import android.widget.ArrayAdapter;  
 import android.widget.EditText;
+import android.widget.ExpandableListView;
+import android.widget.ListAdapter;
 import android.widget.ListView;  
 import android.widget.Toast;  
   
@@ -47,16 +50,16 @@ import android.widget.Toast;
  * @author zhudewei 
  * 
  */  
-public class FragmentList extends Fragment {  
+public class FragmentList2 extends Fragment {  
       
     private List<String> mDataSourceList = new ArrayList<String>();  
     private List<FragmentTransaction> mBackStackList = new ArrayList<FragmentTransaction>();
-	private ListView deviceList;  
+	private ExpandableListView deviceList;  
 	private ArrayList<String> namelist = new ArrayList();
 	private ArrayList<Device> devices;
-	private ArrayList<List<Device>> devicesA;
-	private ArrayList<Device> devicesB;
-	private DeviceListAdapter adapter;
+	private ArrayList<List<Device>> devicesA = new ArrayList<List<Device>>();  //所有的设备A
+	private ArrayList<Device> devicesB = new ArrayList<Device>();  //设备B和C
+	private DeviceExpandableListAdapter adapter;
 	private static final String Tag = "FragmentList";
 	public static final int MSG_REDUCE_DEVICE_COUNT = 17;
 	private static final int MSG_GET_SELF_ID = 18;
@@ -271,7 +274,7 @@ public class FragmentList extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,  
             Bundle savedInstanceState) {  
 		Log.i(Tag,"FragmentList onCreateView");
-        return inflater.inflate(R.layout.fragment_list_layout, container, false);  
+        return inflater.inflate(R.layout.fragment_list_layout2, container, false);  
     }  
 
 	
@@ -314,7 +317,7 @@ public class FragmentList extends Fragment {
     @Override  
     public void onActivityCreated(Bundle savedInstanceState) {  
         super.onActivityCreated(savedInstanceState);  
-        Log.i(Tag,"FragmentList oncreate");
+        Log.i(Tag,"FragmentList2 oncreate");
         
         Bundle bundle = getArguments();  
         Log.i(Tag, "bundle is " +bundle);
@@ -325,109 +328,8 @@ public class FragmentList extends Fragment {
         	Log.i(Tag,"the bundle is null");
         }
         getSelfInfo();
-        dbDeviceHelper = new DbDeviceHelper(getActivity());
-		deviceList = (ListView) getActivity().findViewById(R.id.device_list);
-		devices = new ArrayList<Device>();
-		adapter = new DeviceListAdapter(getActivity(), devices);
-		deviceList.setAdapter(adapter);
-		deviceList.setOnItemClickListener(new OnItemClickListener() {
-			private EditText mInput2;
 
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int count,
-					long arg3) {
-				Toast.makeText(getActivity(), "The item count" + count
-						+ "is clicked!", Toast.LENGTH_SHORT);
-				FragmentManager rightfm = getActivity()
-						.getSupportFragmentManager();
-				Fragment rfm = rightfm.findFragmentById(R.id.detail_container);
-				if (rfm instanceof MapActivity) {
-					mInput2 = new EditText(getActivity());
-					mInput2.setMaxLines(4);
-					String name2 = devices.get(count).deviceName;
-					AlertDialog dialog2 = new AlertDialog.Builder(getActivity())
-							.setTitle("给" + name2 + "发送短信息:")
-							.setView(mInput2)
-							.setPositiveButton("回复",
-									new DialogInterface.OnClickListener() {
-										@Override
-										public void onClick(
-												DialogInterface dialog,
-												int which) {
-											String smstmp = mInput2.getText()
-													.toString();
-											String head = null;
-											String sms = head + smstmp;
-											MainActivity.instance.sendSMS(sms);
-										}
-									}).setNegativeButton(R.string.cancel, null)
-							.create();
-					dialog2.show();
-				} else if (rfm instanceof HistoryActivity) {
-					if (send) {
-						String name2 = namelist.get(count);
-						//Fragment detailFragment = new HistoryActivity();
-						SmsHelper smsHelper = new SmsHelper(getActivity());
-						// 从列表页面传递需要的参数到详情页面
-						//Bundle mBundle = new Bundle();
-						//mBundle.putString("record_name", name2);
-						//mBundle.putString("record_send", "true");
-						//detailFragment.setArguments(mBundle);
-						//final FragmentManager fragmentManager = getActivity()
-						//		.getSupportFragmentManager();
-						//final FragmentTransaction fragmentTransaction = fragmentManager
-						//		.beginTransaction();
-						//fragmentTransaction.replace(R.id.detail_container,
-						//		detailFragment);
-						Cursor cursor = smsHelper.select(name2 , "true");
-						ArrayList<String> list = new ArrayList<String>();
-						list.clear();
-						while (cursor.moveToNext()) {
-							String name = cursor.getString(1);
-							String time = cursor.getString(2);
-							String text = cursor.getString(3);
-							list.add("姓名:" + name + "  时间:" + time + " 内容:" + text);
-						}
-						HistoryActivity rfma = (HistoryActivity)rfm;
-						rfma.selectbyname(list);
-						Toast.makeText(getActivity(), "查找" + name2 + "发送短信息记录",
-								Toast.LENGTH_SHORT).show();
-					} else {
-						String name2 = namelist.get(count);
-						//Fragment detailFragment = new HistoryActivity();
-						SmsHelper smsHelper = new SmsHelper(getActivity());
-						Cursor cursor = smsHelper.select(name2 , "false");
-						ArrayList<String> list = new ArrayList<String>();
-						list.clear();
-						while (cursor.moveToNext()) {
-							String name = cursor.getString(1);
-							String time = cursor.getString(2);
-							String text = cursor.getString(3);
-							list.add("姓名:" + name + "  时间:" + time + " 内容:" + text);
-						}
-						HistoryActivity rfma = (HistoryActivity)rfm;
-						
-						rfma.selectbyname(list);
-						//Fragment detailFragment = new HistoryActivity();
-						//Bundle mBundle = new Bundle();
-						//mBundle.putString("record_name", name2);
-						//mBundle.putString("record_send", "false");
-						//detailFragment.setArguments(mBundle);
-						//final FragmentManager fragmentManager = getActivity()
-						//		.getSupportFragmentManager();
-						//final FragmentTransaction fragmentTransaction = fragmentManager
-						//		.beginTransaction();
-						//fragmentTransaction.replace(R.id.detail_container,
-						//		detailFragment);
-						Toast.makeText(getActivity(), "查找" + name2 + "接收短信息记录",
-								Toast.LENGTH_SHORT).show();
-					}
-				} else {
-
-				}
-
-			}
-		});
+		
 		Bundle bindbundle = getArguments();
 		String bindname =null;
 		String bindid = null;
@@ -470,6 +372,17 @@ public class FragmentList extends Fragment {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+				
+		        Device deviceB1 = new Device();
+		        deviceB1.deviceName = "本机(路由器)";
+		        devicesB.add(deviceB1);
+		        dbDeviceHelper = new DbDeviceHelper(getActivity());
+				deviceList = (ExpandableListView) getActivity().findViewById(R.id.groupdevice);
+				devices = new ArrayList<Device>();
+				devicesA.add(devices);
+				adapter = new DeviceExpandableListAdapter(getActivity(), devicesB,devicesA);
+				deviceList.setAdapter(adapter);
+				
 				reduceDeviceCount();
           
     }  

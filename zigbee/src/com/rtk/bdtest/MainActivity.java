@@ -90,7 +90,7 @@ public class MainActivity extends FragmentActivity implements
 		if (!bdsuccess)Log.i(Tag,"bind bd failed");
 		if(!zgibeesucess)Log.i(Tag,"bind zigbee failed");
 
-		Fragment listFragment = new FragmentList();
+		Fragment listFragment = new FragmentList2();
 
 		FragmentManager fragmentManager = getSupportFragmentManager();
 		FragmentTransaction fragmentTransaction = fragmentManager
