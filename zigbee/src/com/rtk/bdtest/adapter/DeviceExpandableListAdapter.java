@@ -42,7 +42,13 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 
 	@Override
 	public int getChildrenCount(int groupPosition) {
-		return listA.get(groupPosition).size();
+		try {
+			if(groupPosition>= listB.size()) return 0 ;
+			return listA.get(groupPosition).size();
+		} catch (Exception e ) {
+			return 0 ;
+		}
+
 	}
 
 	@Override
@@ -52,6 +58,7 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 
 	@Override
 	public Object getChild(int groupPosition, int childPosition) {
+		if(groupPosition >=listB.size()) return 0;
 		return listA.get(groupPosition).get(childPosition);
 	}
 
@@ -101,7 +108,7 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 		// 在线和不在线颜色不同
 		if (!(listB.get(groupPosition).online)) {
 			convertView.setBackgroundColor(this.context.getResources()
-					.getColor(R.color.ivory));
+					.getColor(R.color.red));
 		} else {
 			convertView.setBackgroundColor(this.context.getResources()
 					.getColor(R.color.green));
@@ -143,7 +150,7 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 		// 在线和不在线颜色不同
 		if (!(listA.get(groupPosition).get(childPosition).online)) {
 			convertView.setBackgroundColor(this.context.getResources()
-					.getColor(R.color.ivory));
+					.getColor(R.color.red));
 		} else {
 			convertView.setBackgroundColor(this.context.getResources()
 					.getColor(R.color.green));

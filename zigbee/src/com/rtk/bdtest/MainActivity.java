@@ -46,6 +46,11 @@ public class MainActivity extends FragmentActivity implements
 		zigbeeService.sendsms2Zigbee(sms);
 	}
 	
+	public void sendData2Zigbee(byte[] hexStringToBytes) {
+		Log.i(Tag, "send data2 zigbee!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+		zigbeeService.sendData2Zigbee(hexStringToBytes);
+	}
+	
 	void getselfInfo() {
 		Log.i(Tag ,  "get self data");
 		if(zigbeeService!= null ) {
@@ -188,7 +193,7 @@ public class MainActivity extends FragmentActivity implements
 			fragmentTransaction.replace(R.id.detail_container, detailFragment);
 
 
-			Fragment listFragment = new FragmentList();
+			Fragment listFragment = new FragmentList2();
 			listFragment.setArguments(arguments);
 			fragmentTransaction.replace(R.id.list_container, listFragment);
 
@@ -202,7 +207,7 @@ public class MainActivity extends FragmentActivity implements
 			detailFragment.setArguments(arguments2);
 
 			
-			Fragment listFragment = new FragmentList();
+			Fragment listFragment = new FragmentList2();
 			listFragment.setArguments(arguments2);
 
 			final FragmentManager fragmentManager = this
@@ -225,7 +230,7 @@ public class MainActivity extends FragmentActivity implements
 		}
 			break;
 		case R.id.settings5: {
-			Fragment detailFragment = new MainActivity2();
+			Fragment detailFragment = new TestActivity();
 			final FragmentManager fragmentManager = this
 					.getSupportFragmentManager();
 			final FragmentTransaction fragmentTransaction = fragmentManager
@@ -264,5 +269,7 @@ public class MainActivity extends FragmentActivity implements
 		}
 		return true;
 	}
+
+
 
 }

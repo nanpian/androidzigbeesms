@@ -41,6 +41,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;  
 import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.ListAdapter;
 import android.widget.ListView;  
 import android.widget.Toast;  
@@ -314,78 +315,181 @@ public class FragmentList2 extends Fragment {
 	private DbDeviceHelper dbDeviceHelper;
 	private boolean send;
 	
-    @Override  
-    public void onActivityCreated(Bundle savedInstanceState) {  
-        super.onActivityCreated(savedInstanceState);  
-        Log.i(Tag,"FragmentList2 oncreate");
-        
-        Bundle bundle = getArguments();  
-        Log.i(Tag, "bundle is " +bundle);
-        if(bundle!=null) {
-            send = bundle.getBoolean("issend");
-            Log.i(Tag,"the bundle is not null ,and the argement sendi is " + send);
-        } else {
-        	Log.i(Tag,"the bundle is null");
-        }
-        getSelfInfo();
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		Log.i(Tag, "FragmentList2 oncreate");
 
-		
-		Bundle bindbundle = getArguments();
-		String bindname =null;
-		String bindid = null;
-		if(bindbundle!=null) {
-		    bindname = bindbundle.getString("name");
-		    bindid = bindbundle.getString("bindid");
+		Bundle bundle = getArguments();
+		Log.i(Tag, "bundle is " + bundle);
+		if (bundle != null) {
+			send = bundle.getBoolean("issend");
+			Log.i(Tag, "the bundle is not null ,and the argement sendi is "
+					+ send);
+		} else {
+			Log.i(Tag, "the bundle is null");
 		}
-		if((bindbundle!=null) && (bindname!=null) && (bindid!=null)) {
+		getSelfInfo();
+
+		Bundle bindbundle = getArguments();
+		String bindname = null;
+		String bindid = null;
+		if (bindbundle != null) {
+			bindname = bindbundle.getString("name");
+			bindid = bindbundle.getString("bindid");
+		}
+		if ((bindbundle != null) && (bindname != null) && (bindid != null)) {
 			Log.i(Tag, "Get argument from bindfragment, the bundle is "
 					+ bindbundle + " The bindname is " + bindname
 					+ " The bind id is " + bindid);
 		}
-		//Thread readThread = new Thread(new Runnable() {
-		//	@Override
-		//	public void run() {
-				File SDFile = android.os.Environment
-						.getExternalStorageDirectory();
-				String path = SDFile.getAbsolutePath() + File.separator
-						+ "name.txt";
-				Log.d(Tag, "soldier file path is : " + path);
-				try {
-					FileInputStream fileIS = new FileInputStream(path);
-					BufferedReader buf = new BufferedReader(
-							new InputStreamReader(fileIS, "GB2312"));
-					String readString = new String();
-					namelist.clear();
-					while ((readString = buf.readLine()) != null) {
-						Log.d(Tag, "line: " + readString);
-						namelist.add(readString);
+		// Thread readThread = new Thread(new Runnable() {
+		// @Override
+		// public void run() {
+		File SDFile = android.os.Environment.getExternalStorageDirectory();
+		String path = SDFile.getAbsolutePath() + File.separator + "name.txt";
+		Log.d(Tag, "soldier file path is : " + path);
+		try {
+			FileInputStream fileIS = new FileInputStream(path);
+			BufferedReader buf = new BufferedReader(new InputStreamReader(
+					fileIS, "GB2312"));
+			String readString = new String();
+			namelist.clear();
+			while ((readString = buf.readLine()) != null) {
+				Log.d(Tag, "line: " + readString);
+				namelist.add(readString);
+			}
+			if (namelist.size() != 0) {
+				mHandler.post(runnableUI);
+			}
+			fileIS.close();
+		} catch (FileNotFoundException e) {
+			Message msg = new Message();
+			msg.what = 3;
+			mHandler.sendMessage(msg);
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		Device deviceB1 = new Device();
+		deviceB1.deviceName = "本机(路由器)";
+		devicesB.add(deviceB1);
+		Device deviceB2 = new Device();
+		deviceB2.deviceName = "路由器2";
+		devicesB.add(deviceB2);
+		Device deviceC1 = new Device();
+		deviceC1.deviceName = "协调器1";
+		devicesB.add(deviceC1);
+		dbDeviceHelper = new DbDeviceHelper(getActivity());
+		deviceList = (ExpandableListView) getActivity().findViewById(
+				R.id.groupdevice);
+		devices = new ArrayList<Device>();
+		devicesA.add(devices);
+		adapter = new DeviceExpandableListAdapter(getActivity(), devicesB,
+				devicesA);
+		deviceList.setAdapter(adapter);
+		deviceList.setOnGroupClickListener(new OnGroupClickListener() {
+			private EditText mInput2;
+
+			@Override
+			public boolean onGroupClick(ExpandableListView parent, View v,
+					int groupPosition, long id) {
+
+				Toast.makeText(getActivity(), "The B device count "
+						+ groupPosition + "is clicked! and the name is "
+						+ devicesB.get(groupPosition).deviceName,
+						Toast.LENGTH_SHORT);
+				FragmentManager rightfm = getActivity()
+						.getSupportFragmentManager();
+				Fragment rfm = rightfm.findFragmentById(R.id.detail_container);
+				if (rfm instanceof MapActivity) {
+					mInput2 = new EditText(getActivity());
+					mInput2.setMaxLines(4);
+					String name2 = devicesB.get(groupPosition).deviceName;
+					AlertDialog dialog2 = new AlertDialog.Builder(getActivity())
+							.setTitle("给" + name2 + "发送短信息:")
+							.setView(mInput2)
+							.setPositiveButton("回复",
+									new DialogInterface.OnClickListener() {
+										@Override
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											String smstmp = mInput2.getText()
+													.toString();
+											String head = null;
+											String sms = head + smstmp;
+											MainActivity.instance.sendSMS(sms);
+										}
+									}).setNegativeButton(R.string.cancel, null)
+							.create();
+					if(!(groupPosition==0)){
+					    dialog2.show();
 					}
-					if (namelist.size() != 0) {
-						mHandler.post(runnableUI);
+				} else if (rfm instanceof HistoryActivity) {
+					
+					if (send) {
+						String name2 = devicesB.get(groupPosition).deviceName;
+						// Fragment detailFragment = new HistoryActivity();
+						SmsHelper smsHelper = new SmsHelper(getActivity());
+						// 从列表页面传递需要的参数到详情页面
+						// Bundle mBundle = new Bundle();
+						// mBundle.putString("record_name", name2);
+						// mBundle.putString("record_send", "true");
+						// detailFragment.setArguments(mBundle);
+						// final FragmentManager fragmentManager = getActivity()
+						// .getSupportFragmentManager();
+						// final FragmentTransaction fragmentTransaction =
+						// fragmentManager
+						// .beginTransaction();
+						// fragmentTransaction.replace(R.id.detail_container,
+						// detailFragment);
+						Cursor cursor = smsHelper.select(name2, "true");
+						ArrayList<String> list = new ArrayList<String>();
+						list.clear();
+						while (cursor.moveToNext()) {
+							String name = cursor.getString(1);
+							String time = cursor.getString(2);
+							String text = cursor.getString(3);
+							list.add("姓名:" + name + "  时间:" + time + " 内容:"
+									+ text);
+						}
+						HistoryActivity rfma = (HistoryActivity) rfm;
+						rfma.selectbyname(list);
+						Toast.makeText(getActivity(), "查找" + name2 + "发送短信息记录",
+								Toast.LENGTH_SHORT).show();
+					} else {
+						String name2 = devicesB.get(groupPosition).deviceName;
+						// Fragment detailFragment = new HistoryActivity();
+						SmsHelper smsHelper = new SmsHelper(getActivity());
+						Cursor cursor = smsHelper.select(name2, "false");
+						ArrayList<String> list = new ArrayList<String>();
+						list.clear();
+						while (cursor.moveToNext()) {
+							String name = cursor.getString(1);
+							String time = cursor.getString(2);
+							String text = cursor.getString(3);
+							list.add("姓名:" + name + "  时间:" + time + " 内容:"
+									+ text);
+						}
+						HistoryActivity rfma = (HistoryActivity) rfm;
+
+						rfma.selectbyname(list);
+ 
+						Toast.makeText(getActivity(), "查找" + name2 + "接收短信息记录",
+								Toast.LENGTH_SHORT).show();
 					}
-					fileIS.close();
-				} catch (FileNotFoundException e) {
-					Message msg = new Message();
-					msg.what = 3;
-					mHandler.sendMessage(msg);
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
+					return true;  //不弹出子设备列表
+				} else {
+                        
 				}
-				
-		        Device deviceB1 = new Device();
-		        deviceB1.deviceName = "本机(路由器)";
-		        devicesB.add(deviceB1);
-		        dbDeviceHelper = new DbDeviceHelper(getActivity());
-				deviceList = (ExpandableListView) getActivity().findViewById(R.id.groupdevice);
-				devices = new ArrayList<Device>();
-				devicesA.add(devices);
-				adapter = new DeviceExpandableListAdapter(getActivity(), devicesB,devicesA);
-				deviceList.setAdapter(adapter);
-				
-				reduceDeviceCount();
-          
-    }  
+				return false;
+			}
+		});
+		reduceDeviceCount();
+
+	}
       
     /** 
      *  

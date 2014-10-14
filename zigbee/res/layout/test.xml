@@ -1,0 +1,56 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".MainActivity" >
+
+    <Button
+        android:id="@+id/get_bd_version_btn"
+        android:visibility="gone"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="@string/get_bd_version" />
+
+    <TextView
+        android:id="@+id/bd_version_tv"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <Button 
+        android:id="@+id/firmware_update_btn"
+        android:layout_width="200dp"
+        android:visibility="gone"
+        android:layout_height="wrap_content"
+        android:text="@string/update_firmware"/>
+    <Button 
+        android:id="@+id/write_id"
+        android:layout_gravity="center"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="@string/write_id"/>
+    <Button 
+        android:id="@+id/get_firmware_info"
+        android:visibility="gone"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="@string/get_firmware_info"/>
+    <Button 
+        android:id="@+id/request_join"
+        android:layout_gravity="center"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="@string/request_join"/>
+
+      <Button 
+        android:id="@+id/sendmessage"
+        android:layout_gravity="center"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="发送信息"/>
+
+</LinearLayout>
