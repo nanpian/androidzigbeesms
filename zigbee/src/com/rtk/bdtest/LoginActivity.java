@@ -51,7 +51,7 @@ public class LoginActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.login);
+		setContentView(R.layout.login2);
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
