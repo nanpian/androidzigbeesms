@@ -121,6 +121,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener{
 		@Override
 		public void onReceive(Context arg0, Intent gpsIntent) {
 			// 收到gps intent以后，发给gps刷新handler，ui显示
+			Log.i(Tag,"the action is !!!!");
 			if (gpsIntent.getAction().equals("ACTION_UPDATE_SELF_GPS")) {
 				String id = ""; // 得到gps所属的id
 				float longitude = gpsIntent.getExtras().getFloat("longitude");

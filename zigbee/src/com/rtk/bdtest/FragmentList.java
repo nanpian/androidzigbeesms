@@ -57,6 +57,7 @@ public class FragmentList extends Fragment {
 	private DeviceListAdapter adapter;
 	private static final String Tag = "FragmentList";
 	public static final int MSG_REDUCE_DEVICE_COUNT = 17;
+	private static final int MSG_GET_SELF_ID = 18;
 	public static boolean isBind = false;
 	
 	public void reduceDeviceCount() {
@@ -71,7 +72,7 @@ public class FragmentList extends Fragment {
 				}
 			}
 
-			mHandler.sendEmptyMessageDelayed(MSG_REDUCE_DEVICE_COUNT, 3 * 1000);
+			mHandler.sendEmptyMessageDelayed(MSG_REDUCE_DEVICE_COUNT, 5 * 1000);
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
@@ -91,6 +92,9 @@ public class FragmentList extends Fragment {
 			case MSG_REDUCE_DEVICE_COUNT:
 				reduceDeviceCount();
 				break;
+			case MSG_GET_SELF_ID:
+			    getSelfInfo();
+			    break;
 			}
 		}
 		
@@ -102,6 +106,7 @@ public class FragmentList extends Fragment {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			// TODO Auto-generated method stub
+			Log.i(Tag, "Receive intent and the action is " +intent.getAction());
 			if(intent.getAction().equalsIgnoreCase("ACTION_ZIGBEE_SMS")) { 
 				String data = intent.getExtras().getString("zigbee_sms");
 				Log.i(Tag, "Receive sms broadcast" + data);
@@ -124,14 +129,45 @@ public class FragmentList extends Fragment {
 								}).setNegativeButton(R.string.cancel, null)
 						.create();
 				dialog.show();
-			} else if (intent.getAction().equalsIgnoreCase("ACTION_NOTIFY_DEVICE"))  {
+			} else if (intent.getAction().equals("ACTION_NOTIFY_DEVICE"))  {
 			   String data = intent.getExtras().getString("zigbee_devicelist");
 			   Log.i(Tag,"Receive device notify broadcast"+data);
 			   notifyDeviceList(data) ;
-			}			
+			} else if (intent.getAction().equals("ACTION_GET_SELF_INFO"))	{
+				   String data = intent.getExtras().getString("self_data");
+				   Log.i(Tag,"Receive get self info  intent , the data is "+data);
+
+                   notifyDeviceB1(data);
+				   
+			} else {
+				
+			}
 			//notifyDeviceList(data) ;
 		}     
 	};
+	
+	private void notifyDeviceB1(String data) {
+		boolean isContain = false;
+		Device deviceB = new Device();
+		deviceB.deviceName = "路由设备" + data.substring(4, 8);
+		deviceB.deviceID = data.substring(8, 12);
+		deviceB.online = true;
+		deviceB.count = 5;
+		for (int i = 0; i < devices.size(); i++) {
+			if (devices.get(i).deviceID != null) {
+				if (devices.get(i).deviceID.equals(deviceB.deviceID)) {
+					isContain = true;
+						devices.get(i).count = 5;
+				}
+			}
+		}
+
+		if (!isContain) {
+			Device device = new Device();
+			device.count = 5;
+			devices.add(deviceB);
+		}
+	}
 
 	public void notifyDeviceList (String data ) {
 		try {
@@ -142,7 +178,7 @@ public class FragmentList extends Fragment {
 					devices.get(i).deviceID = data.substring(10, 14);
 					devices.get(i).deviceType = data.substring(4, 6);
 					devices.get(i).parentAddress = data.substring(14, 18);
-					devices.get(i).online =true;
+					devices.get(i).online =false;
 					if (devices.get(i).count < 5) {
 						devices.get(i).count++;
 					} else {
@@ -196,6 +232,12 @@ public class FragmentList extends Fragment {
 			e.printStackTrace();
 		}
 	}
+	
+	void  getSelfInfo( ) {
+		 MainActivity.instance.getselfInfo();
+		 Log.i(Tag, "get self address and is!");
+		 mHandler.sendEmptyMessageDelayed(MSG_GET_SELF_ID, 10 * 1000);
+	}
   
   
     @Override
@@ -204,6 +246,7 @@ public class FragmentList extends Fragment {
     	Log.i(Tag,"FragmentList onpause");
 		super.onPause();
 		mHandler.removeCallbacks(runnableUI);
+
 		getActivity().unregisterReceiver(receiver);
 		
 	}
@@ -215,7 +258,9 @@ public class FragmentList extends Fragment {
 		Log.i(Tag,"FragmentList onresume");
 		super.onResume();
 		mHandler.post(runnableUI);
-		IntentFilter filter = new IntentFilter("com.rtk.bdtest.service.ZigbeeService.broadcast");
+		IntentFilter filter = new IntentFilter("com.rtk.bdtest.service.ZigbeeService.broadcast2");
+		filter.addAction("ACTION_GET_SELF_INFO");
+		filter.addAction("ACTION_NOTIFY_DEVICE");
 		getActivity().registerReceiver(receiver, filter);
 	}
 
@@ -252,7 +297,7 @@ public class FragmentList extends Fragment {
 						Log.i(Tag,"no data from database!");
 					}
 					devicetmp.deviceName = nametmp1;
-					devicetmp.online = false;
+					//devicetmp.online = false;
 					devices.add(devicetmp);
 				}
 			}
@@ -277,7 +322,7 @@ public class FragmentList extends Fragment {
         } else {
         	Log.i(Tag,"the bundle is null");
         }
-        MainActivity.instance.getselfInfo();
+        getSelfInfo();
         dbDeviceHelper = new DbDeviceHelper(getActivity());
 		deviceList = (ListView) getActivity().findViewById(R.id.device_list);
 		devices = new ArrayList<Device>();
@@ -297,7 +342,7 @@ public class FragmentList extends Fragment {
 				if (rfm instanceof MapActivity) {
 					mInput2 = new EditText(getActivity());
 					mInput2.setMaxLines(4);
-					String name2 = namelist.get(count);
+					String name2 = devices.get(count).deviceName;
 					AlertDialog dialog2 = new AlertDialog.Builder(getActivity())
 							.setTitle("给" + name2 + "发送短信息:")
 							.setView(mInput2)
@@ -423,52 +468,7 @@ public class FragmentList extends Fragment {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-
-		//	}
-	//	});
-	//	readThread.start();
-		
-        /*  
-        for(int i=0, count=20; i<count; i++){  
-        	if(i%2==0) {
-            mDataSourceList.add("战士设备" + i + "        在线");  
-        	} else 
-        	{
-            mDataSourceList.add("战士设备" + i + "        离线");  
-        	}
-        }  
-        
-        ListView listView = (ListView) getActivity().findViewById(R.id.fragment_list);  
-        listView.setAdapter(new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, mDataSourceList));  
-          
-        listView.setOnItemClickListener(new OnItemClickListener() {  
-  
-            @Override  
-            public void onItemClick(AdapterView<?> parent, View view,  
-                    int position, long id) {  
-                Fragment detailFragment = new FragmentDetail();  
-               
-                Bundle mBundle = new Bundle();  
-                mBundle.putString("arg", mDataSourceList.get(position));  
-                detailFragment.setArguments(mBundle);  
-                  
-                final FragmentManager fragmentManager = getActivity().getSupportFragmentManager();  
-                final FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();  
-                  
-                Configuration configuration = getActivity().getResources().getConfiguration();  
-                int ori = configuration.orientation;  
-                  
-                fragmentTransaction.replace(R.id.detail_container, detailFragment);  
-                  
-                if(ori == configuration.ORIENTATION_PORTRAIT){  
-                    fragmentTransaction.addToBackStack(null);  
-                }  
-                  
-                fragmentTransaction.commit();  
-                  
-                  
-            }  
-        });  */
+				reduceDeviceCount();
           
     }  
       
@@ -485,6 +485,8 @@ public class FragmentList extends Fragment {
 	public void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
+		mHandler.removeMessages(MSG_GET_SELF_ID);
+		mHandler.removeMessages(MSG_REDUCE_DEVICE_COUNT);
 	}
 
 

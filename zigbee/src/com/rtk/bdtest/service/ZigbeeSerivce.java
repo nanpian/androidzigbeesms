@@ -68,6 +68,7 @@ public class ZigbeeSerivce extends Service {
 	public static final int MSG_REDUCE_DEVICE_COUNT = 17;
 	private static final int MSG_SEND_SMS = 18;
 	private static final int MSG_SEND_GPS_TOALL = 19;
+	private static final int MSG_GET_SELF_INFO = 20;
 
 	public static final int crcStartIndex = 90;
 	public static final int crcLength = 4;
@@ -174,6 +175,13 @@ public class ZigbeeSerivce extends Service {
 				break;
 			case MSG_SEND_LOCATION_TO_ZIGBEE:
 				break;
+			case MSG_GET_SELF_INFO:
+				Intent intent1 = new Intent("com.rtk.bdtest.service.ZigbeeService.broadcast2");
+				intent1.setAction(("ACTION_GET_SELF_INFO").toString());
+				intent1.putExtra("self_data", msg.obj.toString());
+				sendBroadcast(intent1);
+				Log.i(Tag,"send!!!!data!!!!");
+				break;
 			case MSG_NOTIFY_DEVICE_LIST:
 			{  
 				//收到刷新用户设备列表信息，发送广播给activity
@@ -215,7 +223,12 @@ public class ZigbeeSerivce extends Service {
 			message.obj = data;
 			handler.sendMessage(message);
 		} else if (data.length() == 16) {
-			data.substring(4, 8);
+			// make route id and address
+			//data.substring(4, 8);
+			Log.i(Tag,"send data !!!!");
+			Message message = handler.obtainMessage(MSG_GET_SELF_INFO);
+			message.obj = data;
+			handler.sendMessage(message);
 		} else if (data.substring(0, 2).equals(3003))  {
 			//收到短信息处理！
 			String smsReceive = data.substring(24, data.length());
@@ -267,7 +280,7 @@ public class ZigbeeSerivce extends Service {
 				}
 				if (len > 0) {
 					String receivedData = CharConverter.byteToHexString(zigbeeBuffer, len);
-					Log.d(TAG, "zigbee data = " + receivedData);
+					Log.d(TAG, "zigbee data = " + receivedData + "    The length is " + receivedData.length());
 					handleData(receivedData, zigbeeBuffer);
 					}
 				}

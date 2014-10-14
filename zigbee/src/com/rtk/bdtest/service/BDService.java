@@ -86,7 +86,7 @@ public class BDService extends Service{
 				gpsintent.putExtra("longitude", longitudef);
 				gpsintent.putExtra("latitude", latitudef);
 				Log.i(Tag,"The longitude is " +longitudef + " The latitude is " +latitudef );
-				sendBroadcast(gpsintent);
+			    sendBroadcast(gpsintent);
 				break;
 			case MSG_SHOW_BD_DATA:
 				if (null != mBDInfo)

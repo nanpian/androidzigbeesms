@@ -56,8 +56,11 @@ public class DeviceListAdapter extends BaseAdapter {
 		holder.parentAddress = (TextView) convertView
 				.findViewById(R.id.parent_address);
         holder.name.setText("姓名:"+list.get(position).deviceName);
-
-        holder.online.setText("离线");
+        if((list.get(position)!=null)&&(list.get(position).online)) {
+        	holder.online.setText("在线");
+        } else {
+        	holder.online.setText("离线");
+        }       
 		holder.address.setText(context.getString(R.string.device_address)
 				+ list.get(position).deviceAddress);
 		holder.type.setText(context.getString(R.string.device_type)
@@ -70,6 +73,8 @@ public class DeviceListAdapter extends BaseAdapter {
 		//在线和不在线颜色不同
 		if(!(list.get(position).online)){
 		    convertView.setBackgroundColor(this.context.getResources().getColor(R.color.ivory));
+		} else {
+			convertView.setBackgroundColor(this.context.getResources().getColor(R.color.green));
 		}
 		return convertView;
 	}
