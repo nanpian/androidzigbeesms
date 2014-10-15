@@ -1,5 +1,7 @@
 package com.rtk.bdtest.util;
 
+import com.baidu.mapapi.map.Marker;
+
 public class Device {
 	public String deviceName;
 	public String deviceAddress;
@@ -10,5 +12,6 @@ public class Device {
 	public boolean online;
 	public float jingdu;
 	public float weidu;
+	public Marker gpsMarker;
 	
 }

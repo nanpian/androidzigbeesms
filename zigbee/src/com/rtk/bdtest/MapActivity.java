@@ -156,6 +156,18 @@ public class MapActivity extends Fragment implements MKOfflineMapListener{
         					String latitude = gps.split(",")[0];
         					gpsdevices.get(i).jingdu = Float.parseFloat(longitude)*0.01f;
         					gpsdevices.get(i).weidu = Float.parseFloat(latitude)*0.01f;
+    						LatLng jw = new LatLng(gpsdevices.get(i).jingdu, gpsdevices.get(i).weidu);
+        					if(gpsdevices.get(i).gpsMarker!=null) {
+        						gpsdevices.get(i).gpsMarker.setPosition(jw);
+        					} else {
+        						OverlayOptions ooA = new MarkerOptions().position(jw).icon(bdA)
+        								.zIndex(9).draggable(true);
+        						Marker markertmp;
+        						markertmp = (Marker) (mBaiduMap.addOverlay(ooA));
+        						gpsdevices.get(i).gpsMarker = mMarkerA;
+        					}
+        				} else {
+        					//设备没在设备列表里
         				}
         			}
         		}
@@ -234,6 +246,21 @@ public class MapActivity extends Fragment implements MKOfflineMapListener{
 					LatLng ll = marker.getPosition();
 					mInfoWindow = new InfoWindow(button, ll, -47);
 					mBaiduMap.showInfoWindow(mInfoWindow);
+				} else if (gpsdevices.size()>0) {
+					for (int i =0; i <gpsdevices.size(); i++) {
+						if (marker == gpsdevices.get(i).gpsMarker) {
+							button.setText("动态gps点");
+							button.setOnClickListener(new OnClickListener() {
+								public void onClick(View v) {
+									marker.remove();
+									mBaiduMap.hideInfoWindow();
+								}
+							});
+							LatLng ll = marker.getPosition();
+							mInfoWindow = new InfoWindow(button, ll, -47);
+						}
+					}
+
 				}
 				return true;
 			}
