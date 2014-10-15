@@ -1,5 +1,7 @@
 package com.rtk.bdtest;
 
+import java.util.ArrayList;
+
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
@@ -21,6 +23,7 @@ import com.baidu.mapapi.map.offline.MKOLSearchRecord;
 import com.baidu.mapapi.map.offline.MKOLUpdateElement;
 import com.baidu.mapapi.map.offline.MKOfflineMap;
 import com.baidu.mapapi.map.offline.MKOfflineMapListener;
+import com.rtk.bdtest.util.Device;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -30,6 +33,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,6 +62,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener{
 	private static int count  = 0;
 	//默认南京经纬度
 	private static float[] jingwei = {32.03f , 118.46f};
+	public  ArrayList<Device> gpsdevices;
 
 	static BitmapDescriptor bdA = BitmapDescriptorFactory
 			.fromResource(R.drawable.icon_marka);
@@ -121,7 +126,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener{
 		@Override
 		public void onReceive(Context arg0, Intent gpsIntent) {
 			// 收到gps intent以后，发给gps刷新handler，ui显示
-			Log.i(Tag,"the action is !!!!");
+			Log.i(Tag,"the action is !!!!" + gpsIntent.getAction());
 			if (gpsIntent.getAction().equals("ACTION_UPDATE_SELF_GPS")) {
 				String id = ""; // 得到gps所属的id
 				float longitude = gpsIntent.getExtras().getFloat("longitude");
@@ -134,8 +139,28 @@ public class MapActivity extends Fragment implements MKOfflineMapListener{
 				gpsMessage.obj = jingwei;
 				gpsHandler.sendMessage(gpsMessage);
 				
-			} else if (gpsIntent.getAction().equals("ACTION_UPDATE_OTHERS_GPS")) {
-
+			} else if (gpsIntent.getAction().equals("ACTION_UPDATE_GPS_INFO")) {
+                String jingweidu = gpsIntent.getExtras().getString("gps");
+                String deviceAddress = jingweidu.substring(0,2);
+                String gps = jingweidu.substring(2);
+        		FragmentManager rightfm = getActivity()
+        				.getSupportFragmentManager();
+        		Fragment lfm = rightfm.findFragmentById(R.id.list_container);
+        		if (lfm instanceof FragmentList2) {
+        			//得到B和C设备列表
+        			gpsdevices = ((FragmentList2) lfm).devices;
+        			for(int i = 0 ; i<gpsdevices.size(); i ++) {
+        				if(gpsdevices.get(i).deviceAddress.equals(deviceAddress)) {
+        					gpsdevices.get(i).deviceAddress = deviceAddress;
+        					String longitude = gps.split(",")[2];
+        					String latitude = gps.split(",")[0];
+        					gpsdevices.get(i).jingdu = Float.parseFloat(longitude)*0.01f;
+        					gpsdevices.get(i).weidu = Float.parseFloat(latitude)*0.01f;
+        				}
+        			}
+        		}
+        		//刷新所有marker点的gps经纬度信息
+        		
 			}
 		}
 
@@ -273,6 +298,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener{
 		super.onResume();
 		IntentFilter filter = new IntentFilter("com.rtk.bdtest.service.BDService.broadcast");
 		filter.addAction("ACTION_UPDATE_SELF_GPS");
+		filter.addAction("ACTION_UPDATE_GPS_INFO");
 		getActivity().registerReceiver(receiver, filter);
 		gpsHandler.postDelayed(gpsselfRunnable, 1000);
 	}

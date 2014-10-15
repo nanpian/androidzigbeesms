@@ -61,6 +61,7 @@ public class FragmentList extends Fragment {
 	public static final int MSG_REDUCE_DEVICE_COUNT = 17;
 	private static final int MSG_GET_SELF_ID = 18;
 	public static boolean isBind = false;
+	public static String padaddress="";
 	
 	public void reduceDeviceCount() {
 		try {
@@ -151,7 +152,7 @@ public class FragmentList extends Fragment {
 	private void notifyDeviceB1(String data) {
 		boolean isContain = false;
 		Device deviceB = new Device();
-		deviceB.deviceName = "路由设备" + data.substring(4, 8);
+		deviceB.deviceName = "路由设备" + padaddress;
 		deviceB.deviceID = data.substring(8, 12);
 		deviceB.online = true;
 		deviceB.count = 5;

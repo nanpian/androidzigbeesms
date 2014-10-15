@@ -16,6 +16,7 @@ import com.rtk.bdtest.adapter.DeviceListAdapter;
 import com.rtk.bdtest.db.DbDeviceHelper;
 import com.rtk.bdtest.db.SmsHelper;
 import com.rtk.bdtest.util.Device;
+import com.rtk.bdtest.util.gpsDevice;
   
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -57,7 +58,7 @@ public class FragmentList2 extends Fragment {
     private List<FragmentTransaction> mBackStackList = new ArrayList<FragmentTransaction>();
 	private ExpandableListView deviceList;  
 	private ArrayList<String> namelist = new ArrayList();
-	private ArrayList<Device> devices;
+	public  ArrayList<Device> devices;
 	private ArrayList<List<Device>> devicesA = new ArrayList<List<Device>>();  //所有的设备A
 	private ArrayList<Device> devicesB = new ArrayList<Device>();  //设备B和C
 	private DeviceExpandableListAdapter adapter;
@@ -65,6 +66,7 @@ public class FragmentList2 extends Fragment {
 	public static final int MSG_REDUCE_DEVICE_COUNT = 17;
 	private static final int MSG_GET_SELF_ID = 18;
 	public static boolean isBind = false;
+	public static String padinfo;
 	
 	public void reduceDeviceCount() {
 		try {
@@ -140,10 +142,10 @@ public class FragmentList2 extends Fragment {
 			   Log.i(Tag,"Receive device notify broadcast"+data);
 			   notifyDeviceList(data) ;
 			} else if (intent.getAction().equals("ACTION_GET_SELF_INFO"))	{
-				   String data = intent.getExtras().getString("self_data");
-				   Log.i(Tag,"Receive get self info  intent , the data is "+data);
+				   padinfo = intent.getExtras().getString("self_data");
+				   Log.i(Tag,"Receive get self info  intent , the data is "+padinfo);
 
-                   notifyDeviceB1(data);
+                   notifyDeviceB1(padinfo);
 				   
 			} else {
 				

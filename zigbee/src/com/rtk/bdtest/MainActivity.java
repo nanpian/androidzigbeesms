@@ -11,9 +11,11 @@ import com.rtk.bdtest.service.*;
 import com.rtk.bdtest.service.BDService.BDBinder;
 import com.rtk.bdtest.service.ZigbeeSerivce.ZigbeeBinder;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -36,7 +38,55 @@ public class MainActivity extends FragmentActivity implements
 	private static final String Tag = "main";
 
 	public static MainActivity instance;
+	private static String defaultLatitude = null;
+	private String padAddress = "";
 	
+	private BroadcastReceiver receiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context arg0, Intent arg1) {
+			// TODO Auto-generated method stub
+			//定时发送gps信息到zigbee，这样zigbee才能发送gps广播信息
+			defaultLatitude = arg1.getExtras().getString("defaultLatitude");
+			 sendLocation();
+		}
+	
+	};
+	
+	public void sendLocation() {
+		FragmentManager rightfm = this
+				.getSupportFragmentManager();
+		Fragment lfm = rightfm.findFragmentById(R.id.list_container);
+		if (lfm instanceof FragmentList2) {
+			padAddress = ((FragmentList2) lfm).padinfo.substring(4,8);
+			if (!padAddress.equals("")) {
+				byte[] temp = new byte[("3002" + padAddress).getBytes().length
+						+ (defaultLatitude).getBytes().length + 2];
+				// byte[] temp = CharConverter.hexStringToBytes("3002") +
+				// (padAddress + defaultLatitude).getBytes();
+				int length = (("3002" + padAddress).getBytes().length) / 2
+						+ defaultLatitude.length() + 1;
+				String l = String.format("%02x", length);
+				Log.d(Tag, "l = " + l);
+				System.arraycopy(CharConverter.hexStringToBytes(l), 0, temp, 0,
+						1);
+				System.arraycopy(
+						CharConverter.hexStringToBytes("3002" + padAddress), 0,
+						temp, 1, 4);
+				System.arraycopy((defaultLatitude).getBytes(), 0, temp, 5,
+						(defaultLatitude).getBytes().length);
+				sendData2Zigbee(temp);
+			}
+		}
+		}
+	
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		this.unregisterReceiver(receiver);
+	}
+
 	public Activity getActivity() {
 		return instance;
 	}
@@ -117,6 +167,8 @@ public class MainActivity extends FragmentActivity implements
 		PowerManager.WakeLock mWakeLock = pm.newWakeLock(
 				PowerManager.SCREEN_DIM_WAKE_LOCK, "Zigbee Wakelock");
 		mWakeLock.acquire();
+		IntentFilter filter = new IntentFilter("com.rtk.bdtest.service.BDService.broadcast3");
+		getActivity().registerReceiver(receiver, filter);
 	}
 
 	private ServiceConnection mConnection2 = new ServiceConnection() {

@@ -1,6 +1,6 @@
 package com.rtk.bdtest.util;
 
-public class Device {
+public class gpsDevice {
 	public String deviceName;
 	public String deviceAddress;
 	public String deviceType;
@@ -8,7 +8,7 @@ public class Device {
 	public String parentAddress;
 	public int count;
 	public boolean online;
-	public float jingdu;
-	public float weidu;
-	
+	float jingdu;
+	float weidu;
+	public boolean isGps;
 }

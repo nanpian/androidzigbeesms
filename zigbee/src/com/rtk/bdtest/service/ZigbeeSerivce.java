@@ -217,19 +217,27 @@ public class ZigbeeSerivce extends Service {
 			Message message = handler.obtainMessage(MSG_SHOW_TOAST);
 			message.obj = getString(R.string.write_id_fail);
 			handler.sendMessage(message);
-		} else if (data.length() == 18) {
+		} else if (data.length() == 20) {
 			// device heart beat
 			Message message = handler.obtainMessage(MSG_NOTIFY_DEVICE_LIST);
 			message.obj = data;
 			handler.sendMessage(message);
-		} else if (data.length() == 16) {
+		} else if (data.length() == 18) {
 			// make route id and address
-			//data.substring(4, 8);
+			String padAddress = data.substring(6, 10); 
 			Log.i(Tag,"send data !!!!");
 			Message message = handler.obtainMessage(MSG_GET_SELF_INFO);
 			message.obj = data;
 			handler.sendMessage(message);
-		} else if (data.substring(0, 2).equals(3003))  {
+		} else if (data.substring(1,3).equals(3002)) {
+			Log.i(Tag, "Receive beidou broadcast information! and data is " + data);
+			String beidou = data.substring(3);
+			Intent intent3 = new Intent("com.rtk.bdtest.service.BDService.broadcast");
+			intent3.setAction(("ACTION_UPDATE_GPS_INFO").toString());
+			intent3.putExtra("gps", beidou);
+			sendBroadcast(intent3);
+			Log.i(Tag,"send!!!!data!!!!");
+	    } else if (data.substring(1, 3).equals(3003))  {
 			//收到短信息处理！
 			String smsReceive = data.substring(24, data.length());
 			byte[] bytes = smsReceive.getBytes();
@@ -319,7 +327,7 @@ public class ZigbeeSerivce extends Service {
 		mZigbeeThread.start();
 
 	}
-
+	
 	@Override
 	public void onDestroy() {
 		// TODO Auto-generated method stub

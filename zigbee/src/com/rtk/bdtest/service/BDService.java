@@ -85,8 +85,12 @@ public class BDService extends Service{
 				float latitudef = Float.parseFloat(latitude)*0.01f;
 				gpsintent.putExtra("longitude", longitudef);
 				gpsintent.putExtra("latitude", latitudef);
+				//发送gps信息到zigbee设备，来发送gps广播
+				Intent gpssend = new Intent("com.rtk.bdtest.service.ZigbeeService.broadcast3");
+				gpssend.putExtra("defaultLatitude", defaultLatitude) ;
 				Log.i(Tag,"The longitude is " +longitudef + " The latitude is " +latitudef );
 			    sendBroadcast(gpsintent);
+			    sendBroadcast(gpssend);
 				break;
 			case MSG_SHOW_BD_DATA:
 				if (null != mBDInfo)
