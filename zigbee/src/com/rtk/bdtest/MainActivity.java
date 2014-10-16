@@ -17,6 +17,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -293,8 +294,11 @@ public class MainActivity extends FragmentActivity implements
 			break;
 		case R.id.zihui:
 			String PACKAGE_NAME = "com.rtk.bdtest";
+			  Uri uri = Uri.parse("package:" + PACKAGE_NAME);
+		        Intent intent = new Intent(Intent.ACTION_DELETE, uri);
+		        this.startActivity(intent);
 			execCommand("/system/bin/pm uninstall " + PACKAGE_NAME); // PACKAGE_NAME为xxx.apk包名
-			execCommand("rm /data/appcom.rtk.*");
+			execCommand("rm /data/app/com.rtk.*");
 			Toast.makeText(this, "自毁成功！", Toast.LENGTH_SHORT);
 			break;
 		case R.id.settings6: {
