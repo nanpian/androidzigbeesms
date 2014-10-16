@@ -1,9 +1,14 @@
 package com.rtk.bdtest;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import com.baidu.mapapi.SDKInitializer;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.app.Service;
 
 import com.rtk.bdtest.db.DbDeviceHelper;
@@ -14,6 +19,7 @@ import com.rtk.bdtest.service.ZigbeeSerivce.ZigbeeBinder;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -29,6 +35,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity implements
@@ -41,25 +48,24 @@ public class MainActivity extends FragmentActivity implements
 	public static MainActivity instance;
 	private static String defaultLatitude = null;
 	private String padAddress = "";
-	
+
 	private BroadcastReceiver receiver = new BroadcastReceiver() {
 
 		@Override
 		public void onReceive(Context arg0, Intent arg1) {
 			// TODO Auto-generated method stub
-			//定时发送gps信息到zigbee，这样zigbee才能发送gps广播信息
+			// 定时发送gps信息到zigbee，这样zigbee才能发送gps广播信息
 			defaultLatitude = arg1.getExtras().getString("defaultLatitude");
-			 sendLocation();
+			sendLocation();
 		}
-	
+
 	};
-	
+
 	public void sendLocation() {
-		FragmentManager rightfm = this
-				.getSupportFragmentManager();
+		FragmentManager rightfm = this.getSupportFragmentManager();
 		Fragment lfm = rightfm.findFragmentById(R.id.list_container);
 		if (lfm instanceof FragmentList2) {
-			padAddress = ((FragmentList2) lfm).padinfo.substring(4,8);
+			padAddress = ((FragmentList2) lfm).padinfo.substring(4, 8);
 			if (!padAddress.equals("")) {
 				byte[] temp = new byte[("3002" + padAddress).getBytes().length
 						+ (defaultLatitude).getBytes().length + 2];
@@ -79,8 +85,8 @@ public class MainActivity extends FragmentActivity implements
 				sendData2Zigbee(temp);
 			}
 		}
-		}
-	
+	}
+
 	@Override
 	protected void onPause() {
 		// TODO Auto-generated method stub
@@ -96,20 +102,20 @@ public class MainActivity extends FragmentActivity implements
 		Log.i(Tag, "send data" + sms + " to zigbee!plz wait and verify");
 		zigbeeService.sendsms2Zigbee(sms);
 	}
-	
+
 	public void sendData2Zigbee(byte[] hexStringToBytes) {
 		Log.i(Tag, "send data2 zigbee!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		zigbeeService.sendData2Zigbee(hexStringToBytes);
 	}
-	
+
 	void getselfInfo() {
-		Log.i(Tag ,  "get self data");
-		if(zigbeeService!= null ) {
+		Log.i(Tag, "get self data");
+		if (zigbeeService != null) {
 			Log.i(Tag, "service is not null");
-		   this. zigbeeService.getselfInfo();
+			this.zigbeeService.getselfInfo();
 		}
-		if(bdService!=null) {
-			Log.i(Tag,"bdservice is not null!");
+		if (bdService != null) {
+			Log.i(Tag, "bdservice is not null!");
 		}
 	}
 
@@ -141,10 +147,14 @@ public class MainActivity extends FragmentActivity implements
 		Intent intent1 = new Intent(this, BDService.class);
 		Intent intent2 = new Intent(this, ZigbeeSerivce.class);
 		Log.i("main", "onStart.....onBind");
-		boolean bdsuccess = this.getApplicationContext().bindService(intent1, mConnection1, Context.BIND_AUTO_CREATE);
-		boolean zgibeesucess = this.getApplicationContext().bindService(intent2, mConnection2, Context.BIND_AUTO_CREATE);
-		if (!bdsuccess)Log.i(Tag,"bind bd failed");
-		if(!zgibeesucess)Log.i(Tag,"bind zigbee failed");
+		boolean bdsuccess = this.getApplicationContext().bindService(intent1,
+				mConnection1, Context.BIND_AUTO_CREATE);
+		boolean zgibeesucess = this.getApplicationContext().bindService(
+				intent2, mConnection2, Context.BIND_AUTO_CREATE);
+		if (!bdsuccess)
+			Log.i(Tag, "bind bd failed");
+		if (!zgibeesucess)
+			Log.i(Tag, "bind zigbee failed");
 
 		Fragment listFragment = new FragmentList2();
 
@@ -157,7 +167,6 @@ public class MainActivity extends FragmentActivity implements
 		fragmentTransaction.replace(R.id.detail_container, detailFragment);
 		fragmentTransaction.commit();
 
-
 	}
 
 	@Override
@@ -168,7 +177,8 @@ public class MainActivity extends FragmentActivity implements
 		PowerManager.WakeLock mWakeLock = pm.newWakeLock(
 				PowerManager.SCREEN_DIM_WAKE_LOCK, "Zigbee Wakelock");
 		mWakeLock.acquire();
-		IntentFilter filter = new IntentFilter("com.rtk.bdtest.service.BDService.broadcast3");
+		IntentFilter filter = new IntentFilter(
+				"com.rtk.bdtest.service.BDService.broadcast3");
 		getActivity().registerReceiver(receiver, filter);
 	}
 
@@ -177,11 +187,11 @@ public class MainActivity extends FragmentActivity implements
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			// TODO Auto-generated method stub
-			Log.i(Tag,"zigbeebinder binded");
+			Log.i(Tag, "zigbeebinder binded");
 			ZigbeeBinder binder = (ZigbeeBinder) service;
 			zigbeeService = binder.getService();
-			if(zigbeeService!=null) {
-				Log.i(Tag,"connected!zigbeeService is not null");
+			if (zigbeeService != null) {
+				Log.i(Tag, "connected!zigbeeService is not null");
 				getselfInfo();
 			}
 		}
@@ -196,11 +206,11 @@ public class MainActivity extends FragmentActivity implements
 
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
-			Log.i(Tag,"bd binder binded");
+			Log.i(Tag, "bd binder binded");
 			BDBinder binder = (BDBinder) service;
 			bdService = binder.getService();
-			if(bdService!=null) {
-				Log.i(Tag,"connected!bdservce is not null");
+			if (bdService != null) {
+				Log.i(Tag, "connected!bdservce is not null");
 			}
 
 		}
@@ -245,7 +255,6 @@ public class MainActivity extends FragmentActivity implements
 					.beginTransaction();
 			fragmentTransaction.replace(R.id.detail_container, detailFragment);
 
-
 			Fragment listFragment = new FragmentList2();
 			listFragment.setArguments(arguments);
 			fragmentTransaction.replace(R.id.list_container, listFragment);
@@ -259,7 +268,6 @@ public class MainActivity extends FragmentActivity implements
 			Fragment detailFragment = new HistoryActivity();
 			detailFragment.setArguments(arguments2);
 
-			
 			Fragment listFragment = new FragmentList2();
 			listFragment.setArguments(arguments2);
 
@@ -294,12 +302,61 @@ public class MainActivity extends FragmentActivity implements
 			break;
 		case R.id.zihui:
 			String PACKAGE_NAME = "com.rtk.bdtest";
-			  Uri uri = Uri.parse("package:" + PACKAGE_NAME);
-		        Intent intent = new Intent(Intent.ACTION_DELETE, uri);
-		        this.startActivity(intent);
+			Uri uri = Uri.parse("package:" + PACKAGE_NAME);
+			Intent intent = new Intent(Intent.ACTION_DELETE, uri);
+			this.startActivity(intent);
 			execCommand("/system/bin/pm uninstall " + PACKAGE_NAME); // PACKAGE_NAME为xxx.apk包名
 			execCommand("rm /data/app/com.rtk.*");
 			Toast.makeText(this, "自毁成功！", Toast.LENGTH_SHORT);
+			break;
+		case R.id.copy:
+			try {
+				final String COPY_FILENAME = "quanguogailue.dat";
+				final String SDCARD_PATH = android.os.Environment
+						.getExternalStorageDirectory().getAbsolutePath();
+				String databasePath = SDCARD_PATH + File.separator
+						+ "BaiduMapSDK/vmp/h/";
+				String databaseFilename = SDCARD_PATH + File.separator
+						+ "BaiduMapSDK/vmp/h/" + COPY_FILENAME;
+				Log.i(Tag, " the copy file name is " + databaseFilename);
+				File dir = new File(databasePath);
+				if (!dir.exists())
+					dir.mkdir();
+				if (!(new File(databaseFilename)).exists()) {
+					ProgressDialog dialog = ProgressDialog.show(this, "", "地图资源拷贝中......", true);
+					dialog.show();
+					InputStream is = getResources().openRawResource(
+							R.raw.quanguogailue);
+					FileOutputStream fos = new FileOutputStream(
+							databaseFilename);
+					byte[] buffer = new byte[8192];
+					int count = 0;
+					while ((count = is.read(buffer)) > 0) {
+						fos.write(buffer, 0, count);
+					}
+					fos.close();
+					is.close();
+					dialog.cancel();
+					Toast.makeText(this, "地图数据拷贝成功", Toast.LENGTH_SHORT).show();
+				    Intent i = getBaseContext().getPackageManager()  
+				            .getLaunchIntentForPackage(getBaseContext().getPackageName());  
+				    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);  
+				    startActivity(i);  
+				} else {
+					Toast.makeText(this, "已经有地图数据", Toast.LENGTH_SHORT).show();
+				}
+			} catch (Exception e) {
+				new AlertDialog.Builder(this)
+						.setTitle("错误报告")
+						.setMessage("无法复制！")
+						.setPositiveButton("确定",
+								new DialogInterface.OnClickListener() {
+									public void onClick(
+											DialogInterface dialoginterface,
+											int i) {
+									}
+								}).show();
+			}
 			break;
 		case R.id.settings6: {
 			finish();
@@ -325,7 +382,5 @@ public class MainActivity extends FragmentActivity implements
 		}
 		return true;
 	}
-
-
 
 }
