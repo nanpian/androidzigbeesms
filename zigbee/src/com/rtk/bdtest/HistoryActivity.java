@@ -59,7 +59,7 @@ public class HistoryActivity extends Fragment {
 				while (cursor.moveToNext()) {
 					String name = cursor.getString(1);
 					String time = cursor.getString(2);
-					String text = cursor.getString(3);
+					String text = cursor.getString(4);
 					list.add("姓名:" + name + "  时间:" + time + " 内容:" + text);
 				}
 			}
@@ -74,7 +74,7 @@ public class HistoryActivity extends Fragment {
 				while (cursor.moveToNext()) {
 					String name = cursor.getString(1);
 					String time = cursor.getString(2);
-					String text = cursor.getString(3);
+					String text = cursor.getString(4);
 					list.add("姓名:" + name + "  时间:" + time + " 内容:" + text);
 				}
 			}
@@ -89,7 +89,7 @@ public class HistoryActivity extends Fragment {
 				while(cursor.moveToNext()) {
 					String name = cursor.getString(1);
 					String time = cursor.getString(2);
-					String text = cursor.getString(3);
+					String text = cursor.getString(4);
 					list.add("姓名:"+name+"  时间:"+time +" 内容:"+text);
 				}
 			} else {
@@ -97,7 +97,7 @@ public class HistoryActivity extends Fragment {
 				while(cursor.moveToNext()) {
 					String name = cursor.getString(1);
 					String time = cursor.getString(2);
-					String text = cursor.getString(3);
+					String text = cursor.getString(4);
 					list.add("姓名:"+name+"  时间:"+time +" 内容:"+text);
 				}
 			}
