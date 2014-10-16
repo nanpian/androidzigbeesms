@@ -119,7 +119,7 @@ public class MainActivity extends FragmentActivity implements
 		arguments.putString("name", name);
 		arguments.putString("bindid", id);
 		Log.i(Tag, "onbind linstener ok!");
-		Fragment listFragment = new FragmentList();
+		Fragment listFragment = new FragmentList2();
 		listFragment.setArguments(arguments);
 		final FragmentManager fragmentManager = this
 				.getSupportFragmentManager();

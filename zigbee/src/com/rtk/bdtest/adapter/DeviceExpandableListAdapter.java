@@ -120,7 +120,7 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 	public View getChildView(int groupPosition, int childPosition,
 			boolean isLastChild, View convertView, ViewGroup parent) {
 		ViewHolder holder = new ViewHolder();
-		convertView = (View) inflater.inflate(R.layout.device_list_item_layout,
+		convertView = (View) inflater.inflate(R.layout.device_list_item_layout3,
 				null);
 		holder.name = (TextView) convertView.findViewById(R.id.device_name);
 		holder.online = (TextView) convertView.findViewById(R.id.online);
