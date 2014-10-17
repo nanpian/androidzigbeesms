@@ -98,9 +98,9 @@ public class MainActivity extends FragmentActivity implements
 		return instance;
 	}
 
-	void sendSMS(String sms) {
+	void sendSMS(String sms,String destAddr , String destId) {
 		Log.i(Tag, "send data" + sms + " to zigbee!plz wait and verify");
-		zigbeeService.sendsms2Zigbee(sms);
+		zigbeeService.sendsms2Zigbee(sms, destAddr, destId);
 	}
 
 	public void sendData2Zigbee(byte[] hexStringToBytes) {

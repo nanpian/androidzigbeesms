@@ -19,7 +19,7 @@ public class TestActivity extends Fragment implements OnClickListener{
 	private static final String MODE_NORMAL = "nomal";
 	private static final String WRITE_ID_SUCCESS = "AA";
 	private static final String WRITE_ID_FAIL = "55";
-	private static final String GET_FIRMWARE_INFO = "8003";
+	private static final String GET_FIRMWARE_INFO = "038003";
 	private static final String REQUEST_JOIN = "8004";
 	private TextView mBDInfo;
 	private Button getBDVersionBtn;
@@ -85,7 +85,7 @@ public class TestActivity extends Fragment implements OnClickListener{
 									// TODO Auto-generated method stub
 									try {
 										MainActivity.instance.sendData2Zigbee(CharConverter
-												.hexStringToBytes("8001"
+												.hexStringToBytes("0C8001"
 														+ mId.getText()
 																.toString()));
 									} catch (Exception e) {

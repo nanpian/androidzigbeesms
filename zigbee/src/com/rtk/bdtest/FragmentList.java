@@ -127,7 +127,8 @@ public class FragmentList extends Fragment {
 												.toString();
 										String head  =  null;
 										String sms = head+smstmp;
-										MainActivity.instance.sendSMS(sms);
+										String Addr = null;	String DestId = null;
+										MainActivity.instance.sendSMS(sms,Addr,DestId);
 									}
 								}).setNegativeButton(R.string.cancel, null)
 						.create();
@@ -359,7 +360,9 @@ public class FragmentList extends Fragment {
 													.toString();
 											String head = null;
 											String sms = head + smstmp;
-											MainActivity.instance.sendSMS(sms);
+											String Addr = null;
+											String id = null;
+											MainActivity.instance.sendSMS(sms,Addr,id);
 										}
 									}).setNegativeButton(R.string.cancel, null)
 							.create();

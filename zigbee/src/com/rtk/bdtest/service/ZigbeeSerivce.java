@@ -37,7 +37,7 @@ public class ZigbeeSerivce extends Service {
 	public static final String CMD_ENABLE_RUNNING_MODE = "FE004D034E";
 	public static final String CMD_HAND_SHAKE_SUCCESS = "FE014D8400C8";
 	public static final String CMD_ENABLE_RUNNING_MODE_SUCCESS = "FE014D8300CF";
-	private static final String GET_FIRMWARE_INFO = "8003";
+	private static final String GET_FIRMWARE_INFO = "038003";
 
 	private static ZigbeeApplication mApplication;
 	private SerialPort mZigbeeSerialPort;
@@ -102,14 +102,30 @@ public class ZigbeeSerivce extends Service {
 	
 	
 	//发送短信，发送短信成功的标志是什么？？？
-	public void sendsms2Zigbee(String data) {
+	public void sendsms2Zigbee(String data, String destAddr, String destId) {
 		 /*Message msg = new Message();
 		 msg.what = MSG_SEND_SMS;
 		 msg.obj = data;
 		handler.sendMessage(msg);*/
 		Log.i(Tag, "send sms!");
 		try {
-			sendData2Zigbee(data.getBytes("UTF-8"));
+			//0x2D为length，3003短信息标志位，00为index，01为包数，destAddr目标短地址
+			//destId为目标id，0xffff，0xffff，短信息内容为32字节
+			byte[] temp = new byte[45]; 
+			String head = "2D30030001"+destAddr+destId;
+			System.arraycopy(CharConverter.hexStringToBytes(head), 0, temp, 0,
+					9);
+			byte[] souDest = {(byte) 0xff,(byte) 0xff};
+			byte[] sourId = {(byte) 0xff,(byte) 0xff};
+ 			System.arraycopy(souDest, 0, temp,9 , 2);
+ 			System.arraycopy(sourId, 0, temp,11 , 2);
+ 			
+ 			byte[] sms = data.getBytes("UTF-8");
+ 			System.arraycopy(sms, 0, temp, 13, 32);
+ 			Log.i(Tag,"The sms send data head is " +head);
+ 			Log.i(Tag,"The sms send data string is " + temp);
+ 			sendData2Zigbee(temp);
+			//sendData2Zigbee(data.getBytes("UTF-8"));
 			//sendData2Zigbee(data.getBytes("Unicode"));
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -239,8 +255,9 @@ public class ZigbeeSerivce extends Service {
 			Log.i(Tag,"send!!!!data!!!!");
 	    } else if (data.substring(1, 3).equals(3003))  {
 			//收到短信息处理！
+	    	Log.i(Tag,"sms data received is " + data);
 			String smsReceive = data.substring(24, data.length());
-			byte[] bytes = smsReceive.getBytes();
+			byte[] bytes = CharConverter.hexStringToBytes(smsReceive);
 			try {
 				String smsutf8 = new String(bytes,"utf-8");
 				//收到短信息，发送广播给activity，分两种情况处理，第一种是gps信息，第二种是普通短信息！！！！！！！
