@@ -7,6 +7,7 @@ import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.GroundOverlayOptions;
 import com.baidu.mapapi.map.InfoWindow;
+import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
@@ -53,7 +54,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 	private static Marker mMarkerB;
 	private static Marker mMarkerC;
 	private static Marker mMarkerD;
-	private static Marker mMarkerE;
+	private static Marker mMarkerSelf;
 	private InfoWindow mInfoWindow;
 	private MKOfflineMap mOffline = null;
 	private final static String Tag = "MapActivity";
@@ -85,7 +86,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 			OverlayOptions selfgps = new MarkerOptions().position(jingwei)
 					.icon(bdC).perspective(false).anchor(0.5f, 0.5f).rotate(30)
 					.zIndex(7);
-			mMarkerE = (Marker) (mBaiduMap.addOverlay(selfgps));
+			mMarkerSelf = (Marker) (mBaiduMap.addOverlay(selfgps));
 			MapStatusUpdate status = MapStatusUpdateFactory.newLatLng(jingwei);
 
 		}
@@ -103,7 +104,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 				OverlayOptions selfgps = new MarkerOptions().position(jingwei2)
 						.icon(bdC).perspective(false).anchor(0.5f, 0.5f)
 						.rotate(30).zIndex(7);
-				mMarkerE = (Marker) (mBaiduMap.addOverlay(selfgps));
+				mMarkerSelf = (Marker) (mBaiduMap.addOverlay(selfgps));
 				MapStatusUpdate status = MapStatusUpdateFactory
 						.newLatLng(jingwei2);
 				break;
@@ -137,15 +138,16 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 				BitmapDescriptor bdC = BitmapDescriptorFactory
 						.fromResource(R.drawable.icon_marka);
 				LatLng jingwei2 = new LatLng(jingwei[1], jingwei[0]);
-				if(mMarkerE==null) {
+				if(mMarkerSelf==null) {
 				OverlayOptions selfgps = new MarkerOptions().position(jingwei2)
 						.icon(bdC).perspective(false).anchor(0.5f, 0.5f)
 						.rotate(30).zIndex(7);
-				mMarkerE = (Marker) (mBaiduMap.addOverlay(selfgps));
-				MapStatusUpdate status = MapStatusUpdateFactory
-						.newLatLng(jingwei2);
+				mMarkerSelf = (Marker) (mBaiduMap.addOverlay(selfgps));
+				MapStatus mMapStatus = new MapStatus.Builder().target(jingwei2).zoom(18).build();
+				MapStatusUpdate status = MapStatusUpdateFactory.newMapStatus(mMapStatus);
+				//		.newLatLng(jingwei2);
 				} else {
-					mMarkerE.setPosition(jingwei2);
+					mMarkerSelf.setPosition(jingwei2);
 				}
 				//Message gpsMessage = new Message();
 				//gpsMessage.what = MSG_UPDATE_SELF_GPS;
@@ -161,7 +163,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 				Fragment lfm = rightfm.findFragmentById(R.id.list_container);
 				if (lfm instanceof FragmentList2) {
 					// 得到B和C设备列表
-					gpsdevices = ((FragmentList2) lfm).devices;
+					gpsdevices = ((FragmentList2) lfm).devicesB;
 					for (int i = 0; i < gpsdevices.size(); i++) {
 						if (gpsdevices.get(i).deviceAddress
 								.equals(deviceAddress)) {
@@ -227,6 +229,24 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 				Button button = new Button(getActivity());
 				button.setBackgroundResource(R.drawable.popup);
 				OnInfoWindowClickListener listener = null;
+				for (int i = 0; i <gpsdevices.size(); i ++) {
+					if((gpsdevices.get(i).gpsMarker!=null)&& (marker==gpsdevices.get(i).gpsMarker)) {
+						button.setText(gpsdevices.get(i).deviceName + gpsdevices.get(i).deviceAddress);
+						listener = new OnInfoWindowClickListener() {
+							public void onInfoWindowClick() {
+							//	LatLng ll = marker.getPosition();
+							//	LatLng llNew = new LatLng(ll.latitude + 0.005,
+							//			ll.longitude + 0.005);
+							//	marker.setPosition(llNew);
+								mBaiduMap.hideInfoWindow();
+							}
+						};
+						LatLng ll = marker.getPosition();
+						mInfoWindow = new InfoWindow(BitmapDescriptorFactory
+								.fromView(button), ll, -47, listener);
+						mBaiduMap.showInfoWindow(mInfoWindow);
+					}
+				}
 				if (marker == mMarkerA || marker == mMarkerD) {
 					button.setText("测试用");
 					listener = new OnInfoWindowClickListener() {

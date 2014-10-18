@@ -249,7 +249,7 @@ public class ZigbeeSerivce extends Service {
 			Message message = handler.obtainMessage(MSG_GET_SELF_INFO);
 			message.obj = data;
 			handler.sendMessage(message);
-		} else if (data.substring(1,3).equals(3002)) {
+		} else if (data.substring(2,6).equals(3002)) {
 			Log.i(Tag, "Receive beidou broadcast information! and data is " + data);
 			String beidou = data.substring(3);
 			Intent intent3 = new Intent("com.rtk.bdtest.service.BDService.broadcast");
@@ -260,10 +260,11 @@ public class ZigbeeSerivce extends Service {
 	    } else if (data.substring(2, 6).equals(3003))  {
 			//收到短信息处理！
 	    	Log.i(Tag,"sms data received is " + data);
-			String smsReceive = data.substring(24, data.length());
+			String smsReceive = data.substring(26, data.length());
 			byte[] bytes = CharConverter.hexStringToBytes(smsReceive);
 			try {
 				String smsutf8 = new String(bytes,"utf-8");
+				Log.i(Tag,"the sms utf8 is" + smsutf8);
 				//收到短信息，发送广播给activity，分两种情况处理，第一种是gps信息，第二种是普通短信息！！！！！！！
 				Intent smsintent = new Intent("com.rtk.bdtest.service.ZigbeeService.broadcast");
 				smsintent.setAction(("ACTION_ZIGBEE_SMS").toString());
