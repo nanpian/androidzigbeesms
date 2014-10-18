@@ -43,7 +43,10 @@ public class ZigbeeSerivce extends Service {
 	private SerialPort mZigbeeSerialPort;
 	private OutputStream mZigbeeOutputStream;
 	private InputStream mZigbeeInputStream;
-	private byte[] zigbeeBuffer = new byte[64];
+	private byte[] zigbeeBuffer = new byte[100];
+	private static String receiveData1;
+	private static boolean isSms = false;
+	private static String receivedData;
 
 	private ZigbeeThread mZigbeeThread;
 	private TextView mBDInfo;
@@ -254,7 +257,7 @@ public class ZigbeeSerivce extends Service {
 			intent3.putExtra("gps", beidou);
 			sendBroadcast(intent3);
 			Log.i(Tag,"send!!!!data!!!!");
-	    } else if (data.substring(1, 3).equals(3003))  {
+	    } else if (data.substring(2, 6).equals(3003))  {
 			//收到短信息处理！
 	    	Log.i(Tag,"sms data received is " + data);
 			String smsReceive = data.substring(24, data.length());
@@ -278,6 +281,9 @@ public class ZigbeeSerivce extends Service {
 
 	class ZigbeeThread extends Thread {
 		private boolean bIsRunning = false;
+
+
+
 
 		ZigbeeThread() {
 		}
@@ -305,7 +311,18 @@ public class ZigbeeSerivce extends Service {
 					e.printStackTrace();
 				}
 				if (len > 0) {
-					String receivedData = CharConverter.byteToHexString(zigbeeBuffer, len);
+					receivedData = CharConverter.byteToHexString(zigbeeBuffer, len);
+					Log.d(Tag,"receivedData is " + receivedData + "The substring" +receivedData.substring(2,6));
+					if((receivedData.substring(2, 6).equals("3003")) && (!isSms)) {
+						receiveData1 = receivedData;
+					    isSms = true;
+						return ;
+					} else if (isSms) {
+						receiveData1 = receiveData1 + receivedData;
+						isSms = false;
+						Log.d(Tag, " sms data received is " +receiveData1 );
+						handleData(receiveData1, zigbeeBuffer);
+					}
 					Log.d(TAG, "zigbee data = " + receivedData + "    The length is " + receivedData.length());
 					handleData(receivedData, zigbeeBuffer);
 					}
