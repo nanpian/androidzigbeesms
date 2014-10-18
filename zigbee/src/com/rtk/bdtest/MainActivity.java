@@ -56,6 +56,7 @@ public class MainActivity extends FragmentActivity implements
 			// TODO Auto-generated method stub
 			// 定时发送gps信息到zigbee，这样zigbee才能发送gps广播信息
 			defaultLatitude = arg1.getExtras().getString("defaultLatitude");
+			Log.i(Tag,"send location to zigbee");
 			sendLocation();
 		}
 
@@ -64,6 +65,7 @@ public class MainActivity extends FragmentActivity implements
 	public void sendLocation() {
 		FragmentManager rightfm = this.getSupportFragmentManager();
 		Fragment lfm = rightfm.findFragmentById(R.id.list_container);
+		Log.i(Tag,"The pad info address is " +((FragmentList2) lfm).padinfo.substring(4, 8));
 		if (lfm instanceof FragmentList2) {
 			padAddress = ((FragmentList2) lfm).padinfo.substring(4, 8);
 			if (!padAddress.equals("")) {
@@ -179,7 +181,7 @@ public class MainActivity extends FragmentActivity implements
 		mWakeLock.acquire();
 		IntentFilter filter = new IntentFilter(
 				"com.rtk.bdtest.service.BDService.broadcast3");
-		getActivity().registerReceiver(receiver, filter);
+		this.registerReceiver(receiver, filter);
 	}
 
 	private ServiceConnection mConnection2 = new ServiceConnection() {

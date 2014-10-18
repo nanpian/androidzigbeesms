@@ -142,7 +142,12 @@ public class FragmentList2 extends Fragment {
 			} else if (intent.getAction().equals("ACTION_NOTIFY_DEVICE"))  {
 			   String data = intent.getExtras().getString("zigbee_devicelist");
 			   Log.i(Tag,"Receive device notify broadcast"+data);
-			   notifyDeviceList(data) ;
+			   String type = data.substring(6, 8);
+			   Log.i(Tag, "The device type is " + type);
+			   if (type.equals("01"))notifiyDeviceC1(data);
+			   else {
+			       notifyDeviceList(data) ;
+			   }
 			} else if (intent.getAction().equals("ACTION_GET_SELF_INFO"))	{
 				   padinfo = intent.getExtras().getString("self_data");
 				   Log.i(Tag,"Receive get self info  intent , the data is "+padinfo);
@@ -159,23 +164,63 @@ public class FragmentList2 extends Fragment {
 	private void notifyDeviceB1(String data) {
 		boolean isContain = false;
 		Device deviceB = new Device();
-		deviceB.deviceName = "路由设备" + data.substring(4, 8);
-		deviceB.deviceID = data.substring(8, 12);
+		deviceB.deviceName = "路由设备" + data.substring(6, 10);
+		deviceB.deviceID = data.substring(10, 14);
 		deviceB.online = true;
 		deviceB.count = 5;
-		for (int i = 0; i < devices.size(); i++) {
-			if (devices.get(i).deviceID != null) {
-				if (devices.get(i).deviceID.equals(deviceB.deviceID)) {
+		for (int i = 0; i < devicesB.size(); i++) {
+			if (devicesB.get(i).deviceName != null) {
+				if (devicesB.get(i).deviceName.contains("本机")) {
 					isContain = true;
-						devices.get(i).count = 5;
+					   devicesB.get(i).deviceName = "本机"+data.substring(4,8);
+					   devicesB.get(i).deviceID = data.substring(8,12);
+						devicesB.get(i).count = 5;
+						devicesB.get(i).online = true;
 				}
 			}
 		}
 
 		if (!isContain) {
-			Device device = new Device();
-			device.count = 5;
-			devices.add(deviceB);
+			Device deviceB2 = new Device();
+			deviceB2.count = 5;
+			   deviceB2.deviceName = "本机"+data.substring(4,8);
+			   deviceB2.deviceID = data.substring(8,12);
+			devicesB.add(deviceB2);
+		}
+		
+	}
+	
+	public void notifiyDeviceC1 (String data) {
+		try {
+			boolean isContain = false;
+			Device deviceB = new Device();
+			deviceB.deviceName = "协调器" + data.substring(8, 12);
+			deviceB.deviceID = data.substring(12, 16);
+			deviceB.online = true;
+			deviceB.count = 5;
+			for (int i = 0; i < devicesB.size(); i++) {
+				if (devicesB.get(i).deviceName != null) {
+					if (devicesB.get(i).deviceName.contains("协调器")) {
+						isContain = true;
+						   devicesB.get(i).deviceName = "协调器"+data.substring(4,8);
+						   devicesB.get(i).deviceID = data.substring(8,12);
+							devicesB.get(i).count = 5;
+							devicesB.get(i).online = true;
+					}
+				}
+			}
+			
+			if (!isContain) {
+				Device deviceB2 = new Device();
+				deviceB2.count = 5;
+				   deviceB2.deviceName = "协调器"+data.substring(4,8);
+				   deviceB2.deviceID = data.substring(8,12);
+				devicesB.add(deviceB2);
+			}
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
 		}
 	}
 
@@ -183,11 +228,11 @@ public class FragmentList2 extends Fragment {
 		try {
 			if(devices.size()<=0)Toast.makeText(getActivity(), "未导入战士文件或者导入错误", Toast.LENGTH_SHORT);
 			for (int i = 0; i < devices.size(); i++) {
-				if (devices.get(i).deviceID.equals(data.substring(6,
-						10))) {
-					devices.get(i).deviceID = data.substring(10, 14);
-					devices.get(i).deviceType = data.substring(4, 6);
-					devices.get(i).parentAddress = data.substring(14, 18);
+				if (devices.get(i).deviceID.equals(data.substring(8,
+						12))) {
+					devices.get(i).deviceID = data.substring(12, 16);
+					devices.get(i).deviceType = data.substring(6, 8);
+					devices.get(i).parentAddress = data.substring(16, 20);
 					devices.get(i).online =false;
 					if (devices.get(i).count < 5) {
 						devices.get(i).count++;
@@ -377,7 +422,7 @@ public class FragmentList2 extends Fragment {
 		}
 
 		Device deviceB1 = new Device();
-		deviceB1.deviceName = "本机(路由器)";
+		deviceB1.deviceName = "本机";
 		devicesB.add(deviceB1);
 		Device deviceB2 = new Device();
 		deviceB2.deviceName = "路由器2";

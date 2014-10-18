@@ -235,6 +235,7 @@ public class ZigbeeSerivce extends Service {
 			handler.sendMessage(message);
 		} else if (data.length() == 20) {
 			// device heart beat
+			Log.i(Tag,"the device heart beat is "+ data);
 			Message message = handler.obtainMessage(MSG_NOTIFY_DEVICE_LIST);
 			message.obj = data;
 			handler.sendMessage(message);
