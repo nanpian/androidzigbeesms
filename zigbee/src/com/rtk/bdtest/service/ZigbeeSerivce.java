@@ -45,7 +45,9 @@ public class ZigbeeSerivce extends Service {
 	private InputStream mZigbeeInputStream;
 	private byte[] zigbeeBuffer = new byte[100];
 	private static String receiveData1;
+	private static String receiveData2;
 	private static boolean isSms = false;
+	private static boolean isGps = false;
 	private static String receivedData;
 
 	private ZigbeeThread mZigbeeThread;
@@ -380,6 +382,15 @@ public class ZigbeeSerivce extends Service {
 						isSms = false;
 						Log.d(Tag, " sms data received is " +receiveData1 );
 						handleData(receiveData1, zigbeeBuffer);
+					} else if ((receivedData.substring(2, 6).equals("3002")) && (!isGps)) {
+						receiveData2 = receivedData;
+					    isGps = true;					
+					    Log.i(Tag,"gps data is" +receiveData2);
+					} else if(isGps) {
+						Log.i(Tag,"isGps" + isGps + "");
+						isGps = false;
+						receiveData2 = receiveData2 + receivedData;
+						Log.i(Tag,"gps data is" +receiveData2);
 					} else {
 					Log.d(TAG, "zigbee data = " + receivedData + "    The length is " + receivedData.length());
 					handleData(receivedData, zigbeeBuffer);

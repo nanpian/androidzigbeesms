@@ -89,7 +89,7 @@ public class LoginActivity extends Activity {
 		username = (EditText)findViewById(R.id.username);
 		password2 = (EditText)findViewById(R.id.password);
 		ok = (Button)findViewById(R.id.ok);
-		cancel = (Button)findViewById(R.id.cancel);
+		//cancel = (Button)findViewById(R.id.cancel);
 		ok.setOnClickListener(new OnClickListener () {
 			@Override
 			public void onClick(View arg0) {
@@ -114,7 +114,7 @@ public class LoginActivity extends Activity {
 				}
 			}	
 		});
-		
+		/*
 		cancel.setOnClickListener(new OnClickListener () {
 			@Override
 			public void onClick(View arg0) {
@@ -122,7 +122,7 @@ public class LoginActivity extends Activity {
 				username.setText("");
 				password2.setText("");
 			}	
-		});
+		})*/
 		
 	}
 

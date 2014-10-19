@@ -274,7 +274,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 				} 
 				for (int i = 0; i <gpsdevices.size(); i ++) {
 					if((gpsdevices.get(i).gpsMarker!=null)&& (marker==gpsdevices.get(i).gpsMarker)) {
-						button.setText(gpsdevices.get(i).deviceName + gpsdevices.get(i).deviceAddress);
+						button.setText(gpsdevices.get(i).deviceName);
 						listener = new OnInfoWindowClickListener() {
 							public void onInfoWindowClick() {
 							//	LatLng ll = marker.getPosition();
