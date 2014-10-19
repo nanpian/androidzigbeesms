@@ -45,6 +45,12 @@
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:text="@string/request_join"/>
+        <Button 
+        android:id="@+id/request_join2"
+        android:layout_gravity="center"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="请求入网备用（加命令长度）"/>
 
       <Button 
         android:id="@+id/sendmessage"

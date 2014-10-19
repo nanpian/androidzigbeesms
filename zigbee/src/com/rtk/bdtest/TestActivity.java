@@ -21,6 +21,7 @@ public class TestActivity extends Fragment implements OnClickListener{
 	private static final String WRITE_ID_FAIL = "55";
 	private static final String GET_FIRMWARE_INFO = "038003";
 	private static final String REQUEST_JOIN = "8004";
+	private static final String REQUEST_JOIN2 = "038004";
 	private TextView mBDInfo;
 	private Button getBDVersionBtn;
 	private TextView bdVersionTv;
@@ -30,6 +31,7 @@ public class TestActivity extends Fragment implements OnClickListener{
 	private Button requestJoin;
 	private EditText mId;
 	private Button sendSms;
+	private Button requestJoin2;
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -42,6 +44,9 @@ public class TestActivity extends Fragment implements OnClickListener{
 
 		requestJoin = (Button) getActivity().findViewById(R.id.request_join);
 		requestJoin.setOnClickListener(this);
+		
+		requestJoin2 = (Button) getActivity().findViewById(R.id.request_join2);
+		requestJoin2.setOnClickListener(this);
 		
 		sendSms = (Button)getActivity().findViewById(R.id.sendmessage);
 	    sendSms.setOnClickListener(this);
@@ -100,6 +105,8 @@ public class TestActivity extends Fragment implements OnClickListener{
 			MainActivity.instance.sendData2Zigbee(CharConverter.hexStringToBytes(GET_FIRMWARE_INFO));
 		} else if (v == requestJoin) {
 			MainActivity.instance.sendData2Zigbee(CharConverter.hexStringToBytes(REQUEST_JOIN));
+		} else if (v == requestJoin2) {
+			MainActivity.instance.sendData2Zigbee(CharConverter.hexStringToBytes(REQUEST_JOIN2));
 		}
 	}
 

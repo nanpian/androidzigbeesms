@@ -6,7 +6,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;  
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;  
@@ -68,6 +71,7 @@ public class FragmentList2 extends Fragment {
 	public static boolean isBind = false;
 	public static String padinfo=null;
     public static String selfpadAddress;
+	private SmsHelper smsHelper;
 	
 	public void reduceDeviceCount() {
 		try {
@@ -121,6 +125,7 @@ public class FragmentList2 extends Fragment {
 	
 	private BroadcastReceiver receiver = new BroadcastReceiver() {
 		private EditText mInput;
+		private String devicename;
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -130,19 +135,32 @@ public class FragmentList2 extends Fragment {
 				String data = intent.getExtras().getString("zigbee_sms");
 				final String addrtmp  = intent.getExtras().getString("smsSourAddr");
 				final String  Idtmp = intent.getExtras().getString("smsSourId");
+		        for (int i = 0 ; i <devicesB.size(); i++) {
+		        	if(devicesB.get(i).deviceAddress.equals(addrtmp)) {
+		        		devicename = devicesB.get(i).deviceName;
+		        	}
+		        }
 				Log.i(Tag, "Receive sms broadcast" + data);
 				mInput = new EditText(getActivity());
 				mInput.setMaxLines(4);
 				mInput.setText(data);
+				Date tmpDate = new Date();
+				SimpleDateFormat formatt = new SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒");
+				String xx = formatt.format(tmpDate);
+				smsHelper.insert(devicename, xx, data, "false");
 				AlertDialog dialog = new AlertDialog.Builder(getActivity())
 						.setTitle("收到来自地址"+addrtmp+"ID为"+Idtmp+"短信息")
 						.setView(mInput)
-						.setPositiveButton("回复？",
+						.setPositiveButton("回复",
 								new DialogInterface.OnClickListener() {
 									@Override
 									public void onClick(DialogInterface dialog,
 											int which) {
+										Date tmpDate = new Date();
+										SimpleDateFormat formatt = new SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒");
+										String xx = formatt.format(tmpDate);
 										 MainActivity.instance.sendSMS(mInput.toString(),addrtmp,Idtmp);
+									    smsHelper.insert(devicename, xx, mInput.toString(), "true");
 									}
 								}).setNegativeButton(R.string.cancel, null)
 						.create();
@@ -426,6 +444,7 @@ public class FragmentList2 extends Fragment {
 		Log.i(Tag,"FragmentList onresume");
 		super.onResume();
 		mHandler.post(runnableUI);
+		smsHelper = new SmsHelper(getActivity());
 		IntentFilter filter = new IntentFilter("com.rtk.bdtest.service.ZigbeeService.broadcast2");
 		filter.addAction("ACTION_GET_SELF_INFO");
 		filter.addAction("ACTION_NOTIFY_DEVICE");
@@ -534,7 +553,7 @@ public class FragmentList2 extends Fragment {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
+		
 		Device deviceB1 = new Device();
 		deviceB1.deviceName = "本机";
 		devicesB.add(deviceB1);
@@ -573,7 +592,7 @@ public class FragmentList2 extends Fragment {
 					AlertDialog dialog2 = new AlertDialog.Builder(getActivity())
 							.setTitle("给" + name2 + "发送短信息:")
 							.setView(mInput2)
-							.setPositiveButton("回复",
+							.setPositiveButton("发送",
 									new DialogInterface.OnClickListener() {
 										@Override
 										public void onClick(
@@ -584,6 +603,10 @@ public class FragmentList2 extends Fragment {
 											String destAddr = devicesB.get(groupPosition).deviceAddress;
 											String destId = devicesB.get(groupPosition).deviceID;
 											MainActivity.instance.sendSMS(sms,destAddr,destId);
+											Date tmpDate = new Date();
+											SimpleDateFormat formatt = new SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒");
+											String xx = formatt.format(tmpDate);
+											smsHelper.insert(devicesB.get(groupPosition).deviceName, xx, sms, "true");
 										}
 									}).setNegativeButton(R.string.cancel, null)
 							.create();
