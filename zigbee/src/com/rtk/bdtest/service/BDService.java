@@ -81,8 +81,8 @@ public class BDService extends Service{
 				gpsintent.setAction("ACTION_UPDATE_SELF_GPS");
 				String longitude = defaultLatitude.split(",")[2];
 				String latitude = defaultLatitude.split(",")[0];
-				float longitudef = Float.parseFloat(longitude)*0.01f;
-				float latitudef = Float.parseFloat(latitude)*0.01f;
+				Double longitudef = Double.parseDouble(longitude)*0.01f;
+				Double latitudef = Double.parseDouble(latitude)*0.01f;
 				gpsintent.putExtra("longitude", longitudef);
 				gpsintent.putExtra("latitude", latitudef);
 				//发送gps信息到zigbee设备，来发送gps广播

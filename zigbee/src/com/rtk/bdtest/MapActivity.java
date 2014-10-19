@@ -62,7 +62,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 	private static final int MSG_UPDATE_OTHER_GPS = 1;
 	private static int count = 0;
 	// 默认南京经纬度
-	private static float[] jingwei = { 32.03f, 118.46f };
+	private static Double[] jingwei = { 32.03, 118.46 };
 	public ArrayList<Device> gpsdevices;
 
 	static BitmapDescriptor bdA = BitmapDescriptorFactory
@@ -129,8 +129,8 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 			Log.i(Tag, "the action is !!!!" + gpsIntent.getAction());
 			if (gpsIntent.getAction().equals("ACTION_UPDATE_SELF_GPS")) {
 				String id = ""; // 得到gps所属的id
-				float longitude = gpsIntent.getExtras().getFloat("longitude");
-				float latitude = gpsIntent.getExtras().getFloat("latitude");
+				Double longitude = gpsIntent.getExtras().getDouble("longitude");
+				Double latitude = gpsIntent.getExtras().getDouble("latitude");
 				Log.i(Tag, "update self gps info the longitude is " + longitude
 						+ "the latitude is " + latitude);
 				jingwei[0] = longitude;
@@ -219,8 +219,8 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 		importFromSDCard(mMapView);
 
 		mBaiduMap = mMapView.getMap();
-		MapStatusUpdate msu = MapStatusUpdateFactory.zoomTo(14.0f);
-		mBaiduMap.setMapStatus(msu);
+		//MapStatusUpdate msu = MapStatusUpdateFactory.zoomTo(14.0f);
+		//mBaiduMap.setMapStatus(msu);
 
 		initOverlay();
 
@@ -307,6 +307,10 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 
 	public void initOverlay() {
 		// add marker overlay
+		LatLng testA = new LatLng(32.01807045, 118.48776303);
+		OverlayOptions ooA = new MarkerOptions().position(testA).icon(bdA)
+				.zIndex(9).draggable(true);
+		mMarkerA = (Marker) (mBaiduMap.addOverlay(ooA));
 		/*LatLng llA = new LatLng(39.963175, 116.400244);
 		LatLng llB = new LatLng(39.942821, 116.369199);
 		LatLng llC = new LatLng(39.939723, 116.425541);
@@ -351,6 +355,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 		// TODO Auto-generated method stub
 		mMapView.onPause();
 		//gpsHandler.removeCallbacks(gpsselfRunnable);
+		mMarkerSelf = null;
 		getActivity().unregisterReceiver(receiver);
 		super.onPause();
 	}
