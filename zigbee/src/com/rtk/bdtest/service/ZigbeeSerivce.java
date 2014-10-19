@@ -249,7 +249,7 @@ public class ZigbeeSerivce extends Service {
 			Message message = handler.obtainMessage(MSG_GET_SELF_INFO);
 			message.obj = data;
 			handler.sendMessage(message);
-		} else if (data.substring(2,6).equals(3002)) {
+		} else if (data.substring(2,6).equals("3002")) {
 			Log.i(Tag, "Receive beidou broadcast information! and data is " + data);
 			String beidou = data.substring(3);
 			Intent intent3 = new Intent("com.rtk.bdtest.service.BDService.broadcast");
@@ -257,10 +257,13 @@ public class ZigbeeSerivce extends Service {
 			intent3.putExtra("gps", beidou);
 			sendBroadcast(intent3);
 			Log.i(Tag,"send!!!!data!!!!");
-	    } else if (data.substring(2, 6).equals(3003))  {
+	    } else if (data.substring(2, 6).equals("3003"))  {
 			//收到短信息处理！
-	    	Log.i(Tag,"sms data received is " + data);
+	    	Log.i(Tag,"sms data received is sms " + data);
 			String smsReceive = data.substring(26, data.length());
+			String smsSourAddr = data.substring(18,22);
+			String smsSourId = data.substring(22,26);
+			Log.i(Tag,"smsdata is " + data +"addr" +smsSourAddr + "id " +smsSourId + " content" + smsReceive);
 			byte[] bytes = CharConverter.hexStringToBytes(smsReceive);
 			try {
 				String smsutf8 = new String(bytes,"utf-8");
@@ -269,6 +272,8 @@ public class ZigbeeSerivce extends Service {
 				Intent smsintent = new Intent("com.rtk.bdtest.service.ZigbeeService.broadcast");
 				smsintent.setAction(("ACTION_ZIGBEE_SMS").toString());
 				smsintent.putExtra("zigbee_sms", smsutf8);
+				smsintent.putExtra("smsSourAddr",smsSourAddr);
+				smsintent.putExtra("smsSourId",smsSourId);
 				sendBroadcast(smsintent);
 			} catch (UnsupportedEncodingException e) {
 				// TODO Auto-generated catch block
@@ -313,20 +318,23 @@ public class ZigbeeSerivce extends Service {
 				}
 				if (len > 0) {
 					receivedData = CharConverter.byteToHexString(zigbeeBuffer, len);
-					Log.d(Tag,"receivedData is " + receivedData + "The substring" +receivedData.substring(2,6));
+					if(receivedData.length()>8) {
+					Log.d(Tag,"receivedData is " + receivedData + "The substring" +receivedData.substring(2,6)+" isSms" + isSms);
 					if((receivedData.substring(2, 6).equals("3003")) && (!isSms)) {
 						receiveData1 = receivedData;
 					    isSms = true;
-						return ;
 					} else if (isSms) {
+						Log.i(Tag,"isSms" + isSms + "");
 						receiveData1 = receiveData1 + receivedData;
 						isSms = false;
 						Log.d(Tag, " sms data received is " +receiveData1 );
 						handleData(receiveData1, zigbeeBuffer);
-					}
+					} else {
 					Log.d(TAG, "zigbee data = " + receivedData + "    The length is " + receivedData.length());
 					handleData(receivedData, zigbeeBuffer);
 					}
+					}
+				}
 				}
 			}
 		}

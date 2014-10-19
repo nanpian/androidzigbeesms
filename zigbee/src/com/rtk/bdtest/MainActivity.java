@@ -65,6 +65,7 @@ public class MainActivity extends FragmentActivity implements
 	public void sendLocation() {
 		FragmentManager rightfm = this.getSupportFragmentManager();
 		Fragment lfm = rightfm.findFragmentById(R.id.list_container);
+		if(((FragmentList2) lfm).padinfo!=null) {
 		Log.i(Tag,"The pad info address is " +((FragmentList2) lfm).padinfo.substring(4, 8));
 		if (lfm instanceof FragmentList2) {
 			padAddress = ((FragmentList2) lfm).padinfo.substring(4, 8);
@@ -86,6 +87,7 @@ public class MainActivity extends FragmentActivity implements
 						(defaultLatitude).getBytes().length);
 				sendData2Zigbee(temp);
 			}
+		}
 		}
 	}
 

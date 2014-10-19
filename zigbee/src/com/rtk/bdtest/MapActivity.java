@@ -25,6 +25,7 @@ import com.baidu.mapapi.map.offline.MKOLUpdateElement;
 import com.baidu.mapapi.map.offline.MKOfflineMap;
 import com.baidu.mapapi.map.offline.MKOfflineMapListener;
 import com.rtk.bdtest.util.Device;
+import com.rtk.bdtest.util.GpsCorrect;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -61,8 +62,9 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 	private static final int MSG_UPDATE_SELF_GPS = 0;
 	private static final int MSG_UPDATE_OTHER_GPS = 1;
 	private static int count = 0;
+	private static LatLng jingwei2;
 	// 默认南京经纬度
-	private static Double[] jingwei = { 32.03, 118.46 };
+	private static double[] jingwei = {  0,0 };
 	public ArrayList<Device> gpsdevices;
 
 	static BitmapDescriptor bdA = BitmapDescriptorFactory
@@ -123,6 +125,8 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 
 	private BroadcastReceiver receiver = new BroadcastReceiver() {
 
+
+
 		@Override
 		public void onReceive(Context arg0, Intent gpsIntent) {
 			// 收到gps intent以后，发给gps刷新handler，ui显示
@@ -133,21 +137,29 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 				Double latitude = gpsIntent.getExtras().getDouble("latitude");
 				Log.i(Tag, "update self gps info the longitude is " + longitude
 						+ "the latitude is " + latitude);
-				jingwei[0] = longitude;
-				jingwei[1] = latitude;
+				//GpsCorrect.transform(latitude, longitude, jingwei);
+				//Log.i(Tag, "update self gps  jiupian  info the longitude is " + jingwei[0]
+				//		+ "the latitude is " + jingwei[1]);
+				//jingwei[0] = longitude;
+				//jingwei[1] = latitude;
 				BitmapDescriptor bdC = BitmapDescriptorFactory
 						.fromResource(R.drawable.icon_marka);
-				LatLng jingwei2 = new LatLng(jingwei[1], jingwei[0]);
+				jingwei2 = new LatLng(latitude, longitude);
 				if(mMarkerSelf==null) {
 				OverlayOptions selfgps = new MarkerOptions().position(jingwei2)
 						.icon(bdC).perspective(false).anchor(0.5f, 0.5f)
 						.rotate(30).zIndex(7);
 				mMarkerSelf = (Marker) (mBaiduMap.addOverlay(selfgps));
-				MapStatus mMapStatus = new MapStatus.Builder().target(jingwei2).zoom(18).build();
+				MapStatus mMapStatus = new MapStatus.Builder().target(jingwei2).zoom(8).build();
 				MapStatusUpdate status = MapStatusUpdateFactory.newMapStatus(mMapStatus);
+				mBaiduMap.setMapStatus(status);
 				//		.newLatLng(jingwei2);
 				} else {
-					mMarkerSelf.setPosition(jingwei2);
+					//mMarkerSelf.setPosition(jingwei2);
+					Log.i(Tag, " new position!");
+					LatLng temp = mMarkerSelf.getPosition();
+					LatLng llNew = new LatLng(latitude,longitude);
+					mMarkerSelf.setPosition(llNew);
 				}
 				//Message gpsMessage = new Message();
 				//gpsMessage.what = MSG_UPDATE_SELF_GPS;
@@ -307,10 +319,10 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 
 	public void initOverlay() {
 		// add marker overlay
-		LatLng testA = new LatLng(32.01807045, 118.48776303);
-		OverlayOptions ooA = new MarkerOptions().position(testA).icon(bdA)
-				.zIndex(9).draggable(true);
-		mMarkerA = (Marker) (mBaiduMap.addOverlay(ooA));
+		//LatLng testA = new LatLng(32.01807045, 118.48776303);
+		//OverlayOptions ooA = new MarkerOptions().position(testA).icon(bdA)
+		//		.zIndex(9).draggable(true);
+		//mMarkerA = (Marker) (mBaiduMap.addOverlay(ooA));
 		/*LatLng llA = new LatLng(39.963175, 116.400244);
 		LatLng llB = new LatLng(39.942821, 116.369199);
 		LatLng llC = new LatLng(39.939723, 116.425541);

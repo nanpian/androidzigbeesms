@@ -66,7 +66,7 @@ public class FragmentList2 extends Fragment {
 	public static final int MSG_REDUCE_DEVICE_COUNT = 17;
 	private static final int MSG_GET_SELF_ID = 18;
 	public static boolean isBind = false;
-	public static String padinfo;
+	public static String padinfo=null;
     public static String selfpadAddress;
 	
 	public void reduceDeviceCount() {
@@ -91,7 +91,7 @@ public class FragmentList2 extends Fragment {
 				}
 			}
 
-			mHandler.sendEmptyMessageDelayed(MSG_REDUCE_DEVICE_COUNT, 5 * 1000);
+			mHandler.sendEmptyMessageDelayed(MSG_REDUCE_DEVICE_COUNT, 8 * 1000);
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
@@ -128,25 +128,21 @@ public class FragmentList2 extends Fragment {
 			Log.i(Tag, "Receive intent and the action is " +intent.getAction());
 			if(intent.getAction().equalsIgnoreCase("ACTION_ZIGBEE_SMS")) { 
 				String data = intent.getExtras().getString("zigbee_sms");
+				final String addrtmp  = intent.getExtras().getString("smsSourAddr");
+				final String  Idtmp = intent.getExtras().getString("smsSourId");
 				Log.i(Tag, "Receive sms broadcast" + data);
 				mInput = new EditText(getActivity());
 				mInput.setMaxLines(4);
 				mInput.setText(data);
 				AlertDialog dialog = new AlertDialog.Builder(getActivity())
-						.setTitle("收到短信息")
+						.setTitle("收到来自地址"+addrtmp+"ID为"+Idtmp+"短信息")
 						.setView(mInput)
-						.setPositiveButton("确定",
+						.setPositiveButton("回复？",
 								new DialogInterface.OnClickListener() {
 									@Override
 									public void onClick(DialogInterface dialog,
 											int which) {
-										String smstmp = mInput.getText()
-												.toString();
-										String head  =  null;
-										String sms = head+smstmp;
-										String destAddr = null;
-										String destId = null;
-										//MainActivity.instance.sendSMS(sms,destAddr,destId);
+										 MainActivity.instance.sendSMS(mInput.toString(),addrtmp,Idtmp);
 									}
 								}).setNegativeButton(R.string.cancel, null)
 						.create();
@@ -190,6 +186,7 @@ public class FragmentList2 extends Fragment {
 					isContain = true;
 					   devicesB.get(i).deviceName = "本机"+data.substring(6,10);
 					   devicesB.get(i).deviceID = data.substring(10,14);
+					   devicesB.get(i).deviceAddress = data.substring(6, 10);
 						devicesB.get(i).count = 5;
 						devicesB.get(i).online = true;
 				}
@@ -200,6 +197,7 @@ public class FragmentList2 extends Fragment {
 			Device deviceB2 = new Device();
 			deviceB2.count = 5;
 			   deviceB2.deviceName = "本机"+data.substring(6,10);
+			   deviceB2.deviceAddress = data.substring(6, 10);
 			   deviceB2.deviceID = data.substring(10,14);
 			devicesB.add(deviceB2);
 		}
@@ -211,9 +209,10 @@ public class FragmentList2 extends Fragment {
 		data = data.substring(2,data.length());
 		try {
 			for (int i = 0; i < devicesB.size(); i++) {
-				if (devicesB.get(i).deviceAddress.equals(data.substring(6,10))){
+				if (devicesB.get(i).deviceName.contains("路由器")){
 					isContain = true;
 					   devicesB.get(i).deviceName = "路由器"+data.substring(6,10);
+					   devicesB.get(i).deviceAddress = data.substring(6,10);
 					   devicesB.get(i).deviceID = data.substring(10,14);
 						devicesB.get(i).count = 5;
 						devicesB.get(i).online = true;
@@ -225,8 +224,9 @@ public class FragmentList2 extends Fragment {
 				deviceB2.online = true;
 				deviceB2.deviceName = "路由器" + data.substring(6, 10);
 				deviceB2.deviceID = data.substring(10, 14);
+				deviceB2.deviceAddress = data.substring(6,10);
 				devicesB.add(deviceB2);
-				adapter.notifyDataSetChanged();
+				//adapter.notifyDataSetChanged();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -248,6 +248,7 @@ public class FragmentList2 extends Fragment {
 						isContain = true;
 						   devicesB.get(i).deviceName = "协调器"+data.substring(6,10);
 						   devicesB.get(i).deviceID = data.substring(10,14);
+						   devicesB.get(i).deviceAddress = data.substring(6,10);
 							devicesB.get(i).count = 5;
 							devicesB.get(i).online = true;
 					}
@@ -259,6 +260,7 @@ public class FragmentList2 extends Fragment {
 				deviceB2.count = 5;
 				deviceB2.online = true;
 				   deviceB2.deviceName = "协调器"+data.substring(6,10);
+				   deviceB2.deviceAddress = data.substring(6,10);
 				   deviceB2.deviceID = data.substring(10,14);
 				devicesB.add(deviceB2);
 			}
@@ -551,7 +553,7 @@ public class FragmentList2 extends Fragment {
 
 			@Override
 			public boolean onGroupClick(ExpandableListView parent, View v,
-					int groupPosition, long id) {
+					final int groupPosition, long id) {
 
 				Toast.makeText(getActivity(), "The B device count "
 						+ groupPosition + "is clicked! and the name is "
@@ -573,12 +575,10 @@ public class FragmentList2 extends Fragment {
 										public void onClick(
 												DialogInterface dialog,
 												int which) {
-											String smstmp = mInput2.getText()
+											String sms = mInput2.getText()
 													.toString();
-											String head = null;
-											String sms = head + smstmp;
-											String destAddr = null;
-											String destId = null;
+											String destAddr = devicesB.get(groupPosition).deviceAddress;
+											String destId = devicesB.get(groupPosition).deviceID;
 											MainActivity.instance.sendSMS(sms,destAddr,destId);
 										}
 									}).setNegativeButton(R.string.cancel, null)
