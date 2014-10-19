@@ -278,7 +278,7 @@ public class FragmentList2 extends Fragment {
 				Toast.makeText(getActivity(), "未导入战士文件或者导入错误",
 						Toast.LENGTH_SHORT);
 			for (int i = 0; i < devices.size(); i++) {
-				if (devices.get(i).deviceID.equals(data.substring(8, 12))) {
+				if (devices.get(i).deviceID.equals(data.substring(12, 16))) {
 					isContain = true;
 					devices.get(i).deviceID = data.substring(12, 16);
 					devices.get(i).deviceType = data.substring(6, 8);
@@ -286,6 +286,7 @@ public class FragmentList2 extends Fragment {
 					// 如果终端父亲地址等于路由地址，则显示在线
 					if (devices.get(i).parentAddress.equals(selfpadAddress)) {
 						devices.get(i).online = true;
+	                    devicesA.set(0, devices);
 						if (devices.get(i).count < 5) {
 							devices.get(i).count++;
 						} else {
@@ -307,8 +308,10 @@ public class FragmentList2 extends Fragment {
 					devicetmp.online = true;
 				    devicetmp.count = 5;
 					devices.add(devicetmp);
-					adapter.notifyDataSetChanged();
+
 				}
+                devicesA.set(0, devices);
+				adapter.notifyDataSetChanged();
 				
 			}
 
