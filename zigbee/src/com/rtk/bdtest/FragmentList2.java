@@ -91,7 +91,7 @@ public class FragmentList2 extends Fragment {
 				}
 			}
 
-			mHandler.sendEmptyMessageDelayed(MSG_REDUCE_DEVICE_COUNT, 8 * 1000);
+			mHandler.sendEmptyMessageDelayed(MSG_REDUCE_DEVICE_COUNT, 9 * 1000);
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
