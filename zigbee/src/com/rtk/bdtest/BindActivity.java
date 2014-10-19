@@ -192,8 +192,10 @@ public class BindActivity extends Fragment {
 											// 把id对应的设备名字插入数据库，数据库应该有设备名、id、父节点地址、设备类型、设备名字对应的消息记录表
 											dbDeviceHelper.update(
 													namelist.get(arg2), idTemp);
+											String sendbind = namelist.get(arg2)+"," + idTemp;
 											//将绑定的id name对应的值传给左边的listview fragment
 											bindedListener.OnBindedListener(namelist.get(arg2),idTemp);
+											 MainActivity.instance.sendSMS(sendbind,"0000","FFFF","03");
 											toast2.show();
 										} catch (Exception e) {
 											// TODO: handle exception

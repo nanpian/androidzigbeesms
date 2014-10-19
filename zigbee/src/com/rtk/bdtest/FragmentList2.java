@@ -126,7 +126,7 @@ public class FragmentList2 extends Fragment {
 		public void onReceive(Context context, Intent intent) {
 			// TODO Auto-generated method stub
 			Log.i(Tag, "Receive intent and the action is " +intent.getAction());
-			if(intent.getAction().equalsIgnoreCase("ACTION_ZIGBEE_SMS")) { 
+			if(intent.getAction().equals("ACTION_ZIGBEE_SMS")) { 
 				String data = intent.getExtras().getString("zigbee_sms");
 				final String addrtmp  = intent.getExtras().getString("smsSourAddr");
 				final String  Idtmp = intent.getExtras().getString("smsSourId");
@@ -426,6 +426,7 @@ public class FragmentList2 extends Fragment {
 		IntentFilter filter = new IntentFilter("com.rtk.bdtest.service.ZigbeeService.broadcast2");
 		filter.addAction("ACTION_GET_SELF_INFO");
 		filter.addAction("ACTION_NOTIFY_DEVICE");
+		filter.addAction("ACTION_ZIGBEE_SMS");
 		getActivity().registerReceiver(receiver, filter);
 	}
 

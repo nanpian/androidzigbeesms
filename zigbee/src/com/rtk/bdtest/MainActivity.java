@@ -101,10 +101,15 @@ public class MainActivity extends FragmentActivity implements
 	public Activity getActivity() {
 		return instance;
 	}
-
+	
 	void sendSMS(String sms,String destAddr , String destId) {
 		Log.i(Tag, "send data" + sms + " to zigbee!plz wait and verify");
-		zigbeeService.sendsms2Zigbee(sms, destAddr, destId);
+		zigbeeService.sendsms2Zigbee2(sms, destAddr, destId);
+	}
+
+	void sendSMS(String sms,String destAddr , String destId, String type) {
+		Log.i(Tag, "send data" + sms + " to zigbee!plz wait and verify");
+		zigbeeService.sendsms2Zigbee2(sms, destAddr, destId);
 	}
 
 	public void sendData2Zigbee(byte[] hexStringToBytes) {

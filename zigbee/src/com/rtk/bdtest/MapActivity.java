@@ -65,7 +65,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 	private static LatLng jingwei2;
 	// 默认南京经纬度
 	private static double[] jingwei = {  0,0 };
-	public ArrayList<Device> gpsdevices;
+	public static ArrayList<Device> gpsdevices;
 
 	static BitmapDescriptor bdA = BitmapDescriptorFactory
 			.fromResource(R.drawable.icon_marka);
@@ -137,6 +137,12 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 				Double latitude = gpsIntent.getExtras().getDouble("latitude");
 				Log.i(Tag, "update self gps info the longitude is " + longitude
 						+ "the latitude is " + latitude);
+				FragmentManager rightfm = getActivity()
+						.getSupportFragmentManager();
+				Fragment lfm = rightfm.findFragmentById(R.id.list_container);
+				if(((FragmentList2) lfm).devicesB.size()>0) {
+					gpsdevices = ((FragmentList2) lfm).devicesB;				
+				} 
 				//GpsCorrect.transform(latitude, longitude, jingwei);
 				//Log.i(Tag, "update self gps  jiupian  info the longitude is " + jingwei[0]
 				//		+ "the latitude is " + jingwei[1]);
@@ -153,6 +159,13 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 				MapStatus mMapStatus = new MapStatus.Builder().target(jingwei2).zoom(8).build();
 				MapStatusUpdate status = MapStatusUpdateFactory.newMapStatus(mMapStatus);
 				mBaiduMap.setMapStatus(status);
+				for (int i = 0; i<gpsdevices.size(); i++) {
+					if (gpsdevices.get(i).deviceName!=null) {
+						if(gpsdevices.get(i).deviceName.contains("本机")) {
+							gpsdevices.get(i).gpsMarker = mMarkerSelf;
+						}
+					}
+				}
 				//		.newLatLng(jingwei2);
 				} else {
 					//mMarkerSelf.setPosition(jingwei2);
@@ -160,6 +173,13 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 					LatLng temp = mMarkerSelf.getPosition();
 					LatLng llNew = new LatLng(latitude,longitude);
 					mMarkerSelf.setPosition(llNew);
+					for (int i = 0; i<gpsdevices.size(); i++) {
+						if (gpsdevices.get(i).deviceName!=null) {
+							if(gpsdevices.get(i).deviceName.contains("本机")) {
+								gpsdevices.get(i).gpsMarker = mMarkerSelf;
+							}
+						}
+					}
 				}
 				//Message gpsMessage = new Message();
 				//gpsMessage.what = MSG_UPDATE_SELF_GPS;
@@ -168,15 +188,18 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 
 			} else if (gpsIntent.getAction().equals("ACTION_UPDATE_GPS_INFO")) {
 				String jingweidu = gpsIntent.getExtras().getString("gps");
-				String deviceAddress = jingweidu.substring(0, 2);
-				String gps = jingweidu.substring(2);
+				String deviceAddress = jingweidu.substring(0, 4);
+				String gps = jingweidu.substring(4,jingweidu.length());
+				Log.i(Tag, " gps address is " +deviceAddress + "gps info is " +gps);
 				FragmentManager rightfm = getActivity()
 						.getSupportFragmentManager();
 				Fragment lfm = rightfm.findFragmentById(R.id.list_container);
 				if (lfm instanceof FragmentList2) {
 					// 得到B和C设备列表
+					if(((FragmentList2) lfm).devicesB.size()>0) {
 					gpsdevices = ((FragmentList2) lfm).devicesB;
 					for (int i = 0; i < gpsdevices.size(); i++) {
+						if(gpsdevices.get(i).deviceAddress!=null ) {
 						if (gpsdevices.get(i).deviceAddress
 								.equals(deviceAddress)) {
 							gpsdevices.get(i).deviceAddress = deviceAddress;
@@ -198,9 +221,11 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 								markertmp = (Marker) (mBaiduMap.addOverlay(ooA));
 								gpsdevices.get(i).gpsMarker = mMarkerA;
 							}
+						}
 						} else {
 							// 设备没在设备列表里
 						}
+					}
 					}
 				}
 				// 刷新所有marker点的gps经纬度信息
@@ -241,6 +266,12 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 				Button button = new Button(getActivity());
 				button.setBackgroundResource(R.drawable.popup);
 				OnInfoWindowClickListener listener = null;
+				FragmentManager rightfm = getActivity()
+						.getSupportFragmentManager();
+				Fragment lfm = rightfm.findFragmentById(R.id.list_container);
+				if(((FragmentList2) lfm).devicesB.size()>0) {
+					gpsdevices = ((FragmentList2) lfm).devicesB;				
+				} 
 				for (int i = 0; i <gpsdevices.size(); i ++) {
 					if((gpsdevices.get(i).gpsMarker!=null)&& (marker==gpsdevices.get(i).gpsMarker)) {
 						button.setText(gpsdevices.get(i).deviceName + gpsdevices.get(i).deviceAddress);
@@ -259,6 +290,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 						mBaiduMap.showInfoWindow(mInfoWindow);
 					}
 				}
+				
 				if (marker == mMarkerA || marker == mMarkerD) {
 					button.setText("测试用");
 					listener = new OnInfoWindowClickListener() {
@@ -299,7 +331,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 				} else if (gpsdevices.size() > 0) {
 					for (int i = 0; i < gpsdevices.size(); i++) {
 						if (marker == gpsdevices.get(i).gpsMarker) {
-							button.setText("动态gps点");
+							//button.setText("动态gps点");
 							button.setOnClickListener(new OnClickListener() {
 								public void onClick(View v) {
 									marker.remove();

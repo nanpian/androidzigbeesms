@@ -103,6 +103,43 @@ public class ZigbeeSerivce extends Service {
 		}
 	}
 	
+	//发送短信，发送短信成功的标志是什么？？？
+	public void sendsms2Zigbee2(String data, String destAddr, String destId) {
+		 /*Message msg = new Message();
+		 msg.what = MSG_SEND_SMS;
+		 msg.obj = data;
+		handler.sendMessage(msg);*/
+		Log.i(Tag, "send sms!");
+		try {
+			//0x2D为length，3003短信息标志位，00为index，01为包数，destAddr目标短地址
+			//destId为目标id，0xffff，0xffff，短信息内容为32字节
+			byte[] temp = new byte[45]; 
+            String head = "2D30030001"+destAddr+destId;
+			System.arraycopy(CharConverter.hexStringToBytes(head), 0, temp, 0,
+					9);
+			byte[] souDest = {(byte) 0xff,(byte) 0xff};
+			byte[] sourId = {(byte) 0xff,(byte) 0xff};
+ 			System.arraycopy(souDest, 0, temp,9 , 2);
+ 			System.arraycopy(sourId, 0, temp,11 , 2);
+ 			
+ 			byte[] sms = data.getBytes("UTF-8");
+ 			int smslength = sms.length+2;
+ 			String l = String.format("%02x", smslength);	
+ 			
+ 			System.arraycopy(CharConverter.hexStringToBytes(l), 0, temp, 13, 1 ); //字串长度
+ 			System.arraycopy(CharConverter.hexStringToBytes("03"), 0, temp, 14, 1);//类型为01
+			String head2 = "2D30030001"+destAddr+destId+l+"03";
+ 			System.arraycopy(sms, 0, temp, 15, sms.length);
+ 			Log.i(Tag,"The sms send data head is " +head2);
+ 			Log.i(Tag,"The sms send data string is " + temp);
+ 			sendData2Zigbee(temp);
+			//sendData2Zigbee(data.getBytes("UTF-8"));
+			//sendData2Zigbee(data.getBytes("Unicode"));
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+	}
 	
 	//发送短信，发送短信成功的标志是什么？？？
 	public void sendsms2Zigbee(String data, String destAddr, String destId) {
@@ -115,7 +152,7 @@ public class ZigbeeSerivce extends Service {
 			//0x2D为length，3003短信息标志位，00为index，01为包数，destAddr目标短地址
 			//destId为目标id，0xffff，0xffff，短信息内容为32字节
 			byte[] temp = new byte[45]; 
-			String head = "2D30030001"+destAddr+destId;
+            String head = "2D30030001"+destAddr+destId;
 			System.arraycopy(CharConverter.hexStringToBytes(head), 0, temp, 0,
 					9);
 			byte[] souDest = {(byte) 0xff,(byte) 0xff};
@@ -124,8 +161,14 @@ public class ZigbeeSerivce extends Service {
  			System.arraycopy(sourId, 0, temp,11 , 2);
  			
  			byte[] sms = data.getBytes("UTF-8");
- 			System.arraycopy(sms, 0, temp, 13, 32);
- 			Log.i(Tag,"The sms send data head is " +head);
+ 			int smslength = sms.length+2;
+ 			String l = String.format("%02x", smslength);	
+ 			
+ 			System.arraycopy(CharConverter.hexStringToBytes(l), 0, temp, 13, 1 ); //字串长度
+ 			System.arraycopy(CharConverter.hexStringToBytes("01"), 0, temp, 14, 1);//类型为01
+			String head2 = "2D30030001"+destAddr+destId+l+"01";
+ 			System.arraycopy(sms, 0, temp, 15, sms.length);
+ 			Log.i(Tag,"The sms send data head is " +head2);
  			Log.i(Tag,"The sms send data string is " + temp);
  			sendData2Zigbee(temp);
 			//sendData2Zigbee(data.getBytes("UTF-8"));
@@ -251,22 +294,30 @@ public class ZigbeeSerivce extends Service {
 			handler.sendMessage(message);
 		} else if (data.substring(2,6).equals("3002")) {
 			Log.i(Tag, "Receive beidou broadcast information! and data is " + data);
-			String beidou = data.substring(3);
+			String beidou = data.substring(6,data.length());
 			Intent intent3 = new Intent("com.rtk.bdtest.service.BDService.broadcast");
-			intent3.setAction(("ACTION_UPDATE_GPS_INFO").toString());
+			intent3.setAction(("ACTION_UPDATE_GPS_INFO2").toString());
 			intent3.putExtra("gps", beidou);
 			sendBroadcast(intent3);
 			Log.i(Tag,"send!!!!data!!!!");
 	    } else if (data.substring(2, 6).equals("3003"))  {
 			//收到短信息处理！
 	    	Log.i(Tag,"sms data received is sms " + data);
-			String smsReceive = data.substring(26, data.length());
+
 			String smsSourAddr = data.substring(18,22);
 			String smsSourId = data.substring(22,26);
-			Log.i(Tag,"smsdata is " + data +"addr" +smsSourAddr + "id " +smsSourId + " content" + smsReceive);
+			String length = data.substring(26,28);
+			byte[] smslength = CharConverter.hexStringToBytes(length);
+		    int smslenth = smslength[0]&0xff;
+		    Log.i(Tag,"sms length is " + smslenth);
+			String type = data.substring(28,30);
+			String smsReceive = data.substring(30, data.length());
+			Log.i(Tag,"smsdata is " + data +"addr" +smsSourAddr + "id " +smsSourId + " content" + smsReceive +"type is " +type);
 			byte[] bytes = CharConverter.hexStringToBytes(smsReceive);
+			byte[] temp = new byte[smslenth-2+1];
+			System.arraycopy(bytes, 0, temp, 0, smslenth-2);
 			try {
-				String smsutf8 = new String(bytes,"utf-8");
+				String smsutf8 = new String(temp,"utf-8");
 				Log.i(Tag,"the sms utf8 is" + smsutf8);
 				//收到短信息，发送广播给activity，分两种情况处理，第一种是gps信息，第二种是普通短信息！！！！！！！
 				Intent smsintent = new Intent("com.rtk.bdtest.service.ZigbeeService.broadcast");
