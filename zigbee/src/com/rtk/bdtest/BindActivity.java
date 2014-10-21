@@ -128,7 +128,7 @@ public class BindActivity extends Fragment {
 				    Log.d(Tag,"soldier file path is : " + path);
 				    try{
 				        FileInputStream fileIS = new FileInputStream(path);
-				        BufferedReader buf = new BufferedReader(new InputStreamReader(fileIS,"UTF-8"));
+				        BufferedReader buf = new BufferedReader(new InputStreamReader(fileIS,"GB2312"));
 				        String readString = new String();
 				        while((readString = buf.readLine())!= null){
 				                    Log.d(Tag ,"line: " + readString);
