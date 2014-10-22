@@ -4,7 +4,12 @@
         android:id="@+id/settings1"
         android:orderInCategory="100"
         android:showAsAction="never"
-        android:title="设置-绑定队员姓名和设备"/>
+        android:title="绑定队员姓名和设备"/>
+        <item
+        android:id="@+id/edit"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="编辑队员信息"/>
     <item
         android:id="@+id/settings2"
         android:orderInCategory="100"
@@ -19,7 +24,7 @@
         android:id="@+id/settings4"
         android:orderInCategory="100"
         android:showAsAction="never"
-        android:title="扫描离线地图"/>
+        android:title="查看地图"/>
     <item
         android:id="@+id/settings5"
         android:orderInCategory="100"

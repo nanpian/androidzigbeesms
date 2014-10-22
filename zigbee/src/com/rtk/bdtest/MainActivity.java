@@ -253,6 +253,16 @@ public class MainActivity extends FragmentActivity implements
 			fragmentTransaction.commit();
 		}
 			break;
+		case R.id.edit: {
+			Fragment detailFragment = new PersonActivity();
+			final FragmentManager fragmentManager = this
+					.getSupportFragmentManager();
+			final FragmentTransaction fragmentTransaction = fragmentManager
+					.beginTransaction();
+			fragmentTransaction.replace(R.id.detail_container, detailFragment);
+			fragmentTransaction.commit();
+		}
+			break;
 		case R.id.settings2: {
 			Bundle arguments = new Bundle();
 			arguments.putBoolean("issend", true);
