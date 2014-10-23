@@ -4,8 +4,7 @@
     android:layout_height="fill_parent" >
 
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
 
@@ -13,23 +12,44 @@
             android:id="@+id/name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="5"
+            android:ems="10"
             android:hint="姓名" >
         </EditText>
 
         <EditText
-            android:id="@+id/editText2"
+            android:id="@+id/id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="5"
+            android:ems="10"
             android:hint="ID" />
 
         <EditText
-            android:id="@+id/editText3"
+            android:id="@+id/type"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="5"
+            android:ems="10"
+            android:hint="类型" />
+
+        <EditText
+            android:id="@+id/rank"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
             android:hint="军衔" />
+
+        <EditText
+            android:id="@+id/job"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="职务" />
+
+        <EditText
+            android:id="@+id/year"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="年龄" />
 
         <RadioGroup
             android:id="@+id/radioGroup"
@@ -56,36 +76,10 @@
         </RadioGroup>
 
         <EditText
-            android:id="@+id/editText5"
+            android:id="@+id/beizhu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="5"
-            android:hint="年龄" />
-
-        <TextView
-            android:id="@+id/editText6"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="5"
-            android:hint="出生日期" />
-
-        <android.widget.DatePicker
-            android:id="@+id/datePicker1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <EditText
-            android:id="@+id/editText6"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="5"
-            android:hint="装备" />
-
-        <EditText
-            android:id="@+id/editText6"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="5"
+            android:ems="10"
             android:hint="备注" />
     </LinearLayout>
 

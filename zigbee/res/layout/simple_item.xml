@@ -18,7 +18,22 @@
         android:layout_height="fill_parent"
         android:layout_weight="1"/>
     <TextView
+        android:id="@+id/type"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"/>
+    <TextView
         android:id="@+id/rank"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"/>
+    <TextView
+        android:id="@+id/job"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"/>
+    <TextView
+        android:id="@+id/year"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_weight="1"/>
@@ -27,17 +42,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_weight="1"/>
-    <TextView
-        android:id="@+id/birthday"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="1"/>
-    <TextView
-        android:id="@+id/device"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="1"/>
-    <TextView
+        <TextView
         android:id="@+id/beizhu"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
