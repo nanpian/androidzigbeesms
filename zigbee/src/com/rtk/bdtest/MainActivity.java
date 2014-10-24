@@ -56,7 +56,7 @@ public class MainActivity extends FragmentActivity implements
 			// TODO Auto-generated method stub
 			// 定时发送gps信息到zigbee，这样zigbee才能发送gps广播信息
 			defaultLatitude = arg1.getExtras().getString("defaultLatitude");
-			Log.i(Tag,"send location to zigbee");
+			Log.i(Tag, "send location to zigbee");
 			sendLocation();
 		}
 
@@ -65,29 +65,30 @@ public class MainActivity extends FragmentActivity implements
 	public void sendLocation() {
 		FragmentManager rightfm = this.getSupportFragmentManager();
 		Fragment lfm = rightfm.findFragmentById(R.id.list_container);
-		if(((FragmentList2) lfm).padinfo!=null) {
-		Log.i(Tag,"The pad info address is " +((FragmentList2) lfm).padinfo.substring(4, 8));
-		if (lfm instanceof FragmentList2) {
-			padAddress = ((FragmentList2) lfm).padinfo.substring(4, 8);
-			if (!padAddress.equals("")) {
-				byte[] temp = new byte[("3002" + padAddress).getBytes().length
-						+ (defaultLatitude).getBytes().length + 2];
-				// byte[] temp = CharConverter.hexStringToBytes("3002") +
-				// (padAddress + defaultLatitude).getBytes();
-				int length = (("3002" + padAddress).getBytes().length) / 2
-						+ defaultLatitude.length() + 1;
-				String l = String.format("%02x", length);
-				Log.d(Tag, "l = " + l);
-				System.arraycopy(CharConverter.hexStringToBytes(l), 0, temp, 0,
-						1);
-				System.arraycopy(
-						CharConverter.hexStringToBytes("3002" + padAddress), 0,
-						temp, 1, 4);
-				System.arraycopy((defaultLatitude).getBytes(), 0, temp, 5,
-						(defaultLatitude).getBytes().length);
-				sendData2Zigbee(temp);
+		if (((FragmentList2) lfm).padinfo != null) {
+			Log.i(Tag, "The pad info address is "
+					+ ((FragmentList2) lfm).padinfo.substring(4, 8));
+			if (lfm instanceof FragmentList2) {
+				padAddress = ((FragmentList2) lfm).padinfo.substring(4, 8);
+				if (!padAddress.equals("")) {
+					byte[] temp = new byte[("3002" + padAddress).getBytes().length
+							+ (defaultLatitude).getBytes().length + 2];
+					// byte[] temp = CharConverter.hexStringToBytes("3002") +
+					// (padAddress + defaultLatitude).getBytes();
+					int length = (("3002" + padAddress).getBytes().length) / 2
+							+ defaultLatitude.length() + 1;
+					String l = String.format("%02x", length);
+					Log.d(Tag, "l = " + l);
+					System.arraycopy(CharConverter.hexStringToBytes(l), 0,
+							temp, 0, 1);
+					System.arraycopy(
+							CharConverter.hexStringToBytes("3002" + padAddress),
+							0, temp, 1, 4);
+					System.arraycopy((defaultLatitude).getBytes(), 0, temp, 5,
+							(defaultLatitude).getBytes().length);
+					sendData2Zigbee(temp);
+				}
 			}
-		}
 		}
 	}
 
@@ -101,13 +102,13 @@ public class MainActivity extends FragmentActivity implements
 	public Activity getActivity() {
 		return instance;
 	}
-	
-	void sendSMS(String sms,String destAddr , String destId) {
+
+	void sendSMS(String sms, String destAddr, String destId) {
 		Log.i(Tag, "send data" + sms + " to zigbee!plz wait and verify");
 		zigbeeService.sendsms2Zigbee2(sms, destAddr, destId);
 	}
 
-	void sendSMS(String sms,String destAddr , String destId, String type) {
+	void sendSMS(String sms, String destAddr, String destId, String type) {
 		Log.i(Tag, "send data" + sms + " to zigbee!plz wait and verify");
 		zigbeeService.sendsms2Zigbee2(sms, destAddr, destId);
 	}
@@ -331,6 +332,7 @@ public class MainActivity extends FragmentActivity implements
 		case R.id.copy:
 			try {
 				final String COPY_FILENAME = "quanguogailue.dat";
+				final String COPY_FILENAME2 = "nanjing_315.dat";
 				final String SDCARD_PATH = android.os.Environment
 						.getExternalStorageDirectory().getAbsolutePath();
 				String databasePath = SDCARD_PATH + File.separator
@@ -338,11 +340,14 @@ public class MainActivity extends FragmentActivity implements
 				String databaseFilename = SDCARD_PATH + File.separator
 						+ "BaiduMapSDK/vmp/h/" + COPY_FILENAME;
 				Log.i(Tag, " the copy file name is " + databaseFilename);
+				String databaseFilename2 = SDCARD_PATH + File.separator
+						+ "BaiduMapSDK/vmp/h/" + COPY_FILENAME2;
 				File dir = new File(databasePath);
 				if (!dir.exists())
 					dir.mkdir();
 				if (!(new File(databaseFilename)).exists()) {
-					ProgressDialog dialog = ProgressDialog.show(this, "", "地图资源拷贝中......", true);
+					ProgressDialog dialog = ProgressDialog.show(this, "",
+							"地图资源拷贝中......", true);
 					dialog.show();
 					InputStream is = getResources().openRawResource(
 							R.raw.quanguogailue);
@@ -355,12 +360,28 @@ public class MainActivity extends FragmentActivity implements
 					}
 					fos.close();
 					is.close();
-					dialog.cancel();
+				} else if (!(new File(databaseFilename2)).exists()) {
+					ProgressDialog dialog2 = ProgressDialog.show(this, "",
+							"地图资源拷贝中......", true);
+					dialog2.show();
+					InputStream is2 = getResources().openRawResource(
+							R.raw.nanjing_315);
+					FileOutputStream fos2 = new FileOutputStream(
+							databaseFilename2);
+					byte[] buffer2 = new byte[8192];
+					int count2 = 0;
+					while ((count2 = is2.read(buffer2)) > 0) {
+						fos2.write(buffer2, 0, count2);
+					}
+					fos2.close();
+					is2.close();
+					dialog2.cancel();
 					Toast.makeText(this, "地图数据拷贝成功", Toast.LENGTH_SHORT).show();
-				    Intent i = getBaseContext().getPackageManager()  
-				            .getLaunchIntentForPackage(getBaseContext().getPackageName());  
-				    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);  
-				    startActivity(i);  
+					Intent i = getBaseContext().getPackageManager()
+							.getLaunchIntentForPackage(
+									getBaseContext().getPackageName());
+					i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					startActivity(i);
 				} else {
 					Toast.makeText(this, "已经有地图数据", Toast.LENGTH_SHORT).show();
 				}

@@ -24,6 +24,8 @@ import com.baidu.mapapi.map.offline.MKOLSearchRecord;
 import com.baidu.mapapi.map.offline.MKOLUpdateElement;
 import com.baidu.mapapi.map.offline.MKOfflineMap;
 import com.baidu.mapapi.map.offline.MKOfflineMapListener;
+import com.baidu.mapapi.utils.CoordinateConverter;
+import com.baidu.mapapi.utils.CoordinateConverter.CoordType;
 import com.rtk.bdtest.util.Device;
 import com.rtk.bdtest.util.GpsCorrect;
 
@@ -102,6 +104,9 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 			case MSG_UPDATE_SELF_GPS:
 				BitmapDescriptor bdC = BitmapDescriptorFactory
 						.fromResource(R.drawable.icon_marka);
+				//经纬度换算
+				jingwei[1] = jingwei[1]%1 *100/60 + jingwei[1];
+				jingwei[0] = jingwei[0]%1 *100/60 + jingwei[0];
 				LatLng jingwei2 = new LatLng(jingwei[1], jingwei[0]);
 				OverlayOptions selfgps = new MarkerOptions().position(jingwei2)
 						.icon(bdC).perspective(false).anchor(0.5f, 0.5f)
@@ -135,8 +140,12 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 				String id = ""; // 得到gps所属的id
 				Double longitude = gpsIntent.getExtras().getDouble("longitude");
 				Double latitude = gpsIntent.getExtras().getDouble("latitude");
+				//经纬度换算
+				longitude = longitude%1*100/60+longitude;
+				latitude = latitude%1*100/60+ latitude;
 				Log.i(Tag, "update self gps info the longitude is " + longitude
 						+ "the latitude is " + latitude);
+
 				FragmentManager rightfm = getActivity()
 						.getSupportFragmentManager();
 				Fragment lfm = rightfm.findFragmentById(R.id.list_container);
@@ -350,6 +359,15 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 	}
 
 	public void initOverlay() {
+		CoordinateConverter converter = new CoordinateConverter();
+		converter.from(CoordType.GPS);
+		LatLng sourceLatLng = new LatLng(32.05253311, 118.80744145);
+		// sourceLatLng待转换坐标
+		converter.coord(sourceLatLng);
+		LatLng desLatLng = converter.convert();
+		OverlayOptions ooC = new MarkerOptions().position(desLatLng).icon(bdC)
+				.perspective(false).anchor(0.5f, 0.5f).rotate(30).zIndex(7);
+		mMarkerC = (Marker) (mBaiduMap.addOverlay(ooC));
 		// add marker overlay
 		//LatLng testA = new LatLng(32.01807045, 118.48776303);
 		//OverlayOptions ooA = new MarkerOptions().position(testA).icon(bdA)
@@ -359,6 +377,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 		LatLng llB = new LatLng(39.942821, 116.369199);
 		LatLng llC = new LatLng(39.939723, 116.425541);
 		LatLng llD = new LatLng(39.906965, 116.401394);
+		
 
 		OverlayOptions ooA = new MarkerOptions().position(llA).icon(bdA)
 				.zIndex(9).draggable(true);

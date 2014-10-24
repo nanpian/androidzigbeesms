@@ -73,7 +73,7 @@ public class PersonActivity extends Fragment {
 		// 将GPS设备采集的原始GPS坐标转换成百度坐标
 		CoordinateConverter converter = new CoordinateConverter();
 		converter.from(CoordType.GPS);
-		LatLng sourceLatLng = new LatLng(32.031519864, 118.48446487);
+		LatLng sourceLatLng = new LatLng(32.05253311, 118.80744145);
 		// sourceLatLng待转换坐标
 		converter.coord(sourceLatLng);
 		LatLng desLatLng = converter.convert();
