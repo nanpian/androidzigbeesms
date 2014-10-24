@@ -7,6 +7,7 @@
       <LinearLayout 
       android:layout_width="match_parent"
       android:layout_height="24dp"
+      android:id="@+id/title"
       >
   <TextView
         android:id="@+id/name1"
@@ -22,6 +23,13 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_weight="1"/>
+       <TextView
+        android:id="@+id/idxx"
+        android:text="类型"
+        android:textStyle="bold"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"/>
     <TextView
         android:id="@+id/rank1"
         android:text="军衔"
@@ -31,21 +39,21 @@
         android:layout_weight="1"/>
     <TextView
         android:id="@+id/sex1"
-        android:text="性别"
+        android:text="职位"
         android:textStyle="bold"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_weight="1"/>
     <TextView
         android:id="@+id/birthday1"
-        android:text="出生日期"
+        android:text="年龄"
         android:textStyle="bold"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_weight="1"/>
     <TextView
         android:id="@+id/device1"
-        android:text="装备"
+        android:text="性别"
         android:textStyle="bold"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"

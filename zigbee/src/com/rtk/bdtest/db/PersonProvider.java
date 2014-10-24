@@ -17,6 +17,7 @@ public class PersonProvider extends ContentProvider {
 	private DbPersonHelper mOpenHelper;
 	private final static String DATABASE_NAME = "zigbee_db3";
 	private final static int DATABASE_VERSION = 6;
+	private final static String Tag = "PersonProvider";
 
 	public final static String PERSON_ID = "_id";
 	private static final String PERSON_NAME = "name";
@@ -25,7 +26,7 @@ public class PersonProvider extends ContentProvider {
 	private static final String PERSON_RANK = "rank";
 	private static final String PERSON_JOB = "job";
 	public final static String PERSON_YEAR = "year";
-	public final static String PERSON_SEX = "male";
+	public final static String PERSON_SEX = "sex";
 	private static final String PERSON_BEIZHU = "beizhu";
 	private static final String DEVICE_ADDRESS_ = "address";
 	private static final String DEVICE_TYPE = "device_type";
@@ -37,6 +38,7 @@ public class PersonProvider extends ContentProvider {
 	private static final int PERSONS = 1;
 	private static final int PERSON = 2;
 	private SQLiteDatabase db;
+	public static final Uri CONTENT_URI = Uri.parse("content://"+AUTHORITY+"/zigbee_person");  
 	static {
 		URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
 		// 先将各项注册进去，才能在后面用到后进行匹配
@@ -95,6 +97,7 @@ public class PersonProvider extends ContentProvider {
 		long rowid;
 		switch (URI_MATCHER.match(uri)) {
 		case PERSONS: // 向表中添加新纪录并返回其行号
+			Log.i(Tag,"insert into persons");
 			rowid = db.insert(TABLE_NAME, null, values);
 		    getContext().getContentResolver().notifyChange(uri, null);
 			return ContentUris.withAppendedId(uri, rowid);
@@ -122,7 +125,7 @@ public class PersonProvider extends ContentProvider {
 		switch (URI_MATCHER.match(uri)) {
 		case PERSONS:
 			return db.query(TABLE_NAME, projection, selection, selectionArgs,
-					null, null, sortOrder);
+					null, null, "_id desc");
 		case PERSON:
 			long id = ContentUris.parseId(uri);
 			String where = "id=" + id;
