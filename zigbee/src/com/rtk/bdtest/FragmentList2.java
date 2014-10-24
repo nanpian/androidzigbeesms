@@ -13,22 +13,27 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;  
+import java.util.Map;
 
 import com.rtk.bdtest.adapter.DeviceExpandableListAdapter;
 import com.rtk.bdtest.adapter.DeviceListAdapter;
 import com.rtk.bdtest.db.DbDeviceHelper;
+import com.rtk.bdtest.db.PersonProvider;
 import com.rtk.bdtest.db.SmsHelper;
 import com.rtk.bdtest.util.Device;
 import com.rtk.bdtest.util.gpsDevice;
   
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;  
+import android.database.ContentObserver;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;  
 import android.os.Handler;
 import android.os.Message;
@@ -37,11 +42,18 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentManager.OnBackStackChangedListener;  
 import android.support.v4.app.FragmentTransaction;  
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;  
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;  
+import android.view.View.OnCreateContextMenuListener;
 import android.view.ViewGroup;  
 import android.widget.AdapterView;  
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;  
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;  
 import android.widget.EditText;
 import android.widget.ExpandableListView;
@@ -68,10 +80,20 @@ public class FragmentList2 extends Fragment {
 	private static final String Tag = "FragmentList";
 	public static final int MSG_REDUCE_DEVICE_COUNT = 17;
 	private static final int MSG_GET_SELF_ID = 18;
+	protected static final int MENU_BEIZHU = 3;
+	protected static final int MENU_MODIFY = 0;
 	public static boolean isBind = false;
 	public static String padinfo=null;
     public static String selfpadAddress;
 	private SmsHelper smsHelper;
+	
+	private ContentObserver PersonObserver = new ContentObserver(new Handler()) {
+		public void onChange(boolean selfChange) {
+			// 此处可以进行相应的业务处理
+			Log.i("PersonProvider", "observer find it!!!");
+            mHandler.post(runnableUI2);
+		}
+	};
 	
 	public void reduceDeviceCount() {
 		try {
@@ -432,7 +454,8 @@ public class FragmentList2 extends Fragment {
     	Log.i(Tag,"FragmentList onpause");
 		super.onPause();
 		mHandler.removeCallbacks(runnableUI);
-
+		getActivity().getContentResolver().unregisterContentObserver(
+				PersonObserver);
 		getActivity().unregisterReceiver(receiver);
 		
 	}
@@ -450,6 +473,9 @@ public class FragmentList2 extends Fragment {
 		filter.addAction("ACTION_NOTIFY_DEVICE");
 		filter.addAction("ACTION_ZIGBEE_SMS");
 		getActivity().registerReceiver(receiver, filter);
+		getActivity().getContentResolver().registerContentObserver(
+				Uri.parse("content://Personxxx/zigbee_person"), true,
+				PersonObserver);
 	}
 
 
@@ -494,8 +520,34 @@ public class FragmentList2 extends Fragment {
 
 	};
 	
+	//更新人员姓名列表
+	Runnable runnableUI2 = new Runnable() {
+		@Override
+		public void run() {
+			// 更新界面
+			Log.i(Tag, "notify the new data changed listener!");
+			devices.clear();
+			Cursor cursor = getActivity().getContentResolver().query(
+					PersonProvider.CONTENT_URI, null, null, null, null);
+			if (cursor != null) {
+				while (cursor.moveToNext()) {
+					String nametmp = cursor.getString(1);
+					String bindid = cursor.getString(2);
+					Device devicetmp = new Device();
+					devicetmp.deviceName = nametmp;
+					devicetmp.deviceID = bindid;
+					devices.add(devicetmp);
+				}
+			}
+			adapter.notifyDataSetChanged();
+		}
+
+	};
+	
 	private DbDeviceHelper dbDeviceHelper;
 	private boolean send;
+	private boolean isAnonymous = false;
+	private static int idxx;
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -546,6 +598,7 @@ public class FragmentList2 extends Fragment {
 			}
 			fileIS.close();
 		} catch (FileNotFoundException e) {
+			mHandler.post(runnableUI2);
 			Message msg = new Message();
 			msg.what = 3;
 			mHandler.sendMessage(msg);
@@ -571,6 +624,46 @@ public class FragmentList2 extends Fragment {
 		adapter = new DeviceExpandableListAdapter(getActivity(), devicesB,
 				devicesA);
 		deviceList.setAdapter(adapter);
+		
+		deviceList.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
+			@Override
+			public void onCreateContextMenu(ContextMenu menu, View v,
+					ContextMenuInfo menuInfo) {
+				// TODO Auto-generated method stub
+				  ExpandableListView.ExpandableListContextMenuInfo info = (ExpandableListView.ExpandableListContextMenuInfo) menuInfo;
+				  //menuinfo该对象提供了选中对象的附加信息				  
+				  int type = ExpandableListView
+				    .getPackedPositionType(info.packedPosition);		    
+				  int group = ExpandableListView
+				    .getPackedPositionGroup(info.packedPosition);			    
+				  int child = ExpandableListView
+				    .getPackedPositionChild(info.packedPosition);			    
+				  System.out.println("LongClickListener*type-------------------------"
+				    + type);
+				  System.out.println("LongClickListener*group-------------------------"
+				    + group);
+				  System.out.println("LongClickListener*child-------------------------"
+				    + child);
+				  if (type == 0) {// 分组长按事件
+						//menu.add(Menu.NONE, MENU_MODIFY, 0, "修改备注名");
+					  } else if (type == 1) {// 长按好友列表项
+							menu.add(Menu.NONE, MENU_MODIFY, 0, "修改备注名");
+							idxx = child;
+					  }
+			}
+			
+		});
+		
+		
+		deviceList.setOnItemLongClickListener(new OnItemLongClickListener()  {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> child, View v,
+					int postion , long id) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+			
+		});
 		deviceList.setOnGroupClickListener(new OnGroupClickListener() {
 			private EditText mInput2;
 
@@ -675,6 +768,53 @@ public class FragmentList2 extends Fragment {
 		});
 		reduceDeviceCount();
 
+	}
+	
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case MENU_MODIFY:
+			final EditText mInput3 = new EditText(getActivity());
+			mInput3.setText(devices.get(idxx).deviceName);
+		    if(devices.get(idxx).deviceName.equals("匿名")) {
+		    	isAnonymous  = true;
+		    }
+			AlertDialog dialog2 = new AlertDialog.Builder(getActivity())
+					.setTitle("给ID为" + devices.get(idxx).deviceID + "修改备注名")
+					.setView(mInput3)
+					.setPositiveButton("确定",
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+
+									String namex = mInput3.getText().toString();
+									ContentValues values = new ContentValues();
+									values.put("name", namex);
+									values.put("id", idxx);
+									devices.get(idxx).setDeviceName(namex);
+									if(isAnonymous) {
+										isAnonymous = false;
+									getActivity().getContentResolver().insert(
+											PersonProvider.CONTENT_URI, values);
+									} else {
+										isAnonymous = false;
+										String selection = "name= '" + namex + "'";
+										getActivity()
+										.getContentResolver()
+										.update(PersonProvider.CONTENT_URI,
+												values,selection,null);
+									}
+									devicesA.set(0, devices);
+									adapter.notifyDataSetChanged();
+								}
+							}).setNegativeButton(R.string.cancel, null)
+					.create();
+			dialog2.show();
+			break;
+
+		}
+		return super.onContextItemSelected(item);
 	}
       
     /** 
