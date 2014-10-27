@@ -267,9 +267,14 @@ public class PersonActivity extends Fragment {
 												.insert(PersonProvider.CONTENT_URI,
 														values);
 										//人员姓名#设备ID#班级#职务#性别#军衔#类别
-							 			String send2C = name1+"#"+id1+"#"+beizhu+"#"+job1+"#"+rank1+
+							 			String send2C = name1+"#"+id1+"#"+beizhu1+"#"+job1+"#"+sex1+"#"+rank1+
 							 					"#"+type1;
-							 			MainActivity.instance.sendPersonInfo(send2C, "0000", "FFFF", "03");
+							 			try {
+											MainActivity.instance.sendPersonInfo(send2C, "0000", "FFFF", "03");
+										} catch (InterruptedException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
 							 			// MainActivity.instance.sendSMS(sendbind,"0000","FFFF","03");
 										// simpleadapter.notifyDataSetChanged();
 									}
@@ -387,6 +392,15 @@ public class PersonActivity extends Fragment {
 												.getContentResolver()
 												.update(PersonProvider.CONTENT_URI,
 														values,selection,null);
+										//人员姓名#设备ID#班级#职务#性别#军衔#类别
+							 			String send2Cx = name1+"#"+id1+"#"+beizhu1+"#"+job1+"#"+sex1+"#"+rank1+
+							 					"#"+type1;
+							 			try {
+											MainActivity.instance.sendPersonInfo(send2Cx, "0000", "FFFF", "03");
+										} catch (InterruptedException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
 										// simpleadapter.notifyDataSetChanged();
 									}
 								}

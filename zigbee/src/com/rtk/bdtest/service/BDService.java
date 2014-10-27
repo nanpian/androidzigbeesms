@@ -89,8 +89,8 @@ public class BDService extends Service{
 				Intent gpssend = new Intent("com.rtk.bdtest.service.BDService.broadcast3");
 				gpssend.putExtra("defaultLatitude", defaultLatitude) ;
 				Log.i(Tag,"The longitude is " +longitudef + " The latitude is " +latitudef );
-			    sendBroadcast(gpsintent);
-			    sendBroadcast(gpssend);
+			    //sendBroadcast(gpsintent);
+			   // sendBroadcast(gpssend);
 				break;
 			case MSG_SHOW_BD_DATA:
 				if (null != mBDInfo)

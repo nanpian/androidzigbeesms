@@ -97,7 +97,7 @@ public class ZigbeeSerivce extends Service {
 	public  void sendData2Zigbee(byte[] data) {
 		try {
 			if (null != mZigbeeOutputStream) {
-				Log.d(TAG, "write data = " + new String(data));
+				Log.d(TAG, "write data = " + CharConverter.byteToHexString(data,data.length)+"");
 				mZigbeeOutputStream.write(data);
 			}
 		} catch (Exception e) {

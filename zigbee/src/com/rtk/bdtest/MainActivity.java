@@ -113,7 +113,7 @@ public class MainActivity extends FragmentActivity implements
 	
 	
 	//分包发送分组信息！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
-	void sendPersonInfo(String sms, String destAddr, String destId, String type) {
+	void sendPersonInfo(String sms, String destAddr, String destId, String type) throws InterruptedException {
 		Log.i(Tag, "send personinfo" + sms + " to zigbee!plz wait and verify");
 		byte[] password = {0x19,0x77,0x04,0x14,(byte) 0x90,(byte) 0xAB,(byte) 0xCD,(byte) 0xEF };
 		byte[] sms2;
@@ -122,6 +122,7 @@ public class MainActivity extends FragmentActivity implements
 			DesCrypt DesCryptInstance = new DesCrypt();
 			//byte[] smsdata = DesCryptInstance.desCrypto(sms2, password);//暂不加密
 			byte[] smsdata = sms2;
+		   Log.i("deweidewei","The data length is"+ smsdata.length);
 			if(smsdata.length>30) {
 				int count = (smsdata.length/30) +1;
 				byte count2byte = (byte)count;
@@ -143,17 +144,22 @@ public class MainActivity extends FragmentActivity implements
  		 			System.arraycopy(sourId, 0, temp,11 , 2);
  		 			int smslength = 30;
  		 			if (i<count-1) {
-		 			   smslength = 30;
+		 			   smslength = 30+1+1;
 		 			   System.arraycopy(smsdata, 30*i, smstmpdata, 0, 30);
  		 			} else {
- 		 				smslength = smsdata.length%30;
- 		 				System.arraycopy(smsdata, 30*i, smstmpdata, 0, smslength);
+ 		 				byte[] tmp = new byte[30];
+ 		 				smslength = (smsdata.length%30)+2;
+ 		 				System.arraycopy(smsdata, 30*i, tmp, 0, smsdata.length-30*i);
+ 		 				System.arraycopy(tmp, 0, smstmpdata, 0, 30);
  		 			}
 		 			String l = String.format("%02x", smslength);	
 		 			System.arraycopy(CharConverter.hexStringToBytes(l), 0, temp, 13, 1 ); //字串长度
 		 			System.arraycopy(CharConverter.hexStringToBytes("03"), 0, temp, 14, 1);//类型为03
 		 			System.arraycopy(smstmpdata, 0, temp, 15, smstmpdata.length);
+		 			String logstring = CharConverter.byteToHexString(temp,temp.length);
+		 			Log.i("deweidewei","dewei send data " +i + " data is" +logstring + " ##########temp is" + temp);
 		 			sendData2Zigbee(temp);
+					Thread.sleep(5000);
 				}
 			} else {
 				try {
