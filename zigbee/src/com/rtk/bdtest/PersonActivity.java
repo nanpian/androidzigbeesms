@@ -266,6 +266,11 @@ public class PersonActivity extends Fragment {
 												.getContentResolver()
 												.insert(PersonProvider.CONTENT_URI,
 														values);
+										//人员姓名#设备ID#班级#职务#性别#军衔#类别
+							 			String send2C = name1+"#"+id1+"#"+beizhu+"#"+job1+"#"+rank1+
+							 					"#"+type1;
+							 			MainActivity.instance.sendPersonInfo(send2C, "0000", "FFFF", "03");
+							 			// MainActivity.instance.sendSMS(sendbind,"0000","FFFF","03");
 										// simpleadapter.notifyDataSetChanged();
 									}
 								}

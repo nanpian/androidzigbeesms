@@ -327,6 +327,7 @@ public class ZigbeeSerivce extends Service {
 				smsintent.putExtra("zigbee_sms", smsutf8);
 				smsintent.putExtra("smsSourAddr",smsSourAddr);
 				smsintent.putExtra("smsSourId",smsSourId);
+				smsintent.putExtra("smsType",type);
 				sendBroadcast(smsintent);
 			} catch (UnsupportedEncodingException e) {
 				// TODO Auto-generated catch block
@@ -433,6 +434,8 @@ public class ZigbeeSerivce extends Service {
 		mZigbeeThread.start();
 
 	}
+	
+	
 	
 	@Override
 	public void onDestroy() {

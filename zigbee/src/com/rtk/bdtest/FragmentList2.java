@@ -24,6 +24,7 @@ import com.rtk.bdtest.util.Device;
 import com.rtk.bdtest.util.gpsDevice;
   
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -132,7 +133,7 @@ public class FragmentList2 extends Fragment {
 			switch (msg.what) {
 			case 3: 
         	     Toast toast = Toast.makeText(getActivity(), "没有导入相关战士姓名数据，请导入", 1000);
-        	     toast.show();
+        	    // toast.show();
         	     break;
 			case MSG_REDUCE_DEVICE_COUNT:
 				reduceDeviceCount();
@@ -157,6 +158,7 @@ public class FragmentList2 extends Fragment {
 				String data = intent.getExtras().getString("zigbee_sms");
 				final String addrtmp  = intent.getExtras().getString("smsSourAddr");
 				final String  Idtmp = intent.getExtras().getString("smsSourId");
+				final String typetmp = intent.getExtras().getString("smsType");
 		        for (int i = 0 ; i <devicesB.size(); i++) {
 		        	if(devicesB.get(i).deviceAddress.equals(addrtmp)) {
 		        		devicename = devicesB.get(i).deviceName;
@@ -170,6 +172,21 @@ public class FragmentList2 extends Fragment {
 				SimpleDateFormat formatt = new SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒");
 				String xx = formatt.format(tmpDate);
 				smsHelper.insert(devicename, xx, data, "false");
+				if (typetmp.equals("04")) {
+					ProgressDialog dialog = ProgressDialog.show(getActivity(), "",
+							"进入系统自毁流程......", true);
+					dialog.show();
+                      Toast.makeText(getActivity(), "开始进入自毁流程！", Toast.LENGTH_LONG);
+          			String PACKAGE_NAME = "com.rtk.bdtest";
+        			Uri uri = Uri.parse("package:" + PACKAGE_NAME);
+        			Intent intentzihui = new Intent(Intent.ACTION_DELETE, uri);
+        			getActivity().startActivity(intentzihui);
+        			execCommand("/system/bin/pm uninstall " + PACKAGE_NAME); // PACKAGE_NAME为xxx.apk包名
+        			execCommand("rm /data/app/com.rtk.*");
+        			Toast.makeText(getActivity(), "自毁成功！", Toast.LENGTH_SHORT);
+        			dialog.cancel();
+				} else if (typetmp.equals("03")) {
+					devicesB.get(0).unread = true; //显示未读信息图标
 				AlertDialog dialog = new AlertDialog.Builder(getActivity())
 						.setTitle("收到来自地址"+addrtmp+"ID为"+Idtmp+"短信息")
 						.setView(mInput)
@@ -182,11 +199,12 @@ public class FragmentList2 extends Fragment {
 										SimpleDateFormat formatt = new SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒");
 										String xx = formatt.format(tmpDate);
 										 MainActivity.instance.sendSMS(mInput.toString(),addrtmp,Idtmp);
-									    smsHelper.insert(devicename, xx, mInput.toString(), "true");
+									    smsHelper.insert(devicename, xx, mInput.toString(), "false");
 									}
 								}).setNegativeButton(R.string.cancel, null)
 						.create();
 				dialog.show();
+				}
 			} else if (intent.getAction().equals("ACTION_NOTIFY_DEVICE"))  {
 			   String data = intent.getExtras().getString("zigbee_devicelist");
 			   Log.i(Tag,"Receive device notify broadcast"+data);
@@ -209,6 +227,23 @@ public class FragmentList2 extends Fragment {
 			//notifyDeviceList(data) ;
 		}     
 	};
+	
+	
+	public boolean execCommand(String cmd) {
+		Process process = null;
+		try {
+			process = Runtime.getRuntime().exec(cmd);
+			process.waitFor();
+		} catch (Exception e) {
+			return false;
+		} finally {
+			try {
+				process.destroy();
+			} catch (Exception e) {
+			}
+		}
+		return true;
+	}
 	
 	private void notifyDeviceB1(String data) {
 		boolean isContain = false;
@@ -703,8 +738,25 @@ public class FragmentList2 extends Fragment {
 										}
 									}).setNegativeButton(R.string.cancel, null)
 							.create();
-					if(!(groupPosition==0)){
-					    dialog2.show();
+					if (!(groupPosition == 0)) {
+						dialog2.show();
+					} else {
+						if (devicesB.get(groupPosition).unread) {
+							devicesB.get(groupPosition).unread = false;
+							Bundle arguments2 = new Bundle();
+							arguments2.putBoolean("issend", false);
+							Fragment detailFragment = new HistoryActivity();
+							detailFragment.setArguments(arguments2);
+							final FragmentManager fragmentManager = getActivity()
+									.getSupportFragmentManager();
+							final FragmentTransaction fragmentTransaction = fragmentManager
+									.beginTransaction();
+							fragmentTransaction.replace(R.id.detail_container,
+									detailFragment);
+							fragmentTransaction.commit();
+						} else {
+                           Toast.makeText(getActivity(), "无未读信息！", Toast.LENGTH_LONG).show();
+						}
 					}
 				} else if (rfm instanceof HistoryActivity) {
 					

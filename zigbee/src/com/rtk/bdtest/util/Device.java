@@ -20,6 +20,7 @@ public class Device {
 	public float jingdu;
 	public float weidu;
 	public Marker gpsMarker;
+	public boolean unread = true;
 	public String getDeviceName() {
 		return deviceName;
 	}

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.rtk.bdtest.R;
+import com.rtk.bdtest.ui.BadgeView;
 import com.rtk.bdtest.util.Device;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,10 +95,27 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 		holder.name.setText("姓名:" + listB.get(groupPosition).deviceName);
 		if ((listB.get(groupPosition) != null)
 				&& (listB.get(groupPosition).online)) {
-			holder.online.setText("在线");
+			if(listB.get(groupPosition).unread) {
+				 BadgeView badgeView = new BadgeView(context,holder.online);
+			        badgeView.setText("在线有未读信息");
+
+			   //     badgeView.setTextColor(Color.DKGRAY);
+			        badgeView.show();
+			} else {
+			 BadgeView badgeView = new BadgeView(context,holder.online);
+		        badgeView.setText("在线");
+
+		      //  badgeView.setTextColor(Color.DKGRAY);
+		        badgeView.show();
+			}
 		} else {
-			holder.online.setText("离线");
+			 BadgeView badgeView = new BadgeView(context, holder.online);
+		        badgeView.setText("离线");
+		        //badgeView.setTextSize(5.5f);
+		       // badgeView.setTextColor(Color.DKGRAY);
+		        badgeView.show();
 		}
+	
 		holder.address.setText(context.getString(R.string.device_address)
 				+ listB.get(groupPosition).deviceAddress);
 		holder.type.setText(context.getString(R.string.device_type)
@@ -108,7 +127,7 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 		// 在线和不在线颜色不同
 		if (!(listB.get(groupPosition).online)) {
 			convertView.setBackgroundColor(this.context.getResources()
-					.getColor(R.color.red));
+					.getColor(R.color.white));
 		} else {
 			convertView.setBackgroundColor(this.context.getResources()
 					.getColor(R.color.green));
@@ -132,11 +151,33 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 				.findViewById(R.id.parent_address);
 		holder.name.setText("姓名:"
 				+ listA.get(groupPosition).get(childPosition).deviceName);
-		if ((listA.get(groupPosition).get(childPosition) != null)
+		/*if ((listA.get(groupPosition).get(childPosition) != null)
 				&& (listA.get(groupPosition).get(childPosition).online)) {
 			holder.online.setText("在线");
 		} else {
 			holder.online.setText("离线");
+		}*/
+		if ((listA.get(groupPosition).get(childPosition) != null)
+				&& (listA.get(groupPosition).get(childPosition).online)) {
+			if(listA.get(groupPosition).get(childPosition).unread) {
+				 BadgeView badgeView = new BadgeView(context,holder.online);
+			        badgeView.setText("在线");
+			        //badgeView.setTextSize(5.5f);
+			        //badgeView.setTextColor(Color.DKGRAY);
+			        badgeView.show();
+			} else {
+			 BadgeView badgeView = new BadgeView(context,holder.online);
+		        badgeView.setText("在线");
+		        //badgeView.setTextSize(5.5f);
+		        //badgeView.setTextColor(Color.DKGRAY);
+		        badgeView.show();
+			}
+		} else {
+			 BadgeView badgeView = new BadgeView(context, holder.online);
+		       // badgeView.setText("离线");
+		        badgeView.setTextSize(5.5f);
+		       // badgeView.setTextColor(Color.DKGRAY);
+		        badgeView.show();
 		}
 		holder.address.setText(context.getString(R.string.device_address)
 				+ listA.get(groupPosition).get(childPosition).deviceAddress);
@@ -150,7 +191,7 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 		// 在线和不在线颜色不同
 		if (!(listA.get(groupPosition).get(childPosition).online)) {
 			convertView.setBackgroundColor(this.context.getResources()
-					.getColor(R.color.red));
+					.getColor(R.color.white));
 		} else {
 			convertView.setBackgroundColor(this.context.getResources()
 					.getColor(R.color.green));
