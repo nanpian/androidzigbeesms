@@ -120,7 +120,8 @@ public class MainActivity extends FragmentActivity implements
 		try {
 			sms2 = sms.getBytes("UTF-8");
 			DesCrypt DesCryptInstance = new DesCrypt();
-			byte[] smsdata = DesCryptInstance.desCrypto(sms2, password);
+			//byte[] smsdata = DesCryptInstance.desCrypto(sms2, password);//暂不加密
+			byte[] smsdata = sms2;
 			if(smsdata.length>30) {
 				int count = (smsdata.length/30) +1;
 				byte count2byte = (byte)count;

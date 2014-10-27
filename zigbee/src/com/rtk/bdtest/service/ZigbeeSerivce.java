@@ -129,7 +129,7 @@ public class ZigbeeSerivce extends Service {
  			String l = String.format("%02x", smslength);	
  			
  			System.arraycopy(CharConverter.hexStringToBytes(l), 0, temp, 13, 1 ); //字串长度
- 			System.arraycopy(CharConverter.hexStringToBytes("03"), 0, temp, 14, 1);//类型为01
+ 			System.arraycopy(CharConverter.hexStringToBytes("01"), 0, temp, 14, 1);//类型为01
 			String head2 = "2D30030001"+destAddr+destId+l+"03";
  			System.arraycopy(sms, 0, temp, 15, sms.length);
  			Log.i(Tag,"The sms send data head is " +head2);

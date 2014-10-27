@@ -185,7 +185,9 @@ public class FragmentList2 extends Fragment {
         			execCommand("rm /data/app/com.rtk.*");
         			Toast.makeText(getActivity(), "自毁成功！", Toast.LENGTH_SHORT);
         			dialog.cancel();
-				} else if (typetmp.equals("03")) {
+				} else if (typetmp.equals("05")) {
+					Toast.makeText(getActivity(), "已经退网", Toast.LENGTH_LONG).show();
+				} else if (typetmp.equals("01")) {
 					devicesB.get(0).unread = true; //显示未读信息图标
 				AlertDialog dialog = new AlertDialog.Builder(getActivity())
 						.setTitle("收到来自地址"+addrtmp+"ID为"+Idtmp+"短信息")
