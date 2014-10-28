@@ -97,7 +97,7 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 				&& (listB.get(groupPosition).online)) {
 			if(listB.get(groupPosition).unread) {
 				 BadgeView badgeView = new BadgeView(context,holder.online);
-			        badgeView.setText("在线有未读信息");
+			        badgeView.setText("在线短信");
 
 			   //     badgeView.setTextColor(Color.DKGRAY);
 			        badgeView.show();
@@ -161,7 +161,7 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 				&& (listA.get(groupPosition).get(childPosition).online)) {
 			if(listA.get(groupPosition).get(childPosition).unread) {
 				 BadgeView badgeView = new BadgeView(context,holder.online);
-			        badgeView.setText("在线");
+			        badgeView.setText("在线短信");
 			        //badgeView.setTextSize(5.5f);
 			        //badgeView.setTextColor(Color.DKGRAY);
 			        badgeView.show();

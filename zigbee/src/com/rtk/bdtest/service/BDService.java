@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.rtk.bdtest.SerialPort;
 import com.rtk.bdtest.ZigbeeApplication;
@@ -61,14 +63,17 @@ public class BDService extends Service{
 
 	public static final int crcStartIndex = 90;
 	public static final int crcLength = 4;
+	protected static final int SEND_GPS = 66;
 	int[] res;
 	ProgressDialog checkBinPD;
 	private int currentProgress = 0;
-	private String defaultLongitude = "";
-	private String defaultLatitude = "";
+	private String defaultLongitude = null;
+	private String defaultLatitude = null;
 	
 	private ArrayList<Device> devices;
 	private DeviceListAdapter adapter;
+	private Timer timer = new Timer(true);
+	private String gpsstring = null;
 	
 	Handler handler = new Handler() {
 
@@ -76,21 +81,34 @@ public class BDService extends Service{
 		public void handleMessage(Message msg) {
 			// TODO Auto-generated method stub
 			switch (msg.what) {
+			case SEND_GPS:
+				synchronized (gpsstring) {   
+					if ((gpsstring!=null) && (defaultLatitude != null) && (defaultLatitude != null)) {
+						Intent gpsintent = new Intent(
+								"com.rtk.bdtest.service.BDService.broadcast");
+						gpsintent.setAction("ACTION_UPDATE_SELF_GPS");
+						defaultLatitude = gpsstring.substring(20, 48);
+						defaultLongitude = gpsstring.substring(34, 46);
+						String longitude = defaultLatitude.split(",")[2];
+						String latitude = defaultLatitude.split(",")[0];
+						Double longitudef = Double.parseDouble(longitude) * 0.01f;
+						Double latitudef = Double.parseDouble(latitude) * 0.01f;
+						gpsintent.putExtra("longitude", longitudef);
+						gpsintent.putExtra("latitude", latitudef);
+						// 发送gps信息到zigbee设备，来发送gps广播
+						Intent gpssend = new Intent(
+								"com.rtk.bdtest.service.BDService.broadcast3");
+						gpssend.putExtra("defaultLatitude", defaultLatitude);
+						Log.i(Tag, "The longitude is " + longitudef
+								+ " The latitude is " + latitudef);
+						sendBroadcast(gpsintent);
+						sendBroadcast(gpssend);
+					}
+				} 
+
+				break;
 			case MSG_UPDATE_SELF_GPS:
-				Intent gpsintent = new Intent("com.rtk.bdtest.service.BDService.broadcast");
-				gpsintent.setAction("ACTION_UPDATE_SELF_GPS");
-				String longitude = defaultLatitude.split(",")[2];
-				String latitude = defaultLatitude.split(",")[0];
-				Double longitudef = Double.parseDouble(longitude)*0.01f;
-				Double latitudef = Double.parseDouble(latitude)*0.01f;
-				gpsintent.putExtra("longitude", longitudef);
-				gpsintent.putExtra("latitude", latitudef);
-				//发送gps信息到zigbee设备，来发送gps广播
-				Intent gpssend = new Intent("com.rtk.bdtest.service.BDService.broadcast3");
-				gpssend.putExtra("defaultLatitude", defaultLatitude) ;
-				Log.i(Tag,"The longitude is " +longitudef + " The latitude is " +latitudef );
-			    //sendBroadcast(gpsintent);
-			   // sendBroadcast(gpssend);
+
 				break;
 			case MSG_SHOW_BD_DATA:
 				if (null != mBDInfo)
@@ -146,6 +164,7 @@ public class BDService extends Service{
 		}
 
 	};
+	private TimerTask task = null;
 	
 	class BDThread extends Thread {
 		private boolean bIsRunning = false;
@@ -161,8 +180,8 @@ public class BDService extends Service{
 		public void run() {
 			while (bIsRunning) {
 				try {
-				  //Thread.sleep(0);
-					Thread.sleep(10);
+				    Thread.sleep(10);
+					//Thread.sleep(5000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -177,30 +196,10 @@ public class BDService extends Service{
 					e.printStackTrace();
 				}
 				if (len != 0) {
-					String s = new String(bdBuffer);
-					Log.d(Tag, "s = " + s);
+					String sbd = new String(bdBuffer);
+					Log.d(Tag, "sbd data is  = " + sbd);
 					if (len > 0) {
-						Message message = handler
-								.obtainMessage(MSG_SHOW_BD_DATA);
-						message.obj = s;
-						handler.sendMessage(message);
-						defaultLatitude = s.substring(20, 48);
-						defaultLongitude = s.substring(34, 46);
-						if((defaultLatitude!=null) && (defaultLongitude!=null) ) {
-							//每隔5s更新一次gps经纬度信息
-						    handler.sendEmptyMessageDelayed(MSG_UPDATE_SELF_GPS, 5000);
-						}
-						String[] a = s.split("\n");
-						for (int i = 0; i < a.length; i++) {
-							// Log.d(TAG, "bd data = " + a[i]);
-							if ((a[i].length() >= 9)
-									&& (a[i].substring(0, 8).equals("$PDTINFO"))) {
-								Message infoMessage = handler
-										.obtainMessage(MSG_SHOW_BD_INFO);
-								infoMessage.obj = a[i];
-								handler.sendMessage(infoMessage);
-							}
-						}
+						gpsstring = sbd;
 					}
 				}
 			}
@@ -239,6 +238,20 @@ public class BDService extends Service{
 		bdThread = new BDThread();
 		bdThread.setRunFlag(true);
 		bdThread.start();
+		if (timer == null) timer = new Timer(true);
+		if(task == null) {
+		task = new TimerTask() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				Message msg = new Message();
+				msg.what  = SEND_GPS;
+				handler.sendMessage(msg);
+			}
+			
+		};
+		}
+		timer.schedule(task, 3000, 5000);
 	}
 	
 	

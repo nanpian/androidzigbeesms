@@ -5,6 +5,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.rtk.bdtest.CharConverter;
 import com.rtk.bdtest.FragmentList;
 import com.rtk.bdtest.R;
@@ -45,10 +48,13 @@ public class ZigbeeSerivce extends Service {
 	private InputStream mZigbeeInputStream;
 	private byte[] zigbeeBuffer = new byte[100];
 	private static String receiveData1;
+	private static List<String> listBuffer=new ArrayList<String>();
 	private static String receiveData2;
 	private static boolean isSms = false;
 	private static boolean isGps = false;
+	private static boolean isLongSms = false;
 	private static String receivedData;
+	private static int iCount=0;
 
 	private ZigbeeThread mZigbeeThread;
 	private TextView mBDInfo;
@@ -94,11 +100,17 @@ public class ZigbeeSerivce extends Service {
 	public void getselfInfo( ) {
 		sendData2Zigbee(CharConverter.hexStringToBytes(GET_FIRMWARE_INFO));
 	}
-	public  void sendData2Zigbee(byte[] data) {
+
+	public void sendData2Zigbee(byte[] data) {
 		try {
-			if (null != mZigbeeOutputStream) {
-				Log.d(TAG, "write data = " + CharConverter.byteToHexString(data,data.length)+"");
-				mZigbeeOutputStream.write(data);
+			synchronized (mZigbeeOutputStream) {
+				if (null != mZigbeeOutputStream) {
+					Log.d(TAG,
+							"write data = "
+									+ CharConverter.byteToHexString(data,
+											data.length) + "");
+					mZigbeeOutputStream.write(data);
+				}
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -342,9 +354,6 @@ public class ZigbeeSerivce extends Service {
 	class ZigbeeThread extends Thread {
 		private boolean bIsRunning = false;
 
-
-
-
 		ZigbeeThread() {
 		}
 
@@ -371,36 +380,107 @@ public class ZigbeeSerivce extends Service {
 					e.printStackTrace();
 				}
 				if (len > 0) {
-					receivedData = CharConverter.byteToHexString(zigbeeBuffer, len);
-					if(receivedData.length()>8) {
-					Log.d(Tag,"receivedData is " + receivedData + "The substring" +receivedData.substring(2,6)+" isSms" + isSms);
-					if((receivedData.substring(2, 6).equals("3003")) && (!isSms)) {
-						receiveData1 = receivedData;
-					    isSms = true;
-					} else if (isSms) {
-						Log.i(Tag,"isSms" + isSms + "");
-						receiveData1 = receiveData1 + receivedData;
-						isSms = false;
-						Log.d(Tag, " sms data received is " +receiveData1 );
-						handleData(receiveData1, zigbeeBuffer);
-					} else if ((receivedData.substring(2, 6).equals("3002")) && (!isGps)) {
-						receiveData2 = receivedData;
-					    isGps = true;					
-					    Log.i(Tag,"gps data is" +receiveData2);
-					} else if(isGps) {
-						Log.i(Tag,"isGps" + isGps + "");
-						isGps = false;
-						receiveData2 = receiveData2 + receivedData;
-						Log.i(Tag,"gps data is" +receiveData2);
-					} else {
-					Log.d(TAG, "zigbee data = " + receivedData + "    The length is " + receivedData.length());
-					handleData(receivedData, zigbeeBuffer);
+					synchronized (mZigbeeInputStream) {
+						receivedData = CharConverter.byteToHexString(
+								zigbeeBuffer, len);
+						if (receivedData.length() > 8) {
+							Log.d(Tag,
+									"receivedData is " + receivedData
+											+ "The substring"
+											+ receivedData.substring(2, 6)
+											+ " isSms" + isSms);
+							if ((receivedData.substring(2, 6).equals("3003"))
+									&& (!isSms)) {
+								receiveData1 = receivedData;
+								isSms = true;
+							} else if (isSms) {
+								Log.i(Tag, "isSms" + isSms + "");
+								receiveData1 = receiveData1 + receivedData;
+								isSms = false;
+								Log.d(Tag, " sms data received is "
+										+ receiveData1);
+								byte[] tmp = CharConverter
+										.hexStringToBytes(receiveData1
+												.substring(8, 10));
+								int countOfPackage = 1;
+								countOfPackage = (int) tmp[0];
+								// 如果长度大于1，则需要合包
+								if ((countOfPackage > 1)
+										&& (iCount < countOfPackage)) {
+									isLongSms = true;
+									iCount = iCount + 1;
+									listBuffer.add(receiveData1);
+									handleLongSMS(listBuffer);
+								} else {
+									// 如果长度等于1，说明短信内容较短，直接处理此包
+									isLongSms = false;
+									handleData(receiveData1, zigbeeBuffer);
+								}
+							}
+						} else if ((receivedData.substring(2, 6).equals("3002"))
+								&& (!isGps)) {
+							receiveData2 = receivedData;
+							isGps = true;
+							Log.i(Tag, "gps data is" + receiveData2);
+						} else if (isGps) {
+							Log.i(Tag, "isGps" + isGps + "");
+							isGps = false;
+							receiveData2 = receiveData2 + receivedData;
+							Log.i(Tag, "gps data is" + receiveData2);
+						} else {
+							Log.d(TAG,
+									"zigbee data = " + receivedData
+											+ "    The length is "
+											+ receivedData.length());
+							handleData(receivedData, zigbeeBuffer);
+						}
 					}
-					}
-				}
 				}
 			}
 		}
+	}
+
+		private void handleLongSMS(List<String> listBuffer) {
+			// TODO Auto-generated method stub
+			String smsSourAddr = listBuffer.get(0).substring(18,22);
+			String smsSourId = listBuffer.get(0).substring(22,26);
+			String type = listBuffer.get(0).substring(28,30);
+			int smslenghtTotal = 0 ;
+			for (int i =0 ;i <listBuffer.size(); i++) {	
+				String length = listBuffer.get(i).substring(26,28);
+				byte[] smslength = CharConverter.hexStringToBytes(length);
+			    int smslenth = smslength[0]&0xff -2;//内容要减掉类型和长度字节
+			    Log.i(Tag,"sms length is " + smslenth);
+			    smslenghtTotal = smslenghtTotal +smslenth;
+			}
+			byte[] temp = new byte[smslenghtTotal+1];
+			for (int i =0 ;i <listBuffer.size(); i++) {	
+			//收到短信息处理！
+			String smsReceive = listBuffer.get(i).substring(30, listBuffer.get(i).length());
+			Log.i(Tag,"smsdata is " + smsReceive +"addr" +smsSourAddr + "id " +smsSourId + " content" + smsReceive +"type is " +type);
+			byte[] bytes = CharConverter.hexStringToBytes(smsReceive);
+			
+			String length = listBuffer.get(i).substring(26,28);
+			byte[] smslength = CharConverter.hexStringToBytes(length);
+		    int smslenth = smslength[0]&0xff -2;//内容要减掉类型和长度字节
+		    
+			System.arraycopy(bytes, 0, temp, i*30, smslenth);
+		    }
+			try {
+				String smsutf8 = new String(temp,"utf-8");
+				Log.i(Tag,"the sms utf8 is" + smsutf8);
+				//收到短信息，发送广播给activity，分两种情况处理，第一种是gps信息，第二种是普通短信息！！！！！！！
+				Intent smsintent = new Intent("com.rtk.bdtest.service.ZigbeeService.broadcast");
+				smsintent.setAction(("ACTION_ZIGBEE_SMS").toString());
+				smsintent.putExtra("zigbee_sms", smsutf8);
+				smsintent.putExtra("smsSourAddr",smsSourAddr);
+				smsintent.putExtra("smsSourId",smsSourId);
+				smsintent.putExtra("smsType",type);
+				sendBroadcast(smsintent);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+	}
 
 
 
