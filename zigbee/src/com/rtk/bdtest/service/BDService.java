@@ -82,6 +82,7 @@ public class BDService extends Service{
 			// TODO Auto-generated method stub
 			switch (msg.what) {
 			case SEND_GPS:
+				if(gpsstring!=null) {
 				synchronized (gpsstring) {   
 					if ((gpsstring!=null) && (defaultLatitude != null) && (defaultLatitude != null)) {
 						Intent gpsintent = new Intent(
@@ -105,6 +106,7 @@ public class BDService extends Service{
 						sendBroadcast(gpssend);
 					}
 				} 
+				}
 
 				break;
 			case MSG_UPDATE_SELF_GPS:

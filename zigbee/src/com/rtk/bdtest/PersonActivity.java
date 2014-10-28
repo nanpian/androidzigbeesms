@@ -73,7 +73,13 @@ public class PersonActivity extends Fragment {
 		// 将GPS设备采集的原始GPS坐标转换成百度坐标
 		CoordinateConverter converter = new CoordinateConverter();
 		converter.from(CoordType.GPS);
-		LatLng sourceLatLng = new LatLng(32.05253311, 118.80744145);
+		double[] jingweitest2 = {118.48446487,32.031519864};
+		double  tmp2 = (jingweitest2[1]%1)*100/60;
+		int tmp1 = (int) (jingweitest2[1]/1);
+		Toast.makeText(getActivity(), "tmp xxx" + tmp2 + "tmpxxxx"+ tmp1, Toast.LENGTH_LONG);
+		jingweitest2[1] = (jingweitest2[1]%1)*100/60 + (int)jingweitest2[1]/1;
+		jingweitest2[0] =  (jingweitest2[0]%1)*100/60 + (int)jingweitest2[0]/1;
+		LatLng sourceLatLng = new LatLng(jingweitest2[1], jingweitest2[0]);
 		// sourceLatLng待转换坐标
 		converter.coord(sourceLatLng);
 		LatLng desLatLng = converter.convert();
@@ -81,8 +87,8 @@ public class PersonActivity extends Fragment {
 				+ "dest xxxx lng" + desLatLng.longitude);
 		Toast.makeText(
 				getActivity(),
-				"The dest lat lng is " + desLatLng.latitude + "dest xxxx lng"
-						+ desLatLng.longitude, Toast.LENGTH_LONG).show();
+				"The dest lat lng is " + sourceLatLng.latitude + "dest xxxx lng"
+						+ sourceLatLng.longitude, Toast.LENGTH_LONG).show();
 
 		listems = new ArrayList<Map<String, Object>>();
 		Cursor cursor = getActivity().getContentResolver().query(

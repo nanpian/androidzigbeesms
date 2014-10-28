@@ -421,8 +421,8 @@ public class MainActivity extends FragmentActivity implements
 			break;
 		case R.id.copy:
 			try {
-				final String COPY_FILENAME = "quanguogailue.dat";
-				final String COPY_FILENAME2 = "nanjing_315.dat";
+				final String COPY_FILENAME2 = "quanguogailue.dat";
+				final String COPY_FILENAME = "nanjing_315.dat";
 				final String SDCARD_PATH = android.os.Environment
 						.getExternalStorageDirectory().getAbsolutePath();
 				String databasePath = SDCARD_PATH + File.separator

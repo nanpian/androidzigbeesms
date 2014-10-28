@@ -86,8 +86,18 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 		public void run() {
 			BitmapDescriptor bdC = BitmapDescriptorFactory
 					.fromResource(R.drawable.icon_marka);
-			LatLng jingwei = new LatLng(39.33, 116.400244);
-			OverlayOptions selfgps = new MarkerOptions().position(jingwei)
+			// 将GPS设备采集的原始GPS坐标转换成百度坐标
+			CoordinateConverter converter = new CoordinateConverter();
+			converter.from(CoordType.GPS);
+			LatLng jingwei= new LatLng(39.33, 116.400244);
+			double[] jingweitest2 = {118.48446487,32.031519864};
+			jingweitest2[1] = (jingweitest2[1]%1)*100/60 + (int)jingweitest2[1]/1;
+			jingweitest2[0] =  (jingweitest2[0]%1)*100/60 + (int)jingweitest2[0]/1;
+			LatLng sourceLatLng = new LatLng(jingweitest2[1], jingweitest2[0]);
+			// sourceLatLng待转换坐标
+			converter.coord(sourceLatLng);
+			LatLng desLatLng = converter.convert();
+			OverlayOptions selfgps = new MarkerOptions().position(desLatLng)
 					.icon(bdC).perspective(false).anchor(0.5f, 0.5f).rotate(30)
 					.zIndex(7);
 			mMarkerSelf = (Marker) (mBaiduMap.addOverlay(selfgps));
@@ -105,10 +115,19 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 				BitmapDescriptor bdC = BitmapDescriptorFactory
 						.fromResource(R.drawable.icon_marka);
 				//经纬度换算
-				jingwei[1] = jingwei[1]%1 *100/60 + jingwei[1];
-				jingwei[0] = jingwei[0]%1 *100/60 + jingwei[0];
-				LatLng jingwei2 = new LatLng(jingwei[1], jingwei[0]);
-				OverlayOptions selfgps = new MarkerOptions().position(jingwei2)
+				// 将GPS设备采集的原始GPS坐标转换成百度坐标
+				CoordinateConverter converter = new CoordinateConverter();
+				converter.from(CoordType.GPS);
+				//jingweitest2[1] = (jingweitest2[1]%1)*100/60 + (int)jingweitest2[1]/1;
+				//jingweitest2[0] =  (jingweitest2[0]%1)*100/60 + (int)jingweitest2[0]/1;
+				jingwei[1] = jingwei[1]%1 *100/60 +(int) jingwei[1]/1;
+				jingwei[0] = jingwei[0]%1 *100/60 + (int)jingwei[0]/1;
+				LatLng sourceLatLng = new LatLng(jingwei[1], jingwei[0]);
+				// sourceLatLng待转换坐标
+				converter.coord(sourceLatLng);
+				LatLng desLatLng = converter.convert();
+				//LatLng jingwei2 = new LatLng(jingwei[1], jingwei[0]);
+				OverlayOptions selfgps = new MarkerOptions().position(desLatLng)
 						.icon(bdC).perspective(false).anchor(0.5f, 0.5f)
 						.rotate(30).zIndex(7);
 				mMarkerSelf = (Marker) (mBaiduMap.addOverlay(selfgps));
