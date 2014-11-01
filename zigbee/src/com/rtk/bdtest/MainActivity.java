@@ -35,9 +35,12 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -452,6 +455,46 @@ public class MainActivity extends FragmentActivity implements
 		}
 
 	};
+	
+	// 当用户在首Activity点击返回键时，提示用户是否退出
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		// TODO Auto-generated method stub
+
+		FragmentManager rightfm = getSupportFragmentManager();
+		Fragment rfm = rightfm.findFragmentById(R.id.detail_container);
+		if (rfm instanceof PersonActivity) {
+			LinearLayout lf1 = (LinearLayout) findViewById(R.id.list_container);
+			lf1.setVisibility(View.VISIBLE);
+		}else if (rfm instanceof MapActivity) {
+			if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+				new AlertDialog.Builder(MainActivity.this)
+						.setTitle("退出本应用")
+						.setMessage("您确认要退出吗？")
+						.setPositiveButton("确认",
+								new DialogInterface.OnClickListener() {
+
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										// TODO Auto-generated method stub
+										finish();
+									}
+								})
+						.setNegativeButton("取消",
+								new DialogInterface.OnClickListener() {
+
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										// TODO Auto-generated method stub
+										dialog.dismiss();
+									}
+								}).show();
+			}
+		}
+		return super.onKeyDown(keyCode, event);
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -466,26 +509,39 @@ public class MainActivity extends FragmentActivity implements
 
 		switch (item.getItemId()) {
 		case R.id.settings1: {
+			LinearLayout lf1 = (LinearLayout) findViewById(R.id.list_container);
+			lf1.setVisibility(View.VISIBLE);
 			Fragment detailFragment = new BindActivity();
 			final FragmentManager fragmentManager = this
 					.getSupportFragmentManager();
 			final FragmentTransaction fragmentTransaction = fragmentManager
 					.beginTransaction();
 			fragmentTransaction.replace(R.id.detail_container, detailFragment);
+			fragmentTransaction.addToBackStack(null);
 			fragmentTransaction.commit();
 		}
 			break;
 		case R.id.edit: {
+			
 			Fragment detailFragment = new PersonActivity();
 			final FragmentManager fragmentManager = this
 					.getSupportFragmentManager();
 			final FragmentTransaction fragmentTransaction = fragmentManager
 					.beginTransaction();
 			fragmentTransaction.replace(R.id.detail_container, detailFragment);
+			
+	//		Fragment lfm1 = fragmentManager.findFragmentById(R.id.list_container);
+			
+	//		fragmentTransaction.remove(lfm1);
+			fragmentTransaction.addToBackStack(null);
 			fragmentTransaction.commit();
+			LinearLayout lf1 = (LinearLayout) findViewById(R.id.list_container);
+			lf1.setVisibility(View.GONE);
 		}
 			break;
 		case R.id.settings2: {
+			LinearLayout lf1 = (LinearLayout) findViewById(R.id.list_container);
+			lf1.setVisibility(View.VISIBLE);
 			Bundle arguments = new Bundle();
 			arguments.putBoolean("issend", true);
 			Fragment detailFragment = new HistoryActivity();
@@ -494,6 +550,7 @@ public class MainActivity extends FragmentActivity implements
 					.getSupportFragmentManager();
 			final FragmentTransaction fragmentTransaction = fragmentManager
 					.beginTransaction();
+			fragmentTransaction.addToBackStack(null);
 			fragmentTransaction.replace(R.id.detail_container, detailFragment);
 
 			Fragment listFragment = new FragmentList2();
@@ -504,6 +561,8 @@ public class MainActivity extends FragmentActivity implements
 		}
 			break;
 		case R.id.settings3: {
+			LinearLayout lf1 = (LinearLayout) findViewById(R.id.list_container);
+			lf1.setVisibility(View.VISIBLE);
 			Bundle arguments2 = new Bundle();
 			arguments2.putBoolean("issend", false);
 			Fragment detailFragment = new HistoryActivity();
@@ -518,10 +577,13 @@ public class MainActivity extends FragmentActivity implements
 					.beginTransaction();
 			fragmentTransaction.replace(R.id.detail_container, detailFragment);
 			fragmentTransaction.replace(R.id.list_container, listFragment);
+			fragmentTransaction.addToBackStack(null);
 			fragmentTransaction.commit();
 		}
 			break;
 		case R.id.settings4: {
+			LinearLayout lf1 = (LinearLayout) findViewById(R.id.list_container);
+			lf1.setVisibility(View.VISIBLE);
 			Fragment detailFragment = new MapActivity();
 			final FragmentManager fragmentManager = this
 					.getSupportFragmentManager();
@@ -532,16 +594,21 @@ public class MainActivity extends FragmentActivity implements
 		}
 			break;
 		case R.id.settings5: {
+			LinearLayout lf1 = (LinearLayout) findViewById(R.id.list_container);
+			lf1.setVisibility(View.VISIBLE);
 			Fragment detailFragment = new TestActivity();
 			final FragmentManager fragmentManager = this
 					.getSupportFragmentManager();
 			final FragmentTransaction fragmentTransaction = fragmentManager
 					.beginTransaction();
 			fragmentTransaction.replace(R.id.detail_container, detailFragment);
+			fragmentTransaction.addToBackStack(null);
 			fragmentTransaction.commit();
 		}
 			break;
 		case R.id.zihui:
+			LinearLayout lf1 = (LinearLayout) findViewById(R.id.list_container);
+			lf1.setVisibility(View.VISIBLE);
 			String PACKAGE_NAME = "com.rtk.bdtest";
 			Uri uri = Uri.parse("package:" + PACKAGE_NAME);
 			Intent intent = new Intent(Intent.ACTION_DELETE, uri);
@@ -551,6 +618,8 @@ public class MainActivity extends FragmentActivity implements
 			Toast.makeText(this, "自毁成功！", Toast.LENGTH_SHORT);
 			break;
 		case R.id.copy:
+			LinearLayout lf2 = (LinearLayout) findViewById(R.id.list_container);
+			lf2.setVisibility(View.VISIBLE);
 			try {
 				final String COPY_FILENAME2 = "quanguogailue.dat";
 				final String COPY_FILENAME = "nanjing_315.dat";
