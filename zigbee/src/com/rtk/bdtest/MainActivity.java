@@ -27,6 +27,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.v4.app.Fragment;
@@ -47,6 +48,7 @@ public class MainActivity extends FragmentActivity implements
 	private BDService bdService;
 	private static final String Tag = "main";
 	private static final String REQUEST_JOIN = "8004";
+	private static final int content_length = 29;
 
 	public static MainActivity instance;
 	private static String defaultLatitude = null;
@@ -60,7 +62,7 @@ public class MainActivity extends FragmentActivity implements
 			// 定时发送gps信息到zigbee，这样zigbee才能发送gps广播信息
 			defaultLatitude = arg1.getExtras().getString("defaultLatitude");
 			Log.i(Tag, "send location to zigbee");
-			sendLocation();
+			//sendLocation();
 		}
 
 	};
@@ -108,9 +110,99 @@ public class MainActivity extends FragmentActivity implements
 
 	void sendSMS(String sms, String destAddr, String destId) {
 		Log.i(Tag, "send data" + sms + " to zigbee!plz wait and verify");
-		zigbeeService.sendsms2Zigbee2(sms, destAddr, destId);
+
+		try {
+			sendLongSms(sms, destAddr, destId,"");
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 	
+	//分包发送长短信息！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+	void sendLongSms(String sms, String destAddr, String destId, String type) throws InterruptedException {
+		Log.i(Tag, "send long sms" + sms + " to zigbee!plz wait and verify");
+		byte[] password = {0x19,0x77,0x04,0x14,(byte) 0x90,(byte) 0xAB,(byte) 0xCD,(byte) 0xEF };
+		byte[] sms2;
+		try {
+			sms2 = sms.getBytes("UTF-8");
+			DesCrypt DesCryptInstance = new DesCrypt();
+			//byte[] smsdata = DesCryptInstance.desCrypto(sms2, password);//暂不加密
+			byte[] smsdata = sms2;
+		   Log.i("deweidewei","The long sms  data length is"+ smsdata.length);
+			if(smsdata.length>content_length) {
+				int count = (smsdata.length/content_length) +1;
+				byte count2byte = (byte)count;
+				byte[] smstmpdata = new byte[content_length];
+				for (int i = 0; i <count ; i++) {
+					byte[] temp = new byte[44]; 
+					byte packageindex = (byte)i;
+					byte[] tmpindex = {packageindex,count2byte};
+		            String head = "2C3003";
+					System.arraycopy(CharConverter.hexStringToBytes(head), 0, temp, 0,
+							3);
+					System.arraycopy(tmpindex, 0, temp, 3, 1);
+					System.arraycopy(tmpindex, 1, temp, 4, 1);
+					String head2 = destAddr+destId;
+                     System.arraycopy(CharConverter.hexStringToBytes(head2), 0, temp, 5, 4);
+ 					byte[] souDest = {(byte) 0xff,(byte) 0xff};
+ 					byte[] sourId = {(byte) 0xff,(byte) 0xff};
+ 		 			System.arraycopy(souDest, 0, temp,9 , 2);
+ 		 			System.arraycopy(sourId, 0, temp,11 , 2);
+ 		 			int smslength = content_length;
+ 		 			if (i<count-1) {
+		 			   smslength = content_length+1+1;
+		 			   System.arraycopy(smsdata, content_length*i, smstmpdata, 0, content_length);
+ 		 			} else {
+ 		 				byte[] tmp = new byte[content_length];
+ 		 				smslength = (smsdata.length%content_length)+2;
+ 		 				System.arraycopy(smsdata, content_length*i, tmp, 0, smsdata.length-content_length*i);
+ 		 				System.arraycopy(tmp, 0, smstmpdata, 0, content_length);
+ 		 			}
+		 			String l = String.format("%02x", smslength);	
+		 			System.arraycopy(CharConverter.hexStringToBytes(l), 0, temp, 13, 1 ); //字串长度
+		 			System.arraycopy(CharConverter.hexStringToBytes("01"), 0, temp, 14, 1);//类型为03
+		 			System.arraycopy(smstmpdata, 0, temp, 15, smstmpdata.length);
+		 			String logstring = CharConverter.byteToHexString(temp,temp.length);
+		 			Log.i("deweidewei","dewei send data " +i + " data is" +logstring + " ##########temp is" + temp);
+		 			sendData2Zigbee(temp);
+				}
+			} else {
+				try {
+					//0x2D为length，3003短信息标志位，00为index，01为包数，destAddr目标短地址
+					//destId为目标id，0xffff，0xffff，短信息内容为32字节
+					byte[] temp = new byte[44]; 
+		            String head = "2C30030001"+destAddr+destId;
+					System.arraycopy(CharConverter.hexStringToBytes(head), 0, temp, 0,
+							9);
+					byte[] souDest = {(byte) 0xff,(byte) 0xff};
+					byte[] sourId = {(byte) 0xff,(byte) 0xff};
+		 			System.arraycopy(souDest, 0, temp,9 , 2);
+		 			System.arraycopy(sourId, 0, temp,11 , 2);
+		 			int smslength = smsdata.length+2;
+		 			String l = String.format("%02x", smslength);	
+		 			
+		 			System.arraycopy(CharConverter.hexStringToBytes(l), 0, temp, 13, 1 ); //字串长度
+		 			System.arraycopy(CharConverter.hexStringToBytes("01"), 0, temp, 14, 1);//类型为03
+					String head2 = "2D30030001"+destAddr+destId+l+"03";
+		 			System.arraycopy(smsdata, 0, temp, 15, smsdata.length);
+		 			Log.i(Tag,"The sms send data head is " +head2);
+		 			Log.i(Tag,"The sms send data string is " + temp);
+		 			sendData2Zigbee(temp);
+					//sendData2Zigbee(data.getBytes("UTF-8"));
+					//sendData2Zigbee(data.getBytes("Unicode"));
+				} catch (Exception e) {
+					// TODO: handle exception
+					e.printStackTrace();
+				}
+			}
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
 	
 	//分包发送分组信息！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
 	void sendPersonInfo(String sms, String destAddr, String destId, String type) throws InterruptedException {
@@ -123,15 +215,15 @@ public class MainActivity extends FragmentActivity implements
 			//byte[] smsdata = DesCryptInstance.desCrypto(sms2, password);//暂不加密
 			byte[] smsdata = sms2;
 		   Log.i("deweidewei","The data length is"+ smsdata.length);
-			if(smsdata.length>30) {
-				int count = (smsdata.length/30) +1;
+			if(smsdata.length>content_length) {
+				int count = (smsdata.length/content_length) +1;
 				byte count2byte = (byte)count;
-				byte[] smstmpdata = new byte[30];
+				byte[] smstmpdata = new byte[content_length];
 				for (int i = 0; i <count ; i++) {
-					byte[] temp = new byte[45]; 
+					byte[] temp = new byte[44]; 
 					byte packageindex = (byte)i;
 					byte[] tmpindex = {packageindex,count2byte};
-		            String head = "2D3003";
+		            String head = "2C3003";
 					System.arraycopy(CharConverter.hexStringToBytes(head), 0, temp, 0,
 							3);
 					System.arraycopy(tmpindex, 0, temp, 3, 1);
@@ -142,15 +234,15 @@ public class MainActivity extends FragmentActivity implements
  					byte[] sourId = {(byte) 0xff,(byte) 0xff};
  		 			System.arraycopy(souDest, 0, temp,9 , 2);
  		 			System.arraycopy(sourId, 0, temp,11 , 2);
- 		 			int smslength = 30;
+ 		 			int smslength = content_length;
  		 			if (i<count-1) {
-		 			   smslength = 30+1+1;
-		 			   System.arraycopy(smsdata, 30*i, smstmpdata, 0, 30);
+		 			   smslength = content_length+1+1;
+		 			   System.arraycopy(smsdata, content_length*i, smstmpdata, 0, content_length);
  		 			} else {
- 		 				byte[] tmp = new byte[30];
- 		 				smslength = (smsdata.length%30)+2;
- 		 				System.arraycopy(smsdata, 30*i, tmp, 0, smsdata.length-30*i);
- 		 				System.arraycopy(tmp, 0, smstmpdata, 0, 30);
+ 		 				byte[] tmp = new byte[content_length];
+ 		 				smslength = (smsdata.length%content_length)+2;
+ 		 				System.arraycopy(smsdata, content_length*i, tmp, 0, smsdata.length-content_length*i);
+ 		 				System.arraycopy(tmp, 0, smstmpdata, 0, content_length);
  		 			}
 		 			String l = String.format("%02x", smslength);	
 		 			System.arraycopy(CharConverter.hexStringToBytes(l), 0, temp, 13, 1 ); //字串长度
@@ -159,14 +251,13 @@ public class MainActivity extends FragmentActivity implements
 		 			String logstring = CharConverter.byteToHexString(temp,temp.length);
 		 			Log.i("deweidewei","dewei send data " +i + " data is" +logstring + " ##########temp is" + temp);
 		 			sendData2Zigbee(temp);
-					Thread.sleep(5000);
 				}
 			} else {
 				try {
 					//0x2D为length，3003短信息标志位，00为index，01为包数，destAddr目标短地址
 					//destId为目标id，0xffff，0xffff，短信息内容为32字节
-					byte[] temp = new byte[45]; 
-		            String head = "2D30030001"+destAddr+destId;
+					byte[] temp = new byte[44]; 
+		            String head = "2C30030001"+destAddr+destId;
 					System.arraycopy(CharConverter.hexStringToBytes(head), 0, temp, 0,
 							9);
 					byte[] souDest = {(byte) 0xff,(byte) 0xff};
@@ -202,9 +293,49 @@ public class MainActivity extends FragmentActivity implements
 		zigbeeService.sendsms2Zigbee2(sms, destAddr, destId);
 	}
 
-	public void sendData2Zigbee(byte[] hexStringToBytes) {
+	public Handler handler = new Handler();
+    private byte[] hexStringToBytesF = null;
+
+	   // 构建Runnable对象，在runnable中更新listview界面  
+    Runnable   runnableSendSms=new  Runnable(){  
+
+	@Override  
+       public void run() {  
+           //更新界面  
+   		zigbeeService.sendData2Zigbee(hexStringToBytesF );
+   		try {
+				Thread.sleep(3000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+       }  
+       
+         
+   };
+   
+	public void sendData2Zigbee(byte[] tmp111) {
 		Log.i(Tag, "send data2 zigbee!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-		zigbeeService.sendData2Zigbee(hexStringToBytes);
+		hexStringToBytesF = tmp111;
+   		zigbeeService.sendData2Zigbee(hexStringToBytesF );
+   		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+       // handler.post(runnableSendSms);
+       // handler.removeCallbacks(runnableSendSms);
+
+	}
+	
+	
+
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+		handler.removeCallbacks(runnableSendSms);
 	}
 
 	void getselfInfo() {

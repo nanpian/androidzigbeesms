@@ -82,9 +82,10 @@ public class BDService extends Service{
 			// TODO Auto-generated method stub
 			switch (msg.what) {
 			case SEND_GPS:
+				Log.i(Tag,"send gps self info every 5 seconds!");
 				if(gpsstring!=null) {
 				synchronized (gpsstring) {   
-					if ((gpsstring!=null) && (defaultLatitude != null) && (defaultLatitude != null)) {
+					if ((gpsstring!=null)) {
 						Intent gpsintent = new Intent(
 								"com.rtk.bdtest.service.BDService.broadcast");
 						gpsintent.setAction("ACTION_UPDATE_SELF_GPS");
@@ -249,6 +250,7 @@ public class BDService extends Service{
 				Message msg = new Message();
 				msg.what  = SEND_GPS;
 				handler.sendMessage(msg);
+				Log.i(Tag,"timer task start!");
 			}
 			
 		};
@@ -270,6 +272,7 @@ public class BDService extends Service{
 		try {
 			// thread.join();
 			bdThread.interrupt();
+			timer.cancel();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

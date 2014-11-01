@@ -160,8 +160,10 @@ public class FragmentList2 extends Fragment {
 				final String  Idtmp = intent.getExtras().getString("smsSourId");
 				final String typetmp = intent.getExtras().getString("smsType");
 		        for (int i = 0 ; i <devicesB.size(); i++) {
+		        	if(devicesB.get(i).deviceAddress!=null) {
 		        	if(devicesB.get(i).deviceAddress.equals(addrtmp)) {
 		        		devicename = devicesB.get(i).deviceName;
+		        	}
 		        	}
 		        }
 				Log.i(Tag, "Receive sms broadcast" + data);
