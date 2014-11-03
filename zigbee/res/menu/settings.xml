@@ -1,10 +1,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <item
+<!--     <item
         android:id="@+id/settings1"
         android:orderInCategory="100"
         android:showAsAction="never"
-        android:title="绑定队员姓名和设备"/>
+        android:title="绑定队员姓名和设备"/> -->
         <item
         android:id="@+id/edit"
         android:orderInCategory="100"
@@ -14,12 +14,12 @@
         android:id="@+id/settings2"
         android:orderInCategory="100"
         android:showAsAction="never"
-        android:title="发送消息记录"/>
-    <item
+        android:title="查看历史记录"/>
+<!--     <item
         android:id="@+id/settings3"
         android:orderInCategory="100"
         android:showAsAction="never"
-        android:title="接收消息记录"/>
+        android:title="接收消息记录"/> -->
     <item
         android:id="@+id/settings4"
         android:orderInCategory="100"

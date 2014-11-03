@@ -75,6 +75,8 @@ public class FragmentList2 extends Fragment {
 	private ExpandableListView deviceList;  
 	private ArrayList<String> namelist = new ArrayList();
 	public  ArrayList<Device> devices;
+	public Device deviceBtmp;
+	public Device deviceB1tmp;
 	private ArrayList<List<Device>> devicesA = new ArrayList<List<Device>>();  //所有的设备A
 	public  ArrayList<Device> devicesB = new ArrayList<Device>();  //设备B和C
 	private DeviceExpandableListAdapter adapter;
@@ -191,6 +193,13 @@ public class FragmentList2 extends Fragment {
 					Toast.makeText(getActivity(), "已经退网", Toast.LENGTH_LONG).show();
 				} else if (typetmp.equals("01")) {
 					devicesB.get(0).unread = true; //显示未读信息图标
+					Intent smsintent = new Intent(
+							"com.rtk.bdtest.service.ZigbeeService.broadcastMap");
+					smsintent.setAction(("ACTION_ZIGBEE_SMS").toString());
+					smsintent.putExtra("zigbee_sms", data);
+					smsintent.putExtra("smsSourAddr", addrtmp);
+					smsintent.putExtra("smsSourId", Idtmp);
+					getActivity().sendBroadcast(smsintent);
 				AlertDialog dialog = new AlertDialog.Builder(getActivity())
 						.setTitle("收到来自地址"+addrtmp+"ID为"+Idtmp+"短信息")
 						.setView(mInput)
@@ -253,17 +262,23 @@ public class FragmentList2 extends Fragment {
 		boolean isContain = false;
 		//data = data.substring(2,data.length());
 		Device deviceB = new Device();
-		deviceB.deviceName = "路由设备" + data.substring(6, 10);
+		deviceB.deviceName = "匿名队长" + data.substring(6, 10);
+		if(deviceB1tmp!=null) {
+			if (deviceB1tmp.deviceID.equals(data.substring(10, 14))) {
+				deviceB.deviceName = deviceB1tmp.deviceName;
+			} 
+		}
+
 		deviceB.deviceID = data.substring(10, 14);
 		deviceB.deviceAddress = data.substring(6,10);
 		selfpadAddress  = deviceB.deviceAddress;
 		deviceB.online = true;
 		deviceB.count = 5;
 		for (int i = 0; i < devicesB.size(); i++) {
-			if (devicesB.get(i).deviceName != null) {
-				if (devicesB.get(i).deviceName.contains("本机")) {
+			if (devicesB.get(i).deviceID != null) {
+				if (devicesB.get(i).deviceID.equals(data.substring(10,14))) {
 					isContain = true;
-					   devicesB.get(i).deviceName = "本机"+data.substring(6,10);
+					  // devicesB.get(i).deviceName = "本机"+data.substring(6,10);
 					   devicesB.get(i).deviceID = data.substring(10,14);
 					   devicesB.get(i).deviceAddress = data.substring(6, 10);
 						devicesB.get(i).count = 5;
@@ -278,7 +293,7 @@ public class FragmentList2 extends Fragment {
 			   deviceB2.deviceName = "本机"+data.substring(6,10);
 			   deviceB2.deviceAddress = data.substring(6, 10);
 			   deviceB2.deviceID = data.substring(10,14);
-			devicesB.add(deviceB2);
+			   devicesB.add(deviceB2);
 		}
 		
 	}
@@ -288,9 +303,8 @@ public class FragmentList2 extends Fragment {
 		data = data.substring(2,data.length());
 		try {
 			for (int i = 0; i < devicesB.size(); i++) {
-				if (devicesB.get(i).deviceName.contains("路由器")){
-					isContain = true;
-					   devicesB.get(i).deviceName = "路由器"+data.substring(6,10);
+				if (devicesB.get(i).deviceID.equals(data.substring(10, 14))){
+					   isContain = true;
 					   devicesB.get(i).deviceAddress = data.substring(6,10);
 					   devicesB.get(i).deviceID = data.substring(10,14);
 						devicesB.get(i).count = 5;
@@ -299,13 +313,18 @@ public class FragmentList2 extends Fragment {
 			} 
 			if (!isContain) {
 				Device deviceB2 = new Device();
+				deviceB2.deviceName = "匿名队长" + data.substring(6, 10);
+				if(deviceBtmp!=null) {
+					if (data.substring(10,14).equals(deviceBtmp.deviceID)){
+						deviceB2.deviceName = deviceBtmp.deviceName;
+					}
+				} 
 				deviceB2.count = 5;
 				deviceB2.online = true;
-				deviceB2.deviceName = "路由器" + data.substring(6, 10);
 				deviceB2.deviceID = data.substring(10, 14);
 				deviceB2.deviceAddress = data.substring(6,10);
 				devicesB.add(deviceB2);
-				//adapter.notifyDataSetChanged();
+				adapter.notifyDataSetChanged();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -570,12 +589,24 @@ public class FragmentList2 extends Fragment {
 					PersonProvider.CONTENT_URI, null, null, null, null);
 			if (cursor != null) {
 				while (cursor.moveToNext()) {
+					//如果备注是持有人，则是修改路由器设备的名称
+					if(cursor.getString(8).contains("持有人")) {
+						deviceB1tmp = new Device();
+						deviceB1tmp.deviceName = cursor.getString(1);
+						deviceB1tmp.deviceID = cursor.getString(2);
+						//adapter.notifyDataSetChanged();
+					} else if (cursor.getString(8).contains("队长")) {
+						deviceBtmp = new Device();
+						deviceBtmp.deviceName = cursor.getString(1);
+					    deviceBtmp.deviceID = cursor.getString(2);
+					} else {
 					String nametmp = cursor.getString(1);
 					String bindid = cursor.getString(2);
 					Device devicetmp = new Device();
 					devicetmp.deviceName = nametmp;
 					devicetmp.deviceID = bindid;
 					devices.add(devicetmp);
+					}
 				}
 			}
 			adapter.notifyDataSetChanged();
@@ -647,11 +678,11 @@ public class FragmentList2 extends Fragment {
 		}
 		
 		Device deviceB1 = new Device();
-		deviceB1.deviceName = "本机";
+		deviceB1.deviceName = "持有人";
 		devicesB.add(deviceB1);
-		Device deviceB2 = new Device();
-		deviceB2.deviceName = "路由器2";
-		devicesB.add(deviceB2);
+		//Device deviceB2 = new Device();
+		//deviceB2.deviceName = "路由器2";
+		//devicesB.add(deviceB2);
 		Device deviceC1 = new Device();
 		deviceC1.deviceName = "协调器";
 		devicesB.add(deviceC1);
@@ -746,7 +777,7 @@ public class FragmentList2 extends Fragment {
 						dialog2.show();
 					} else {
 						if (devicesB.get(groupPosition).unread) {
-							devicesB.get(groupPosition).unread = false;
+							//devicesB.get(groupPosition).unread = false;
 							Bundle arguments2 = new Bundle();
 							arguments2.putBoolean("issend", false);
 							Fragment detailFragment = new HistoryActivity();
@@ -792,7 +823,7 @@ public class FragmentList2 extends Fragment {
 						}
 						HistoryActivity rfma = (HistoryActivity) rfm;
 						rfma.selectbyname(list);
-						Toast.makeText(getActivity(), "查找" + name2 + "发送短信息记录",
+						Toast.makeText(getActivity(), "查找" + name2 + "短信息记录",
 								Toast.LENGTH_SHORT).show();
 					} else {
 						String name2 = devicesB.get(groupPosition).deviceName;
@@ -812,7 +843,7 @@ public class FragmentList2 extends Fragment {
 
 						rfma.selectbyname(list);
  
-						Toast.makeText(getActivity(), "查找" + name2 + "接收短信息记录",
+						Toast.makeText(getActivity(), "查找" + name2 + "短信息记录",
 								Toast.LENGTH_SHORT).show();
 					}
 					return true;  //不弹出子设备列表
@@ -822,7 +853,12 @@ public class FragmentList2 extends Fragment {
 				return false;
 			}
 		});
-		reduceDeviceCount();
+		FragmentManager rightfm = getActivity()
+				.getSupportFragmentManager();
+		Fragment rfm = rightfm.findFragmentById(R.id.detail_container);
+		if(rfm instanceof MapActivity ) {
+		    reduceDeviceCount();
+		}
 
 	}
 	

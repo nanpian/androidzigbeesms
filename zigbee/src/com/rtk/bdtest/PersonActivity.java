@@ -32,12 +32,15 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
@@ -51,10 +54,21 @@ public class PersonActivity extends Fragment {
 	private static List<Map<String, Object>> listems;
 	private ArrayAdapter bindadapter;
 	private final static String Tag = "PersonFragment";
-
+	private static int typeCount = 0 ;
+	private static int rankCount = 0;
+	private static int jobCount = 0;
+	private static final String[] typelist ={"人","装备","物资"};   
+	private static final String[] ranklist = {"团长","营长","班长","队员"};
+	private static final String[] joblist = {"团长","营长","班长","队员"};
 	private String[] name = { "xxxxx", "yyyy", "hello", "zdsfdsf" };
 
 	private String[] desc = { "sdfsdf", "dsfdsf", "dsefrwer", "sdfwer" };
+	private Spinner spinnertype;
+	private Spinner spinnerrank;
+	private Spinner spinnerjob;
+	private ArrayAdapter<String> adapter;
+	private ArrayAdapter<String> adapter2;
+	private ArrayAdapter<String> adapter3;
 	private static SimpleAdapter simpleadapter;
 	private static int idindex;
 
@@ -90,10 +104,11 @@ public class PersonActivity extends Fragment {
 				"The dest lat lng is " + sourceLatLng.latitude + "dest xxxx lng"
 						+ sourceLatLng.longitude, Toast.LENGTH_LONG).show();
 
-		listems = new ArrayList<Map<String, Object>>();
+
 		Cursor cursor = getActivity().getContentResolver().query(
 				PersonProvider.CONTENT_URI, null, null, null, null);
 		if (cursor != null) {
+			listems = new ArrayList<Map<String, Object>>();
 			while (cursor.moveToNext()) {
 				String name = cursor.getString(1);
 				String id = cursor.getString(2);
@@ -169,6 +184,87 @@ public class PersonActivity extends Fragment {
 			LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
 			final View myAddView = layoutInflater.inflate(R.layout.add_new,
 					null);
+	  
+			spinnertype = (Spinner)myAddView.findViewById(R.id.type111);
+			spinnerrank = (Spinner)myAddView.findViewById(R.id.rank111);
+			spinnerjob = (Spinner)myAddView.findViewById(R.id.job111);
+			spinnertype.setPrompt("请选择类别：");
+			spinnerrank.setPrompt("请选择军衔");
+			spinnerjob.setPrompt("请选择职务");
+			//将可选内容与ArrayAdapter连接起来   
+			adapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,typelist);   	    
+			//设置下拉列表的风格   
+			adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);   		        
+			//将adapter 添加到spinner中   
+			spinnertype.setAdapter(adapter);   	     
+			//添加事件Spinner事件监听     
+			spinnertype.setOnItemSelectedListener(new OnItemSelectedListener(){
+
+				@Override
+				public void onItemSelected(AdapterView<?> arg0, View arg1,
+						int arg2, long arg3) {
+					// TODO Auto-generated method stub	
+					typeCount = arg2;
+				}
+
+				@Override
+				public void onNothingSelected(AdapterView<?> arg0) {
+					// TODO Auto-generated method stub
+					typeCount = 0;
+				}
+			});
+
+			//设置默认值   
+			spinnertype.setVisibility(View.VISIBLE);   
+			//将可选内容与ArrayAdapter连接起来   
+			adapter2 = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,ranklist);   	    
+			//设置下拉列表的风格   
+			adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);   		        
+			//将adapter 添加到spinner中   
+			spinnerrank.setAdapter(adapter2);   	     
+			//添加事件Spinner事件监听     
+			spinnerrank.setOnItemSelectedListener(new OnItemSelectedListener(){
+
+				@Override
+				public void onItemSelected(AdapterView<?> arg0, View arg1,
+						int arg2, long arg3) {
+					// TODO Auto-generated method stub
+					rankCount = arg2;
+				}
+
+				@Override
+				public void onNothingSelected(AdapterView<?> arg0) {
+					// TODO Auto-generated method stub
+					rankCount = 0;
+				}
+				
+			});   	  
+			//设置默认值   
+			spinnerrank.setVisibility(View.VISIBLE);   
+			//将可选内容与ArrayAdapter连接起来   
+			adapter3 = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,joblist);   	    
+			//设置下拉列表的风格   
+			adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);   		        
+			//将adapter 添加到spinner中   
+			spinnerjob.setAdapter(adapter3);   	     
+			//添加事件Spinner事件监听     
+			spinnerjob.setOnItemSelectedListener(new OnItemSelectedListener(){
+
+				@Override
+				public void onItemSelected(AdapterView<?> arg0, View arg1,
+						int arg2, long arg3) {
+					// TODO Auto-generated method stub
+					jobCount = arg2;
+				}
+
+				@Override
+				public void onNothingSelected(AdapterView<?> arg0) {
+					// TODO Auto-generated method stub
+					jobCount = 0;
+				}
+			}); 
+			//设置默认值   
+			spinnerjob.setVisibility(View.VISIBLE);   
 			RadioGroup group = (RadioGroup) myAddView
 					.findViewById(R.id.radioGroup);
 			group.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -197,12 +293,12 @@ public class PersonActivity extends Fragment {
 											.findViewById(R.id.name);
 									EditText id = (EditText) myAddView
 											.findViewById(R.id.id);
-									EditText type = (EditText) myAddView
+/*									EditText type = (EditText) myAddView
 											.findViewById(R.id.type);
 									EditText rank = (EditText) myAddView
 											.findViewById(R.id.rank);
 									EditText job = (EditText) myAddView
-											.findViewById(R.id.job);
+											.findViewById(R.id.job);*/
 									EditText year = (EditText) myAddView
 											.findViewById(R.id.year);
 									RadioButton sex = (RadioButton) myAddView
@@ -211,9 +307,9 @@ public class PersonActivity extends Fragment {
 											.findViewById(R.id.beizhu);
 									String name1 = name.getText().toString();
 									String id1 = id.getText().toString();
-									String type1 = type.getText().toString();
-									String rank1 = rank.getText().toString();
-									String job1 = job.getText().toString();
+									String type1 = typelist[typeCount];
+									String rank1 = ranklist[rankCount];
+									String job1 = joblist[jobCount];
 									String year1 = year.getText().toString();
 									String sex1 = male;
 									String beizhu1 = beizhu.getText()
@@ -300,14 +396,100 @@ public class PersonActivity extends Fragment {
 			LayoutInflater layoutInflater2 = LayoutInflater.from(getActivity());
 			final View myAddView2 = layoutInflater2.inflate(R.layout.add_new,
 					null);
+	  
+			spinnertype = (Spinner)myAddView2.findViewById(R.id.type111);
+			spinnerrank = (Spinner)myAddView2.findViewById(R.id.rank111);
+			spinnerjob = (Spinner)myAddView2.findViewById(R.id.job111);
+			spinnertype.setPrompt("请选择类别：");
+			spinnerrank.setPrompt("请选择军衔");
+			spinnerjob.setPrompt("请选择职务");
+			//将可选内容与ArrayAdapter连接起来   
+			adapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,typelist);   	    
+			//设置下拉列表的风格   
+			adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);   		        
+			//将adapter 添加到spinner中   
+			spinnertype.setAdapter(adapter);   	     
+			//添加事件Spinner事件监听     
+			spinnertype.setOnItemSelectedListener(new OnItemSelectedListener(){
+
+				@Override
+				public void onItemSelected(AdapterView<?> arg0, View arg1,
+						int arg2, long arg3) {
+					// TODO Auto-generated method stub	
+					typeCount = arg2;
+				}
+
+				@Override
+				public void onNothingSelected(AdapterView<?> arg0) {
+					// TODO Auto-generated method stub
+					typeCount = 0;
+				}
+			});
+
+			//设置默认值   
+			spinnertype.setVisibility(View.VISIBLE);   
+			//将可选内容与ArrayAdapter连接起来   
+			adapter2 = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,ranklist);   	    
+			//设置下拉列表的风格   
+			adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);   		        
+			//将adapter 添加到spinner中   
+			spinnerrank.setAdapter(adapter2);   	     
+			//添加事件Spinner事件监听     
+			spinnerrank.setOnItemSelectedListener(new OnItemSelectedListener(){
+
+				@Override
+				public void onItemSelected(AdapterView<?> arg0, View arg1,
+						int arg2, long arg3) {
+					// TODO Auto-generated method stub
+					rankCount = arg2;
+				}
+
+				@Override
+				public void onNothingSelected(AdapterView<?> arg0) {
+					// TODO Auto-generated method stub
+					rankCount = 0;
+				}
+				
+			});   	  
+			//设置默认值   
+			spinnerrank.setVisibility(View.VISIBLE);   
+			//将可选内容与ArrayAdapter连接起来   
+			adapter3 = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,joblist);   	    
+			//设置下拉列表的风格   
+			adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);   		        
+			//将adapter 添加到spinner中   
+			spinnerjob.setAdapter(adapter3);   	     
+			//添加事件Spinner事件监听     
+			spinnerjob.setOnItemSelectedListener(new OnItemSelectedListener(){
+
+				@Override
+				public void onItemSelected(AdapterView<?> arg0, View arg1,
+						int arg2, long arg3) {
+					// TODO Auto-generated method stub
+					jobCount = arg2;
+				}
+
+				@Override
+				public void onNothingSelected(AdapterView<?> arg0) {
+					// TODO Auto-generated method stub
+					jobCount = 0;
+				}
+			}); 
+			//设置默认值   
+			spinnerjob.setVisibility(View.VISIBLE);   
 			EditText name = (EditText) myAddView2.findViewById(R.id.name);
 			EditText id2 = (EditText) myAddView2.findViewById(R.id.id);
-			EditText type = (EditText) myAddView2.findViewById(R.id.type);
-			EditText rank = (EditText) myAddView2.findViewById(R.id.rank);
-			EditText job = (EditText) myAddView2.findViewById(R.id.job);
-			EditText year = (EditText) myAddView2.findViewById(R.id.year);
-			name.setText(listems.get(id).get("name").toString());
-			id2.setText(listems.get(id).get("id").toString());
+
+			//EditText type = (EditText) myAddView2.findViewById(R.id.type);
+			//EditText rank = (EditText) myAddView2.findViewById(R.id.rank);
+			//EditText job = (EditText) myAddView2.findViewById(R.id.job);
+		    EditText year = (EditText) myAddView2.findViewById(R.id.year);
+			if (listems!=null) {
+				if(listems.size()>0) {
+			    name.setText(listems.get(id).get("name").toString());
+			    id2.setText(listems.get(id).get("id").toString());
+				}
+			}
 			RadioButton sex = (RadioButton) myAddView2
 					.findViewById(R.id.radioMale);
 			EditText beizhu = (EditText) myAddView2.findViewById(R.id.beizhu);
@@ -339,12 +521,12 @@ public class PersonActivity extends Fragment {
 											.findViewById(R.id.name);
 									EditText ids = (EditText) myAddView2
 											.findViewById(R.id.id);
-									EditText type = (EditText) myAddView2
+/*									EditText type = (EditText) myAddView2
 											.findViewById(R.id.type);
 									EditText rank = (EditText) myAddView2
 											.findViewById(R.id.rank);
 									EditText job = (EditText) myAddView2
-											.findViewById(R.id.job);
+											.findViewById(R.id.job);*/
 									EditText year = (EditText) myAddView2
 											.findViewById(R.id.year);
 									RadioButton sex = (RadioButton) myAddView2
@@ -353,9 +535,9 @@ public class PersonActivity extends Fragment {
 											.findViewById(R.id.beizhu);
 									String name1 = name.getText().toString();
 									String id1 = ids.getText().toString();
-									String type1 = type.getText().toString();
-									String rank1 = rank.getText().toString();
-									String job1 = job.getText().toString();
+									String type1 = typelist[typeCount];
+									String rank1 = ranklist[rankCount];
+									String job1 = joblist[jobCount];
 									String year1 = year.getText().toString();
 									String sex1 = male;
 									String beizhu1 = beizhu.getText()
@@ -416,7 +598,12 @@ public class PersonActivity extends Fragment {
 			layoutParams2.width = 200;
 			layoutParams2.height = LayoutParams.WRAP_CONTENT;
 			alertDialog2.getWindow().setAttributes(layoutParams2);
-			alertDialog2.show();
+			if (listems.size()>0) {	
+				alertDialog2.show();
+			} else {
+				Toast.makeText(getActivity(), "没有数据，无法修改", Toast.LENGTH_LONG).show();
+			}
+
 			toast(item.getTitle() + idx);
 			break;
 		case MENU_DELETE:

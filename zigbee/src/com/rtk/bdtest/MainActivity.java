@@ -508,7 +508,7 @@ public class MainActivity extends FragmentActivity implements
 		// TODO Auto-generated method stub
 
 		switch (item.getItemId()) {
-		case R.id.settings1: {
+/*		case R.id.settings1: {
 			LinearLayout lf1 = (LinearLayout) findViewById(R.id.list_container);
 			lf1.setVisibility(View.VISIBLE);
 			Fragment detailFragment = new BindActivity();
@@ -520,7 +520,7 @@ public class MainActivity extends FragmentActivity implements
 			fragmentTransaction.addToBackStack(null);
 			fragmentTransaction.commit();
 		}
-			break;
+			break;*/
 		case R.id.edit: {
 			
 			Fragment detailFragment = new PersonActivity();
@@ -560,7 +560,7 @@ public class MainActivity extends FragmentActivity implements
 			fragmentTransaction.commit();
 		}
 			break;
-		case R.id.settings3: {
+/*		case R.id.settings3: {
 			LinearLayout lf1 = (LinearLayout) findViewById(R.id.list_container);
 			lf1.setVisibility(View.VISIBLE);
 			Bundle arguments2 = new Bundle();
@@ -580,7 +580,7 @@ public class MainActivity extends FragmentActivity implements
 			fragmentTransaction.addToBackStack(null);
 			fragmentTransaction.commit();
 		}
-			break;
+			break;*/
 		case R.id.settings4: {
 			LinearLayout lf1 = (LinearLayout) findViewById(R.id.list_container);
 			lf1.setVisibility(View.VISIBLE);

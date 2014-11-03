@@ -48,7 +48,21 @@ public class HistoryActivity extends Fragment {
 		list = new ArrayList<String>();
 		smsHelper = new SmsHelper(getActivity());
 		list.clear();
-		if (isSend) {
+		Cursor cursor = null;
+		if (username != null) {
+			cursor = smsHelper.select(username );
+		} else {
+			cursor = smsHelper.select();
+		}
+		if (cursor != null) {
+			while (cursor.moveToNext()) {
+				String name = cursor.getString(1);
+				String time = cursor.getString(2);
+				String text = cursor.getString(4);
+				list.add("姓名:" + name + "  时间:" + time + " 内容:" + text);
+			}
+		}
+/*		if (isSend) {
 			Cursor cursor = null;
 			if (username != null) {
 				cursor = smsHelper.select(username , "true");
@@ -78,8 +92,8 @@ public class HistoryActivity extends Fragment {
 					list.add("姓名:" + name + "  时间:" + time + " 内容:" + text);
 				}
 			}
-		}
-		if(list.size()==0) {
+		}*/
+/*		if(list.size()==0) {
 			smsHelper.insert("张三", "201210121", "你好测试信息", "true");
 			smsHelper.insert("张三", "201210121", "你好测试信息2", "false");
 			smsHelper.insert("李四", "201210121", "你好测试信息", "false");
@@ -101,7 +115,7 @@ public class HistoryActivity extends Fragment {
 					list.add("姓名:"+name+"  时间:"+time +" 内容:"+text);
 				}
 			}
-		}
+		}*/
 
 		LinearLayout layout = (LinearLayout) getActivity().findViewById(
 				R.id.detail_container);

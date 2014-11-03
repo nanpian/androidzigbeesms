@@ -23,26 +23,40 @@
             android:ems="10"
             android:inputType="number" 
             android:hint="ID" />
-
+            <Spinner
+        android:id="@+id/type111"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
         <EditText
             android:id="@+id/type"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:visibility="gone"
             android:hint="类型" />
+        <Spinner
+        android:id="@+id/rank111"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
         <EditText
             android:id="@+id/rank"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+                        android:visibility="gone"
             android:hint="军衔" />
+                <Spinner
+        android:id="@+id/job111"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
         <EditText
             android:id="@+id/job"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+                        android:visibility="gone"
             android:hint="职务" />
 
         <EditText

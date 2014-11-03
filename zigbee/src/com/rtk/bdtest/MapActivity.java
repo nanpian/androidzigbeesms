@@ -48,9 +48,6 @@ import android.widget.Toast;
 
 public class MapActivity extends Fragment implements MKOfflineMapListener {
 
-	/**
-	 * MapView �ǵ�ͼ���ؼ�
-	 */
 	private MapView mMapView;
 	private static BaiduMap mBaiduMap;
 	private static Marker mMarkerA;
@@ -63,8 +60,13 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 	private final static String Tag = "MapActivity";
 	private static final int MSG_UPDATE_SELF_GPS = 0;
 	private static final int MSG_UPDATE_OTHER_GPS = 1;
+	private static final int MSG_UPDATE_SMS = 2;
 	private static int count = 0;
 	private static LatLng jingwei2;
+	private static String smsdata;
+	private static String addrtmp;
+	private static String Idtmp;
+	private static String typetmp;
 	// 默认南京经纬度
 	private static double[] jingwei = {  0,0 };
 	public static ArrayList<Device> gpsdevices;
@@ -105,12 +107,32 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 
 		}
 	};
+	
+	public Runnable markeFlashRunnable = new Runnable() {
+
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			Message smsMessage = new Message();
+			mMarkerSelf.setVisible(true);
+			smsMessage.what = MSG_UPDATE_SMS;
+			//gpsMessage.obj = jingwei;
+			gpsHandler.sendMessage(smsMessage);
+		}
+		
+	};
 
 	Handler gpsHandler = new Handler() {
+
 		@Override
 		public void handleMessage(Message msg) {
 			// TODO Auto-generated method stub
 			switch (msg.what) {
+			case MSG_UPDATE_SMS:
+				//闪烁图标
+				mMarkerSelf.setVisible(false);
+				gpsHandler.postDelayed(markeFlashRunnable, 2000);
+				break;
 			case MSG_UPDATE_SELF_GPS:
 				BitmapDescriptor bdC = BitmapDescriptorFactory
 						.fromResource(R.drawable.icon_marka);
@@ -148,10 +170,37 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 			Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.activity_overlay, container, false);
 	}
+	
+	private BroadcastReceiver receiverSms = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context arg0, Intent smsIntent) {
+			// TODO Auto-generated method stub
+			if (smsIntent.getAction().equals("ACTION_ZIGBEE_SMS")) {
+/*				for (int i = 0; i<gpsdevices.size(); i++) {
+					if (gpsdevices.get(i).deviceName!=null) {
+						if(gpsdevices.get(i).deviceName.contains("本机")) {
+							gpsdevices.get(i).gpsMarker = mMarkerSelf;
+						}
+					}
+				}*/
+				if (mMarkerSelf!=null) {
+					smsdata = smsIntent.getExtras().getString("zigbee_sms");
+				    addrtmp  = smsIntent.getExtras().getString("smsSourAddr");
+					Idtmp = smsIntent.getExtras().getString("smsSourId");
+					typetmp = smsIntent.getExtras().getString("smsType");
+					Message smsMessage = new Message();
+					smsMessage.what = MSG_UPDATE_SMS;
+					//gpsMessage.obj = jingwei;
+					gpsHandler.sendMessage(smsMessage);
+				}
+				
+			}
+		}
+	
+	};
 
 	private BroadcastReceiver receiver = new BroadcastReceiver() {
-
-
 
 		@Override
 		public void onReceive(Context arg0, Intent gpsIntent) {
@@ -319,13 +368,15 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 				} 
 				for (int i = 0; i <gpsdevices.size(); i ++) {
 					if((gpsdevices.get(i).gpsMarker!=null)&& (marker==gpsdevices.get(i).gpsMarker)) {
-						button.setText(gpsdevices.get(i).deviceName);
+						if(gpsdevices.get(i).unread) {
+						    button.setText("来自"+Idtmp+"短信内容: "+smsdata);
+						    gpsHandler.removeCallbacks(markeFlashRunnable);
+						    gpsdevices.get(i).unread = false;
+						} else {
+						    button.setText("无未读短信");
+						}
 						listener = new OnInfoWindowClickListener() {
 							public void onInfoWindowClick() {
-							//	LatLng ll = marker.getPosition();
-							//	LatLng llNew = new LatLng(ll.latitude + 0.005,
-							//			ll.longitude + 0.005);
-							//	marker.setPosition(llNew);
 								mBaiduMap.hideInfoWindow();
 							}
 						};
@@ -334,60 +385,6 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 								.fromView(button), ll, -47, listener);
 						mBaiduMap.showInfoWindow(mInfoWindow);
 					}
-				}
-				
-				if (marker == mMarkerA || marker == mMarkerD) {
-					button.setText("测试用");
-					listener = new OnInfoWindowClickListener() {
-						public void onInfoWindowClick() {
-							LatLng ll = marker.getPosition();
-							LatLng llNew = new LatLng(ll.latitude + 0.005,
-									ll.longitude + 0.005);
-							marker.setPosition(llNew);
-							mBaiduMap.hideInfoWindow();
-						}
-					};
-					LatLng ll = marker.getPosition();
-					mInfoWindow = new InfoWindow(BitmapDescriptorFactory
-							.fromView(button), ll, -47, listener);
-					mBaiduMap.showInfoWindow(mInfoWindow);
-				} else if (marker == mMarkerB) {
-					button.setText("地址222");
-					button.setOnClickListener(new OnClickListener() {
-						public void onClick(View v) {
-							marker.setIcon(bd);
-							mBaiduMap.hideInfoWindow();
-						}
-					});
-					LatLng ll = marker.getPosition();
-					mInfoWindow = new InfoWindow(button, ll, -47);
-					mBaiduMap.showInfoWindow(mInfoWindow);
-				} else if (marker == mMarkerC) {
-					button.setText("地址1");
-					button.setOnClickListener(new OnClickListener() {
-						public void onClick(View v) {
-							marker.remove();
-							mBaiduMap.hideInfoWindow();
-						}
-					});
-					LatLng ll = marker.getPosition();
-					mInfoWindow = new InfoWindow(button, ll, -47);
-					mBaiduMap.showInfoWindow(mInfoWindow);
-				} else if (gpsdevices.size() > 0) {
-					for (int i = 0; i < gpsdevices.size(); i++) {
-						if (marker == gpsdevices.get(i).gpsMarker) {
-							//button.setText("动态gps点");
-							button.setOnClickListener(new OnClickListener() {
-								public void onClick(View v) {
-									marker.remove();
-									mBaiduMap.hideInfoWindow();
-								}
-							});
-							LatLng ll = marker.getPosition();
-							mInfoWindow = new InfoWindow(button, ll, -47);
-						}
-					}
-
 				}
 				return true;
 			}
@@ -456,6 +453,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 		//gpsHandler.removeCallbacks(gpsselfRunnable);
 		mMarkerSelf = null;
 		getActivity().unregisterReceiver(receiver);
+		getActivity().unregisterReceiver(receiverSms);
 		super.onPause();
 	}
 
@@ -468,7 +466,11 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 				"com.rtk.bdtest.service.BDService.broadcast");
 		filter.addAction("ACTION_UPDATE_SELF_GPS");
 		filter.addAction("ACTION_UPDATE_GPS_INFO");
+		IntentFilter filterSms = new IntentFilter(
+				"com.rtk.bdtest.service.ZigbeeService.broadcastMap");
+		filterSms.addAction("ACTION_ZIGBEE_SMS");
 		getActivity().registerReceiver(receiver, filter);
+		getActivity().registerReceiver(receiverSms, filterSms);
 		//gpsHandler.postDelayed(gpsselfRunnable, 1000);
 	}
 
