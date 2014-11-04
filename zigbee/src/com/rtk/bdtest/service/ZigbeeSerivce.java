@@ -1,5 +1,6 @@
 package com.rtk.bdtest.service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,6 +14,8 @@ import com.rtk.bdtest.FragmentList;
 import com.rtk.bdtest.R;
 import com.rtk.bdtest.SerialPort;
 import com.rtk.bdtest.ZigbeeApplication;
+import com.rtk.bdtest.util.DesCrypt;
+
 import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.Intent;
@@ -20,6 +23,7 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.util.Base64;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -32,6 +36,7 @@ import android.widget.TextView;
 public class ZigbeeSerivce extends Service {
 
 	private static final String TAG = "ZigbeeService";
+	private static final boolean EnableDES = false;
 	private static final String WRITE_ID_SUCCESS = "AA";
 	private static final String WRITE_ID_FAIL = "55";
 	public static final String WRITE_SUCCESS = "00";
@@ -331,6 +336,24 @@ public class ZigbeeSerivce extends Service {
 			Log.i(Tag, "sms length is " + smslenth);
 			String type = data.substring(28, 30);
 			String smsReceive = data.substring(30, data.length());
+			byte[] temp2 = smsReceive.getBytes();
+			if (EnableDES) {
+				byte[] temp3 = Base64.decode(temp2,  Base64.DEFAULT);
+			    DesCrypt DesCryptInstance = new DesCrypt();
+			    byte[] smsdatatmp;
+				try {
+				    if(((ZigbeeApplication) getApplication()).getKey()!=null) {
+				    	String key = (String) ((ZigbeeApplication) getApplication()).getKey();
+					     smsdatatmp = DesCryptInstance.desCrypto(temp3, key.getBytes());
+				    } else {
+					     smsdatatmp = DesCryptInstance.desCrypto(temp3, ("mydes").getBytes());
+				    }
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			    smsReceive = new String(smsdatatmp);
+			} 
 			Log.i(Tag, "smsdata is " + data + "addr" + smsSourAddr + "id "
 					+ smsSourId + " content" + smsReceive + "type is " + type);
 			byte[] bytes = CharConverter.hexStringToBytes(smsReceive);
@@ -488,7 +511,22 @@ public class ZigbeeSerivce extends Service {
 		}
         listBuffer.clear();
 		try {
-			String smsutf8 = new String(temp, "utf-8");
+			String smsutf8 = "解码错误";
+			if (EnableDES) {
+				byte[] temp2 = Base64.decode(temp,  Base64.DEFAULT);
+			    DesCrypt DesCryptInstance = new DesCrypt();
+			    byte[] smsdatatmp;
+			    if(((ZigbeeApplication) getApplication()).getKey()!=null) {
+			    	String key = (String) ((ZigbeeApplication) getApplication()).getKey();
+				     smsdatatmp = DesCryptInstance.desCrypto(temp2, key.getBytes());
+			    } else {
+				     smsdatatmp = DesCryptInstance.desCrypto(temp2, ("mydes").getBytes());
+			    }
+                smsutf8 = new String(smsdatatmp);
+			} else {
+			   smsutf8 = new String(temp, "utf-8");
+			}
+
 			Log.i(Tag, "the sms utf8 is" + smsutf8);
 			// 收到短信息，发送广播给activity，分两种情况处理，第一种是gps信息，第二种是普通短信息！！！！！！！
 			Intent smsintent = new Intent(

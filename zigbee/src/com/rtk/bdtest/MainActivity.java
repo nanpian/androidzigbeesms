@@ -1,5 +1,6 @@
 package com.rtk.bdtest;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -34,6 +35,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -50,6 +52,7 @@ public class MainActivity extends FragmentActivity implements
 	private ZigbeeSerivce zigbeeService;
 	private BDService bdService;
 	private static final String Tag = "main";
+	private static final boolean EnableDES = false;
 	private static final String REQUEST_JOIN = "8004";
 	private static final int content_length = 29;
 
@@ -129,10 +132,24 @@ public class MainActivity extends FragmentActivity implements
 		byte[] password = {0x19,0x77,0x04,0x14,(byte) 0x90,(byte) 0xAB,(byte) 0xCD,(byte) 0xEF };
 		byte[] sms2;
 		try {
-			sms2 = sms.getBytes("UTF-8");
-			DesCrypt DesCryptInstance = new DesCrypt();
-			//byte[] smsdata = DesCryptInstance.desCrypto(sms2, password);//暂不加密
-			byte[] smsdata = sms2;
+
+			byte[] smsdata ;
+			if (EnableDES) {
+				sms2 = sms.getBytes();
+			    DesCrypt DesCryptInstance = new DesCrypt();
+			    byte[] smsdatatmp;
+			    if(((ZigbeeApplication) getApplication()).getKey()!=null) {
+			    	String key = (String) ((ZigbeeApplication) getApplication()).getKey();
+				     smsdatatmp = DesCryptInstance.desCrypto(sms2, key.getBytes());
+			    } else {
+				     smsdatatmp = DesCryptInstance.desCrypto(sms2, ("mydes").getBytes());
+			    }
+	            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+	            smsdata = Base64.encode(sms2, Base64.DEFAULT);
+			} else {
+				sms2 = sms.getBytes("UTF-8");
+			    smsdata = sms2;
+			}
 		   Log.i("deweidewei","The long sms  data length is"+ smsdata.length);
 			if(smsdata.length>content_length) {
 				int count = (smsdata.length/content_length) +1;
@@ -213,10 +230,23 @@ public class MainActivity extends FragmentActivity implements
 		byte[] password = {0x19,0x77,0x04,0x14,(byte) 0x90,(byte) 0xAB,(byte) 0xCD,(byte) 0xEF };
 		byte[] sms2;
 		try {
-			sms2 = sms.getBytes("UTF-8");
-			DesCrypt DesCryptInstance = new DesCrypt();
-			//byte[] smsdata = DesCryptInstance.desCrypto(sms2, password);//暂不加密
-			byte[] smsdata = sms2;
+			byte[] smsdata ;
+			if (EnableDES) {
+				sms2 = sms.getBytes();
+			    DesCrypt DesCryptInstance = new DesCrypt();
+			    byte[] smsdatatmp;
+			    if(((ZigbeeApplication) getApplication()).getKey()!=null) {
+			    	String key = (String) ((ZigbeeApplication) getApplication()).getKey();
+				     smsdatatmp = DesCryptInstance.desCrypto(sms2, key.getBytes());
+			    } else {
+				     smsdatatmp = DesCryptInstance.desCrypto(sms2, ("mydes").getBytes());
+			    }
+	            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+	            smsdata = Base64.encode(sms2, Base64.DEFAULT);
+			} else {
+				sms2 = sms.getBytes("UTF-8");
+			    smsdata = sms2;
+			}
 		   Log.i("deweidewei","The data length is"+ smsdata.length);
 			if(smsdata.length>content_length) {
 				int count = (smsdata.length/content_length) +1;
