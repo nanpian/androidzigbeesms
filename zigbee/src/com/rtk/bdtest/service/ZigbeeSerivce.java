@@ -320,7 +320,7 @@ public class ZigbeeSerivce extends Service {
 			String beidou = data.substring(6, data.length());
 			Intent intent3 = new Intent(
 					"com.rtk.bdtest.service.BDService.broadcast");
-			intent3.setAction(("ACTION_UPDATE_GPS_INFO2").toString());
+			intent3.setAction(("ACTION_UPDATE_GPS_INFO").toString());
 			intent3.putExtra("gps", beidou);
 			sendBroadcast(intent3);
 			Log.i(Tag, "send!!!!data!!!!");

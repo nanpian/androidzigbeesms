@@ -261,24 +261,25 @@ public class FragmentList2 extends Fragment {
 	private void notifyDeviceB1(String data) {
 		boolean isContain = false;
 		//data = data.substring(2,data.length());
-		Device deviceB = new Device();
-		deviceB.deviceName = "匿名队长" + data.substring(6, 10);
+
 		if(deviceB1tmp!=null) {
 			if (deviceB1tmp.deviceID.equals(data.substring(10, 14))) {
-				deviceB.deviceName = deviceB1tmp.deviceName;
+				devicesB.get(0).deviceName = deviceB1tmp.deviceName;
 			} 
+		} else {
+			
 		}
-
-		deviceB.deviceID = data.substring(10, 14);
-		deviceB.deviceAddress = data.substring(6,10);
-		selfpadAddress  = deviceB.deviceAddress;
-		deviceB.online = true;
-		deviceB.count = 5;
-		for (int i = 0; i < devicesB.size(); i++) {
+       
+		devicesB.get(0).deviceID = data.substring(10, 14);
+		devicesB.get(0).deviceAddress = data.substring(6,10);
+		selfpadAddress  = devicesB.get(0).deviceAddress;
+		devicesB.get(0).online = true;
+		devicesB.get(0).count = 5;
+/*		for (int i = 0; i < devicesB.size(); i++) {
 			if (devicesB.get(i).deviceID != null) {
 				if (devicesB.get(i).deviceID.equals(data.substring(10,14))) {
 					isContain = true;
-					  // devicesB.get(i).deviceName = "本机"+data.substring(6,10);
+					   devicesB.get(i).deviceName = "本机"+data.substring(6,10);
 					   devicesB.get(i).deviceID = data.substring(10,14);
 					   devicesB.get(i).deviceAddress = data.substring(6, 10);
 						devicesB.get(i).count = 5;
@@ -290,11 +291,11 @@ public class FragmentList2 extends Fragment {
 		if (!isContain) {
 			Device deviceB2 = new Device();
 			deviceB2.count = 5;
-			   deviceB2.deviceName = "本机"+data.substring(6,10);
+			   deviceB2.deviceName = "持有"+data.substring(6,10);
 			   deviceB2.deviceAddress = data.substring(6, 10);
 			   deviceB2.deviceID = data.substring(10,14);
-			   devicesB.add(deviceB2);
-		}
+			   //devicesB.add(deviceB2);
+		}*/
 		
 	}
 	
@@ -585,20 +586,38 @@ public class FragmentList2 extends Fragment {
 			// 更新界面
 			Log.i(Tag, "notify the new data changed listener!");
 			devices.clear();
+			devicesB.clear();
+			Device tmp = new Device();
+			tmp.deviceName = "持有人";
+			devicesB.add(tmp);
+			Device deviceC1 = new Device();
+			deviceC1.deviceName = "协调器";
+			devicesB.add(deviceC1);
 			Cursor cursor = getActivity().getContentResolver().query(
 					PersonProvider.CONTENT_URI, null, null, null, null);
+           deviceB1tmp = null;
+           deviceBtmp = null;
+            boolean hasSelfName = false;
 			if (cursor != null) {
 				while (cursor.moveToNext()) {
 					//如果备注是持有人，则是修改路由器设备的名称
 					if(cursor.getString(8).contains("持有人")) {
+						hasSelfName = true;
 						deviceB1tmp = new Device();
 						deviceB1tmp.deviceName = cursor.getString(1);
 						deviceB1tmp.deviceID = cursor.getString(2);
+						devicesB.get(0).deviceName = deviceB1tmp.deviceName;
 						//adapter.notifyDataSetChanged();
 					} else if (cursor.getString(8).contains("队长")) {
 						deviceBtmp = new Device();
 						deviceBtmp.deviceName = cursor.getString(1);
 					    deviceBtmp.deviceID = cursor.getString(2);
+					    devicesB.add(deviceBtmp);
+					} else if (cursor.getString(8).contains("协调器")) {
+						deviceBtmp = new Device();
+						deviceBtmp.deviceName = cursor.getString(1);
+					    deviceBtmp.deviceID = cursor.getString(2);
+					    devicesB.get(0).deviceName =  deviceBtmp.deviceName;
 					} else {
 					String nametmp = cursor.getString(1);
 					Log.i(Tag,"dewei dewei name is " +nametmp);
@@ -610,6 +629,7 @@ public class FragmentList2 extends Fragment {
 					}
 				}
 			}
+			if(!hasSelfName)devicesB.get(0).deviceName = "持有人";
 			adapter.notifyDataSetChanged();
 		}
 

@@ -1,6 +1,8 @@
 package com.rtk.bdtest;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
@@ -26,11 +28,14 @@ import com.baidu.mapapi.map.offline.MKOfflineMap;
 import com.baidu.mapapi.map.offline.MKOfflineMapListener;
 import com.baidu.mapapi.utils.CoordinateConverter;
 import com.baidu.mapapi.utils.CoordinateConverter.CoordType;
+import com.rtk.bdtest.db.SmsHelper;
 import com.rtk.bdtest.util.Device;
 import com.rtk.bdtest.util.GpsCorrect;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -38,12 +43,14 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 public class MapActivity extends Fragment implements MKOfflineMapListener {
@@ -249,7 +256,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 				mBaiduMap.setMapStatus(status);
 				for (int i = 0; i<gpsdevices.size(); i++) {
 					if (gpsdevices.get(i).deviceName!=null) {
-						if(gpsdevices.get(i).deviceName.contains("本机")) {
+						if(i==0) {
 							gpsdevices.get(i).gpsMarker = mMarkerSelf;
 						}
 					}
@@ -368,12 +375,51 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 				} 
 				for (int i = 0; i <gpsdevices.size(); i ++) {
 					if((gpsdevices.get(i).gpsMarker!=null)&& (marker==gpsdevices.get(i).gpsMarker)) {
-						if(gpsdevices.get(i).unread) {
-						    button.setText("来自"+Idtmp+"短信内容: "+smsdata);
-						    gpsHandler.removeCallbacks(markeFlashRunnable);
-						    gpsdevices.get(i).unread = false;
+						if (i == 0) {
+							if (gpsdevices.get(i).unread) {
+								button.setText("来自" + Idtmp + "短信内容: "
+										+ smsdata);
+								gpsHandler.removeCallbacks(markeFlashRunnable);
+								gpsdevices.get(i).unread = false;
+							} else {
+								button.setText("无未读短信");
+							}
 						} else {
-						    button.setText("无未读短信");
+							    final String name2 = gpsdevices.get(i).deviceName;
+							    final String addrtmp  = gpsdevices.get(i).deviceAddress;
+							    final String idtmp = gpsdevices.get(i).deviceID;
+                                button.setText("发送短信");
+                                button.setOnClickListener(new OnClickListener(){
+									@Override
+									public void onClick(View arg0) {
+										final EditText mInput2 = new EditText(getActivity());
+										mInput2.setMaxLines(4);
+										AlertDialog dialog2 = new AlertDialog.Builder(getActivity())
+										.setTitle("给" + name2 + "发送短信息:")
+										.setView(mInput2)
+										.setPositiveButton("发送",
+												new DialogInterface.OnClickListener() {
+											private SmsHelper smsHelper;
+
+													@Override
+													public void onClick(
+															DialogInterface dialog,
+															int which) {
+														String sms = mInput2.getText()
+																.toString();
+														String destAddr =addrtmp ;
+														String destId = idtmp ;
+														MainActivity.instance.sendSMS(sms,destAddr,destId);
+														Date tmpDate = new Date();
+														SimpleDateFormat formatt = new SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒");
+														String xx = formatt.format(tmpDate);
+														smsHelper = new SmsHelper(getActivity());
+														smsHelper.insert(name2, xx, sms, "true");
+													}
+												}).setNegativeButton(R.string.cancel, null)
+										.create();
+									}                 	
+                                });
 						}
 						listener = new OnInfoWindowClickListener() {
 							public void onInfoWindowClick() {
