@@ -145,6 +145,7 @@ public class PersonProvider extends ContentProvider {
 		// TODO Auto-generated method stub
 		db = mOpenHelper.getWritableDatabase();
 		int num;
+		Log.i(Tag,"update ittttttt!!!");
 		switch (URI_MATCHER.match(uri)) {
 		case PERSONS:
 			num = db.update(TABLE_NAME, values, selection, selectionArgs);

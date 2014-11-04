@@ -75,6 +75,13 @@ public class SmsHelper extends SQLiteOpenHelper {
 		return row; 
 		}
 	
+	public void delete(int id) {
+		SQLiteDatabase db=this.getWritableDatabase();
+		String where=SMS_ID+"=?";
+		String idd = String.valueOf(id);
+		String[] whereValue={idd}; db.delete(TABLE_NAME, where, whereValue);
+	}
+	
 	public void delete(String name) { 
 		SQLiteDatabase db=this.getWritableDatabase();
 		String where=SMS_NAME+"=?";

@@ -2,6 +2,7 @@ package com.rtk.bdtest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.rtk.bdtest.db.SmsHelper;
 
@@ -11,19 +12,29 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.View.OnCreateContextMenuListener;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class HistoryActivity extends Fragment {
 
 	private final static String Tag = "HistoryActivity";
+	protected static final int MENU_ROM = 2;
 	private SmsHelper smsHelper;
 	private ArrayAdapter historyAdater;
 	public static  ArrayList<String> list;
+	public static ArrayList<Integer> list2;
+	private static List<Map<Integer , String>> listems = new ArrayList<Map<Integer, String>>();
 	public static HistoryActivity instance;
 
 	@Override
@@ -46,8 +57,10 @@ public class HistoryActivity extends Fragment {
 		Log.i(Tag, "The argument issend is " + isSend);
 		Log.i(Tag,"The argument name is " + username);
 		list = new ArrayList<String>();
+		list2 = new ArrayList<Integer>();
 		smsHelper = new SmsHelper(getActivity());
 		list.clear();
+		list2.clear();
 		Cursor cursor = null;
 		if (username != null) {
 			cursor = smsHelper.select(username );
@@ -56,10 +69,13 @@ public class HistoryActivity extends Fragment {
 		}
 		if (cursor != null) {
 			while (cursor.moveToNext()) {
+				int idc = cursor.getInt(0);
 				String name = cursor.getString(1);
 				String time = cursor.getString(2);
 				String text = cursor.getString(4);
 				list.add("姓名:" + name + "  时间:" + time + " 内容:" + text);
+				list2.add(idc);
+				//listems.add(idc)
 			}
 		}
 /*		if (isSend) {
@@ -93,11 +109,13 @@ public class HistoryActivity extends Fragment {
 				}
 			}
 		}*/
-/*		if(list.size()==0) {
+	//if(list.size()==0) {
 			smsHelper.insert("张三", "201210121", "你好测试信息", "true");
 			smsHelper.insert("张三", "201210121", "你好测试信息2", "false");
 			smsHelper.insert("李四", "201210121", "你好测试信息", "false");
 			smsHelper.insert("李四", "201210121", "你好测试信息22222", "true");
+	//}
+			/*
 			if(isSend) {
 				Cursor cursor = smsHelper.selectsend("true");
 				while(cursor.moveToNext()) {
@@ -125,9 +143,42 @@ public class HistoryActivity extends Fragment {
 		ListView listView = (ListView) getActivity().findViewById(
 				R.id.fragment_detail);
 		listView.setAdapter(historyAdater);
+		listView.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
+			@Override
+			public void onCreateContextMenu(ContextMenu menu, View v,
+					ContextMenuInfo menuInfo) {
+				menu.add(Menu.NONE, MENU_ROM, 0, "删除");
+			}
+		});
 
 
 
+	}
+	
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		// TODO Auto-generated method stub
+		final AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
+				.getMenuInfo();
+		int id;
+		if (info != null) {
+			id = (int) info.id;
+		} else {
+			id = 0;
+		}
+
+		String idx = String.valueOf(id);
+		if (-1 == id) {
+			super.onContextItemSelected(item);
+		}
+		switch (item.getItemId()) {
+		case MENU_ROM:
+			int idc = list2.get(id);
+			smsHelper.delete(idc);
+			Toast.makeText(getActivity(), "id is " +id, Toast.LENGTH_LONG).show();
+			break;
+		}
+		return super.onContextItemSelected(item);
 	}
 	
 	public void selectbyname ( ArrayList<String> list2) {

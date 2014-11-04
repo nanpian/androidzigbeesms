@@ -601,6 +601,7 @@ public class FragmentList2 extends Fragment {
 					    deviceBtmp.deviceID = cursor.getString(2);
 					} else {
 					String nametmp = cursor.getString(1);
+					Log.i(Tag,"dewei dewei name is " +nametmp);
 					String bindid = cursor.getString(2);
 					Device devicetmp = new Device();
 					devicetmp.deviceName = nametmp;
@@ -883,22 +884,26 @@ public class FragmentList2 extends Fragment {
 									String namex = mInput3.getText().toString();
 									ContentValues values = new ContentValues();
 									values.put("name", namex);
-									values.put("id", idxx);
-									devices.get(idxx).setDeviceName(namex);
+									values.put("id", devices.get(idxx).deviceID);
+									//devices.get(idxx).setDeviceName(namex);
 									if(isAnonymous) {
 										isAnonymous = false;
+										Log.i(Tag,"dewei is anonymous");
 									getActivity().getContentResolver().insert(
 											PersonProvider.CONTENT_URI, values);
 									} else {
 										isAnonymous = false;
-										String selection = "name= '" + namex + "'";
+										Log.i(Tag,"dewei is not anonymous");
+										String selection = "name= '" +namex + "'";
+										Log.i(Tag,"dewei the name is " + selection);
 										getActivity()
 										.getContentResolver()
 										.update(PersonProvider.CONTENT_URI,
 												values,selection,null);
 									}
+									//devices.get(idxx).setDeviceName(namex);
 									devicesA.set(0, devices);
-									adapter.notifyDataSetChanged();
+									//adapter.notifyDataSetChanged();
 								}
 							}).setNegativeButton(R.string.cancel, null)
 					.create();
