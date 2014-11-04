@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#ff00ff00" >
+    android:background="#fffffff0" >
 
     <ListView
         android:id="@+id/fragment_detail"

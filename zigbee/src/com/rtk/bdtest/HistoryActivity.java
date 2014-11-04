@@ -174,8 +174,10 @@ public class HistoryActivity extends Fragment {
 		switch (item.getItemId()) {
 		case MENU_ROM:
 			int idc = list2.get(id);
+			list.remove(id);
+			historyAdater.notifyDataSetChanged();
 			smsHelper.delete(idc);
-			Toast.makeText(getActivity(), "id is " +id, Toast.LENGTH_LONG).show();
+			Toast.makeText(getActivity(), "id is " +id +" sid is " +idc, Toast.LENGTH_LONG).show();
 			break;
 		}
 		return super.onContextItemSelected(item);

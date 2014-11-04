@@ -27,6 +27,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnCreateContextMenuListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -35,6 +36,7 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -69,6 +71,7 @@ public class PersonActivity extends Fragment {
 	private ArrayAdapter<String> adapter;
 	private ArrayAdapter<String> adapter2;
 	private ArrayAdapter<String> adapter3;
+	private static Button report;
 	private static SimpleAdapter simpleadapter;
 	private static int idindex;
 
@@ -83,7 +86,28 @@ public class PersonActivity extends Fragment {
 				R.id.person_edit);
 		LinearLayout title = (LinearLayout) getActivity().findViewById(
 				R.id.title);
-
+        report = (Button)getActivity().findViewById(R.id.report);
+        report.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				try {
+					StringBuilder send2C = new StringBuilder();
+					for(int i = 0 ;i <listems.size();i++) {
+			 			String send2Ctmp = listems.get(i).get("name")+"#"+ listems.get(i).get("id")+"#"+ listems.get(i).get("beizhu")+"#"+ listems.get(i).get("job")+"#"+ listems.get(i).get("sex")+"#"+ listems.get(i).get("rank")+
+			 					"#"+ listems.get(i).get("type");
+			 			Log.i(Tag,"send2c tmp " + i +" string is" + send2Ctmp);
+			 			send2C.append(send2Ctmp);
+					}
+					String send2Cstring = send2C.toString();
+					MainActivity.instance.sendPersonInfo(send2Cstring, "0000", "FFFF", "03");
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+        	
+        });
 		// 将GPS设备采集的原始GPS坐标转换成百度坐标
 		CoordinateConverter converter = new CoordinateConverter();
 		converter.from(CoordType.GPS);
@@ -205,7 +229,32 @@ public class PersonActivity extends Fragment {
 						int arg2, long arg3) {
 					// TODO Auto-generated method stub	
 					typeCount = arg2;
-				}
+					if(typeCount>0) {
+						spinnerrank.setVisibility(View.GONE);
+						spinnerjob.setVisibility(View.GONE);
+						EditText year = (EditText) myAddView
+								.findViewById(R.id.year);
+						year.setVisibility(View.GONE);
+						RadioButton sex = (RadioButton) myAddView
+								.findViewById(R.id.radioMale);
+						sex.setVisibility(View.GONE);
+						RadioButton sex2 = (RadioButton) myAddView
+								.findViewById(R.id.radioFemale);
+						sex2.setVisibility(View.GONE);
+					} else {
+						spinnerrank.setVisibility(View.VISIBLE);
+						spinnerjob.setVisibility(View.VISIBLE);
+						EditText year = (EditText) myAddView
+								.findViewById(R.id.year);
+						year.setVisibility(View.VISIBLE);
+						RadioButton sex = (RadioButton) myAddView
+								.findViewById(R.id.radioMale);
+						sex.setVisibility(View.VISIBLE);
+						RadioButton sex1 = (RadioButton) myAddView
+								.findViewById(R.id.radioFemale);
+						sex1.setVisibility(View.VISIBLE);
+					}
+ 				}
 
 				@Override
 				public void onNothingSelected(AdapterView<?> arg0) {
@@ -308,10 +357,17 @@ public class PersonActivity extends Fragment {
 									String name1 = name.getText().toString();
 									String id1 = id.getText().toString();
 									String type1 = typelist[typeCount];
-									String rank1 = ranklist[rankCount];
-									String job1 = joblist[jobCount];
-									String year1 = year.getText().toString();
-									String sex1 = male;
+                                    String rank1 = null;
+                                    String job1 = null;
+                                    String year1 = null;
+                                    String sex1 = null;
+									if (type1.equals("人")) {
+										rank1 = ranklist[rankCount];
+										 job1 = joblist[jobCount];
+									    year1 = year.getText()
+												.toString();
+										sex1 = male;
+									} 
 									String beizhu1 = beizhu.getText()
 											.toString();
 									if (name1.equals("") || id1.equals(""))// --------用户名为空时----------------
@@ -371,12 +427,12 @@ public class PersonActivity extends Fragment {
 										//人员姓名#设备ID#班级#职务#性别#军衔#类别
 							 			String send2C = name1+"#"+id1+"#"+beizhu1+"#"+job1+"#"+sex1+"#"+rank1+
 							 					"#"+type1;
-							 			try {
+							 		/*	try {
 											MainActivity.instance.sendPersonInfo(send2C, "0000", "FFFF", "03");
 										} catch (InterruptedException e) {
 											// TODO Auto-generated catch block
 											e.printStackTrace();
-										}
+										}*/
 							 			// MainActivity.instance.sendSMS(sendbind,"0000","FFFF","03");
 										// simpleadapter.notifyDataSetChanged();
 									}
@@ -417,6 +473,31 @@ public class PersonActivity extends Fragment {
 						int arg2, long arg3) {
 					// TODO Auto-generated method stub	
 					typeCount = arg2;
+					if(typeCount>0) {
+						spinnerrank.setVisibility(View.GONE);
+						spinnerjob.setVisibility(View.GONE);
+						EditText year = (EditText) myAddView2
+								.findViewById(R.id.year);
+						year.setVisibility(View.GONE);
+						RadioButton sex = (RadioButton) myAddView2
+								.findViewById(R.id.radioMale);
+						RadioButton sex2 = (RadioButton) myAddView2
+								.findViewById(R.id.radioFemale);
+						sex.setVisibility(View.GONE);
+						sex2.setVisibility(View.GONE);
+					} else {
+						spinnerrank.setVisibility(View.VISIBLE);
+						spinnerjob.setVisibility(View.VISIBLE);
+						EditText year = (EditText) myAddView2
+								.findViewById(R.id.year);
+						year.setVisibility(View.VISIBLE);
+						RadioButton sex = (RadioButton) myAddView2
+								.findViewById(R.id.radioMale);
+						sex.setVisibility(View.VISIBLE);
+						RadioButton sex2 = (RadioButton) myAddView2
+								.findViewById(R.id.radioFemale);
+						sex2.setVisibility(View.VISIBLE);
+					}
 				}
 
 				@Override
@@ -536,10 +617,16 @@ public class PersonActivity extends Fragment {
 									String name1 = name.getText().toString();
 									String id1 = ids.getText().toString();
 									String type1 = typelist[typeCount];
-									String rank1 = ranklist[rankCount];
-									String job1 = joblist[jobCount];
-									String year1 = year.getText().toString();
-									String sex1 = male;
+									String rank1 = null;
+									String job1 = null;
+									String year1 = null;
+									String sex1 = null;
+									if (type1.equals("人")) {
+										rank1 = ranklist[rankCount];
+										job1 = joblist[jobCount];
+										year1 = year.getText().toString();
+										sex1 = male;
+									}
 									String beizhu1 = beizhu.getText()
 											.toString();
 									if (name1.equals("") || id1.equals(""))// --------用户名为空时----------------
@@ -583,12 +670,12 @@ public class PersonActivity extends Fragment {
 										//人员姓名#设备ID#班级#职务#性别#军衔#类别
 							 			String send2Cx = name1+"#"+id1+"#"+beizhu1+"#"+job1+"#"+sex1+"#"+rank1+
 							 					"#"+type1;
-							 			try {
+							 	/*		try {
 											MainActivity.instance.sendPersonInfo(send2Cx, "0000", "FFFF", "03");
 										} catch (InterruptedException e) {
 											// TODO Auto-generated catch block
 											e.printStackTrace();
-										}
+										}*/
 										// simpleadapter.notifyDataSetChanged();
 									}
 								}

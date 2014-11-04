@@ -136,8 +136,9 @@ public class DesCrypt
 
 			// 用密匙初始化Cipher对象
 
-			cipher.init(Cipher.ENCRYPT_MODE, securekey, random);
-
+			//cipher.init(Cipher.ENCRYPT_MODE, securekey, random);
+			//按照http://blog.sina.com.cn/s/blog_6d51d25e0100lp28.html
+			cipher.init(Cipher.ENCRYPT_MODE, securekey);
 			// 现在，获取数据并加密
 
 			// 正式执行加密操作
@@ -191,8 +192,8 @@ public class DesCrypt
 
 		// 用密匙初始化Cipher对象
 
-		cipher.init(Cipher.DECRYPT_MODE, securekey, random);
-
+	//	cipher.init(Cipher.DECRYPT_MODE, securekey, random);
+		cipher.init(Cipher.DECRYPT_MODE, securekey);
 		// 真正开始解密操作
 
 		return cipher.doFinal(src);

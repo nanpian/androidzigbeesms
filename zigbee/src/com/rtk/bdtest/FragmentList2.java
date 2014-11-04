@@ -678,6 +678,7 @@ public class FragmentList2 extends Fragment {
 			e.printStackTrace();
 		}
 		
+		devicesB.clear();
 		Device deviceB1 = new Device();
 		deviceB1.deviceName = "持有人";
 		devicesB.add(deviceB1);
@@ -894,7 +895,7 @@ public class FragmentList2 extends Fragment {
 									} else {
 										isAnonymous = false;
 										Log.i(Tag,"dewei is not anonymous");
-										String selection = "name= '" +namex + "'";
+										String selection = "name= '" + devices.get(idxx).deviceName + "'";
 										Log.i(Tag,"dewei the name is " + selection);
 										getActivity()
 										.getContentResolver()

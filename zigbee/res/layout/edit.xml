@@ -1,86 +1,119 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?><LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#fffff0" >
-      <LinearLayout 
-      android:layout_width="match_parent"
-      android:layout_height="24dp"
-      android:id="@+id/title"
-      >
-  <TextView
-        android:id="@+id/name1"
-        android:text="姓名"
-        android:textStyle="bold"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="1"/>
-    <TextView
-        android:id="@+id/id1"
-        android:text="ID"
-        android:textStyle="bold"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="1"/>
-       <TextView
-        android:id="@+id/idxx"
-        android:text="类型"
-        android:textStyle="bold"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="1"/>
-    <TextView
-        android:id="@+id/rank1"
-        android:text="军衔"
-        android:textStyle="bold"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="1"/>
-    <TextView
-        android:id="@+id/sex1"
-        android:text="职位"
-        android:textStyle="bold"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="1"/>
-    <TextView
-        android:id="@+id/birthday1"
-        android:text="年龄"
-        android:textStyle="bold"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="1"/>
-    <TextView
-        android:id="@+id/device1"
-        android:text="性别"
-        android:textStyle="bold"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="1"/>
-    <TextView
-        android:id="@+id/beizhu1"
-        android:text="备注"
-        android:textStyle="bold"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="1"/>
-</LinearLayout>
-    <View
-        android:layout_width="match_parent"
-        android:background="#000000"
-        android:layout_height="1dp" />
-    <ListView
-        android:id="@+id/person_edit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:cacheColorHint="@android:color/transparent"
-        android:fadingEdge="none" >
-    </ListView>
+    android:background="#fffff0"
+    android:orientation="vertical" >
 
-    <View
-        android:layout_width="match_parent"
-        android:background="#000000"
-        android:layout_height="1dp" />
+    <LinearLayout
+        android:id="@+id/content"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="24dp" >
+
+            <TextView
+                android:id="@+id/name1"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:text="姓名"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/id1"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:text="ID"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/idxx"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:text="类型"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/rank1"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:text="军衔"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/sex1"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:text="职位"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/birthday1"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:text="年龄"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/device1"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:text="性别"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/beizhu1"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:text="备注"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#000000" />
+
+        <ListView
+            android:id="@+id/person_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:cacheColorHint="@android:color/transparent"
+            android:fadingEdge="none" >
+        </ListView>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#000000" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:orientation="vertical" >
+
+        <Button
+            android:id="@+id/report"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:focusable="false"
+            android:text="上报" />
+    </LinearLayout>
+
 
 </LinearLayout>
