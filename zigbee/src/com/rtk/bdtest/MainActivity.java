@@ -52,7 +52,7 @@ public class MainActivity extends FragmentActivity implements
 	private ZigbeeSerivce zigbeeService;
 	private BDService bdService;
 	private static final String Tag = "main";
-	private static final boolean EnableDES = false;
+	private static final boolean EnableDES = true;
 	private static final String REQUEST_JOIN = "8004";
 	private static final int content_length = 29;
 
@@ -135,17 +135,17 @@ public class MainActivity extends FragmentActivity implements
 
 			byte[] smsdata ;
 			if (EnableDES) {
-				sms2 = sms.getBytes();
+				sms2 = sms.getBytes("UTF-8");
 			    DesCrypt DesCryptInstance = new DesCrypt();
 			    byte[] smsdatatmp;
 			    if(((ZigbeeApplication) getApplication()).getKey()!=null) {
 			    	String key = (String) ((ZigbeeApplication) getApplication()).getKey();
-				     smsdatatmp = DesCryptInstance.desCrypto(sms2, key.getBytes());
+				     smsdatatmp = DesCryptInstance.desCrypto(sms2, key.getBytes("UTF-8"));
 			    } else {
-				     smsdatatmp = DesCryptInstance.desCrypto(sms2, ("mydes").getBytes());
+				     smsdatatmp = DesCryptInstance.desCrypto(sms2, ("hellomys").getBytes("UTF-8"));
 			    }
 	            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-	            smsdata = Base64.encode(sms2, Base64.DEFAULT);
+	            smsdata = Base64.encode(smsdatatmp, Base64.DEFAULT);
 			} else {
 				sms2 = sms.getBytes("UTF-8");
 			    smsdata = sms2;
@@ -232,17 +232,17 @@ public class MainActivity extends FragmentActivity implements
 		try {
 			byte[] smsdata ;
 			if (EnableDES) {
-				sms2 = sms.getBytes();
+				sms2 = sms.getBytes("UTF-8");
 			    DesCrypt DesCryptInstance = new DesCrypt();
 			    byte[] smsdatatmp;
 			    if(((ZigbeeApplication) getApplication()).getKey()!=null) {
 			    	String key = (String) ((ZigbeeApplication) getApplication()).getKey();
-				     smsdatatmp = DesCryptInstance.desCrypto(sms2, key.getBytes());
+				     smsdatatmp = DesCryptInstance.desCrypto(sms2, key.getBytes("UTF-8"));
 			    } else {
-				     smsdatatmp = DesCryptInstance.desCrypto(sms2, ("mydes").getBytes());
+				     smsdatatmp = DesCryptInstance.desCrypto(sms2, ("hellomys").getBytes("UTF-8"));
 			    }
 	            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-	            smsdata = Base64.encode(sms2, Base64.DEFAULT);
+	            smsdata = Base64.encode(smsdatatmp, Base64.DEFAULT);
 			} else {
 				sms2 = sms.getBytes("UTF-8");
 			    smsdata = sms2;

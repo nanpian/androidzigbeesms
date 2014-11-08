@@ -11,6 +11,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 
 import javax.crypto.spec.DESKeySpec;
+import javax.crypto.spec.IvParameterSpec;
 
 public class DesCrypt
 
@@ -24,13 +25,15 @@ public class DesCrypt
 
 		// 待加密内容
 
-		String str = "我是中国人";
+		String str = "hellomys";
 
 		// 密码，长度要是8的倍数
 
-		String password = "alnton08";
+		String password = "hellomys";
+		
+		DesCrypt XX = new DesCrypt();
 
-		byte[] result = desCrypto(str.getBytes(), password);
+		byte[] result = XX.desCrypto(str.getBytes("UTF-8"), password.getBytes());
 
 		System.out.println("加密后内容" + new String(result));
 
@@ -40,7 +43,7 @@ public class DesCrypt
 
 		{
 
-			byte[] decryResult = decrypt(result, password);
+			byte[] decryResult = XX.decrypt(result, password);
 
 			System.out.println("加密前内容为：" + new String(decryResult));
 
@@ -81,11 +84,11 @@ public class DesCrypt
 
 			// Cipher对象实际完成加密操作
 
-			Cipher cipher = Cipher.getInstance("DES");
+			Cipher cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
 
 			// 用密匙初始化Cipher对象
 
-			cipher.init(Cipher.ENCRYPT_MODE, securekey, random);
+			cipher.init(Cipher.ENCRYPT_MODE, securekey);
 
 			// 现在，获取数据并加密
 
@@ -176,7 +179,7 @@ public class DesCrypt
 
 		// 创建一个DESKeySpec对象
 
-		DESKeySpec desKey = new DESKeySpec(password.getBytes());
+		DESKeySpec desKey = new DESKeySpec(password.getBytes("UTF-8"));
 
 		// 创建一个密匙工厂
 
@@ -193,6 +196,7 @@ public class DesCrypt
 		// 用密匙初始化Cipher对象
 
 	//	cipher.init(Cipher.DECRYPT_MODE, securekey, random);
+		byte[] iv = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}; 
 		cipher.init(Cipher.DECRYPT_MODE, securekey);
 		// 真正开始解密操作
 

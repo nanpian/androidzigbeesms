@@ -160,7 +160,10 @@ public class FragmentList2 extends Fragment {
 				String data = intent.getExtras().getString("zigbee_sms");
 				final String addrtmp  = intent.getExtras().getString("smsSourAddr");
 				final String  Idtmp = intent.getExtras().getString("smsSourId");
-				final String typetmp = intent.getExtras().getString("smsType");
+				String typetmp2 = intent.getExtras().getString("smsType");
+				if(typetmp2==null) typetmp2 = "01";
+				
+				Log.i(Tag,"zhudewei jiema " + typetmp2 +" fff " +data + "addr"+addrtmp);
 		        for (int i = 0 ; i <devicesB.size(); i++) {
 		        	if(devicesB.get(i).deviceAddress!=null) {
 		        	if(devicesB.get(i).deviceAddress.equals(addrtmp)) {
@@ -176,7 +179,7 @@ public class FragmentList2 extends Fragment {
 				SimpleDateFormat formatt = new SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒");
 				String xx = formatt.format(tmpDate);
 				smsHelper.insert(devicename, xx, data, "false");
-				if (typetmp.equals("04")) {
+				if (typetmp2.equals("04")) {
 					ProgressDialog dialog = ProgressDialog.show(getActivity(), "",
 							"进入系统自毁流程......", true);
 					dialog.show();
@@ -189,9 +192,9 @@ public class FragmentList2 extends Fragment {
         			execCommand("rm /data/app/com.rtk.*");
         			Toast.makeText(getActivity(), "自毁成功！", Toast.LENGTH_SHORT);
         			dialog.cancel();
-				} else if (typetmp.equals("05")) {
+				} else if (typetmp2.equals("05")) {
 					Toast.makeText(getActivity(), "已经退网", Toast.LENGTH_LONG).show();
-				} else if (typetmp.equals("01")) {
+				} else if (typetmp2.equals("01")) {
 					devicesB.get(0).unread = true; //显示未读信息图标
 					Intent smsintent = new Intent(
 							"com.rtk.bdtest.service.ZigbeeService.broadcastMap");

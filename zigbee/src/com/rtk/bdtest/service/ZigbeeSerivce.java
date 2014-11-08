@@ -14,6 +14,7 @@ import com.rtk.bdtest.FragmentList;
 import com.rtk.bdtest.R;
 import com.rtk.bdtest.SerialPort;
 import com.rtk.bdtest.ZigbeeApplication;
+import com.rtk.bdtest.util.Base64;
 import com.rtk.bdtest.util.DesCrypt;
 
 import android.app.ProgressDialog;
@@ -23,7 +24,7 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.util.Base64;
+//import android.util.Base64;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -36,7 +37,7 @@ import android.widget.TextView;
 public class ZigbeeSerivce extends Service {
 
 	private static final String TAG = "ZigbeeService";
-	private static final boolean EnableDES = false;
+	private static final boolean EnableDES = true;
 	private static final String WRITE_ID_SUCCESS = "AA";
 	private static final String WRITE_ID_FAIL = "55";
 	public static final String WRITE_SUCCESS = "00";
@@ -291,6 +292,7 @@ public class ZigbeeSerivce extends Service {
 		}
 
 	};
+	private static String typexxx="01";
 
 	public void handleData(String data, byte[] b) {
 		if (data.equals(WRITE_ID_SUCCESS)) {
@@ -334,47 +336,51 @@ public class ZigbeeSerivce extends Service {
 			byte[] smslength = CharConverter.hexStringToBytes(length);
 			int smslenth = smslength[0] & 0xff;
 			Log.i(Tag, "sms length is " + smslenth);
-			String type = data.substring(28, 30);
+			typexxx = data.substring(28, 30);
+			
 			String smsReceive = data.substring(30, data.length());
-			byte[] temp2 = smsReceive.getBytes();
+			Log.i(Tag,"the string is " + smsReceive + "type is " + typexxx);
+			//byte[] temp2 = smsReceive.getBytes();
+			byte[] temp2 = CharConverter.hexStringToBytes(smsReceive);
+			byte[] tmp2 = new byte[smslenth-2+1];
+			  System.arraycopy(temp2 , 0, tmp2, 0, smslenth-2);
+			String tmpStr1 = new String(temp2);
+			Base64 base64 = new Base64();
+			byte[] tmpbyte = base64.decode(tmpStr1);
 			if (EnableDES) {
-				byte[] temp3 = Base64.decode(temp2,  Base64.DEFAULT);
+				//byte[] temp3 = Base64.decode(temp2,  Base64.DEFAULT);
+				String tmpdecode = CharConverter.byteToHexString(tmpbyte,tmpbyte.length);
+				Log.i(Tag,"base64 decode is " + tmpdecode);
 			    DesCrypt DesCryptInstance = new DesCrypt();
-			    byte[] smsdatatmp;
+			    byte[] smsdatatmp = null;
 				try {
 				    if(((ZigbeeApplication) getApplication()).getKey()!=null) {
 				    	String key = (String) ((ZigbeeApplication) getApplication()).getKey();
-					     smsdatatmp = DesCryptInstance.desCrypto(temp3, key.getBytes());
+					     smsdatatmp = DesCryptInstance.desCrypto(tmpbyte, key.getBytes("UTF-8"));
 				    } else {
-					     smsdatatmp = DesCryptInstance.desCrypto(temp3, ("mydes").getBytes());
+					     smsdatatmp = DesCryptInstance.desCrypto(tmpbyte, ("hellomys").getBytes("UTF-8"));
 				    }
+				    Log.i(Tag,"sms desecret is " + CharConverter.byteToHexString(smsdatatmp,smsdatatmp.length));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			    smsReceive = new String(smsdatatmp);
 			} 
-			Log.i(Tag, "smsdata is " + data + "addr" + smsSourAddr + "id "
-					+ smsSourId + " content" + smsReceive + "type is " + type);
-			byte[] bytes = CharConverter.hexStringToBytes(smsReceive);
-			byte[] temp = new byte[smslenth - 2 + 1];
-			System.arraycopy(bytes, 0, temp, 0, smslenth - 2);
-			try {
-				String smsutf8 = new String(temp, "utf-8");
-				Log.i(Tag, "the sms utf8 is" + smsutf8);
-				// 收到短信息，发送广播给activity，分两种情况处理，第一种是gps信息，第二种是普通短信息！！！！！！！
-				Intent smsintent = new Intent(
-						"com.rtk.bdtest.service.ZigbeeService.broadcast");
-				smsintent.setAction(("ACTION_ZIGBEE_SMS").toString());
-				smsintent.putExtra("zigbee_sms", smsutf8);
-				smsintent.putExtra("smsSourAddr", smsSourAddr);
-				smsintent.putExtra("smsSourId", smsSourId);
-				smsintent.putExtra("smsType", type);
-				sendBroadcast(smsintent);
-			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+//String smsutf8 = new String(temp, "utf-8");
+			String smsutf8 = smsReceive;
+			Log.i(Tag, "the sms utf8 is" + smsutf8);
+			// 收到短信息，发送广播给activity，分两种情况处理，第一种是gps信息，第二种是普通短信息！！！！！！！
+			Intent smsintent = new Intent(
+					"com.rtk.bdtest.service.ZigbeeService.broadcast");
+			smsintent.setAction(("ACTION_ZIGBEE_SMS").toString());
+			smsintent.putExtra("zigbee_sms", smsutf8);
+			smsintent.putExtra("smsSourAddr", smsSourAddr);
+			smsintent.putExtra("smsSourId", smsSourId);
+			//typexxx = "01";
+			smsintent.putExtra("smsType", typexxx);
+			Log.i(Tag,"broadcast info "+ smsutf8+" "+ typexxx);
+			sendBroadcast(smsintent);
 		} else {
 			Log.d(TAG, "debug info = " + new String(b));
 		}
@@ -513,16 +519,20 @@ public class ZigbeeSerivce extends Service {
 		try {
 			String smsutf8 = "解码错误";
 			if (EnableDES) {
-				byte[] temp2 = Base64.decode(temp,  Base64.DEFAULT);
+				 String xx = new String(temp);
+				 Base64 xx2 = new Base64();
+				 
+				byte[] temp2 = xx2.decode(xx);
 			    DesCrypt DesCryptInstance = new DesCrypt();
 			    byte[] smsdatatmp;
 			    if(((ZigbeeApplication) getApplication()).getKey()!=null) {
 			    	String key = (String) ((ZigbeeApplication) getApplication()).getKey();
-				     smsdatatmp = DesCryptInstance.desCrypto(temp2, key.getBytes());
+				     smsdatatmp = DesCryptInstance.desCrypto(temp2, key.getBytes("UTF-8"));
 			    } else {
-				     smsdatatmp = DesCryptInstance.desCrypto(temp2, ("mydes").getBytes());
+				     smsdatatmp = DesCryptInstance.desCrypto(temp2, ("hellomys").getBytes("UTF-8"));
+				     Log.i(Tag,"sms desecret is " + CharConverter.byteToHexString(smsdatatmp,smsdatatmp.length));
 			    }
-                smsutf8 = new String(smsdatatmp);
+                smsutf8 = new String(smsdatatmp,"utf-8");
 			} else {
 			   smsutf8 = new String(temp, "utf-8");
 			}
