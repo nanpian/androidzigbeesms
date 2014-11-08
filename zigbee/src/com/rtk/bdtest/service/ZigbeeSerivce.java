@@ -356,9 +356,9 @@ public class ZigbeeSerivce extends Service {
 				try {
 				    if(((ZigbeeApplication) getApplication()).getKey()!=null) {
 				    	String key = (String) ((ZigbeeApplication) getApplication()).getKey();
-					     smsdatatmp = DesCryptInstance.desCrypto(tmpbyte, key.getBytes("UTF-8"));
+					     smsdatatmp = DesCryptInstance.decrypt(tmpbyte, key);
 				    } else {
-					     smsdatatmp = DesCryptInstance.desCrypto(tmpbyte, ("hellomys").getBytes("UTF-8"));
+					     smsdatatmp = DesCryptInstance.decrypt(tmpbyte,"hellomys");
 				    }
 				    Log.i(Tag,"sms desecret is " + CharConverter.byteToHexString(smsdatatmp,smsdatatmp.length));
 				} catch (Exception e) {

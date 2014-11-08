@@ -202,7 +202,7 @@ public class FragmentList2 extends Fragment {
 					smsintent.putExtra("zigbee_sms", data);
 					smsintent.putExtra("smsSourAddr", addrtmp);
 					smsintent.putExtra("smsSourId", Idtmp);
-					getActivity().sendBroadcast(smsintent);
+					getActivity().sendBroadcast(smsintent);/*
 				AlertDialog dialog = new AlertDialog.Builder(getActivity())
 						.setTitle("收到来自地址"+addrtmp+"ID为"+Idtmp+"短信息")
 						.setView(mInput)
@@ -218,8 +218,8 @@ public class FragmentList2 extends Fragment {
 									    smsHelper.insert(devicename, xx, mInput.toString(), "false");
 									}
 								}).setNegativeButton(R.string.cancel, null)
-						.create();
-				dialog.show();
+						.create();*/
+				//dialog.show();
 				}
 			} else if (intent.getAction().equals("ACTION_NOTIFY_DEVICE"))  {
 			   String data = intent.getExtras().getString("zigbee_devicelist");
