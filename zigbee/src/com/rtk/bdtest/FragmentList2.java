@@ -194,6 +194,8 @@ public class FragmentList2 extends Fragment {
         			dialog.cancel();
 				} else if (typetmp2.equals("05")) {
 					Toast.makeText(getActivity(), "已经退网", Toast.LENGTH_LONG).show();
+				} else if (typetmp2.equals("07")){
+					Toast.makeText(getActivity(), "密钥已过期！", Toast.LENGTH_LONG).show();
 				} else if (typetmp2.equals("01")) {
 					devicesB.get(0).unread = true; //显示未读信息图标
 					Intent smsintent = new Intent(

@@ -527,9 +527,9 @@ public class ZigbeeSerivce extends Service {
 			    byte[] smsdatatmp;
 			    if(((ZigbeeApplication) getApplication()).getKey()!=null) {
 			    	String key = (String) ((ZigbeeApplication) getApplication()).getKey();
-				     smsdatatmp = DesCryptInstance.desCrypto(temp2, key.getBytes("UTF-8"));
+				     smsdatatmp = DesCryptInstance.decrypt(temp2, key);
 			    } else {
-				     smsdatatmp = DesCryptInstance.desCrypto(temp2, ("hellomys").getBytes("UTF-8"));
+				     smsdatatmp = DesCryptInstance.decrypt(temp2, ("hellomys"));
 				     Log.i(Tag,"sms desecret is " + CharConverter.byteToHexString(smsdatatmp,smsdatatmp.length));
 			    }
                 smsutf8 = new String(smsdatatmp,"utf-8");
