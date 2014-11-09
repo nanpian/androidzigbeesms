@@ -114,22 +114,30 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 
 		}
 	};
+	public static boolean isVisble = true;
 	
-	public Runnable markeFlashRunnable = new Runnable() {
+	public static Runnable markeFlashRunnable = new Runnable() {
 
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
 			Message smsMessage = new Message();
-			mMarkerSelf.setVisible(true);
-			smsMessage.what = MSG_UPDATE_SMS;
+			if(isVisble) {
+			    mMarkerSelf.setVisible(true);
+			    isVisble = false;
+			} else {
+				mMarkerSelf.setVisible(false);
+				isVisble = true;
+			}
+			//smsMessage.what = MSG_UPDATE_SMS;
 			//gpsMessage.obj = jingwei;
-			gpsHandler.sendMessage(smsMessage);
+			//gpsHandler.sendMessage(smsMessage);
+			gpsHandler.postDelayed(markeFlashRunnable, 3000);
 		}
 		
 	};
 
-	Handler gpsHandler = new Handler() {
+	private  static Handler gpsHandler = new Handler() {
 
 		@Override
 		public void handleMessage(Message msg) {
@@ -138,7 +146,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 			case MSG_UPDATE_SMS:
 				//闪烁图标
 				mMarkerSelf.setVisible(false);
-				gpsHandler.postDelayed(markeFlashRunnable, 2000);
+				gpsHandler.postDelayed(markeFlashRunnable, 5000);
 				break;
 			case MSG_UPDATE_SELF_GPS:
 				BitmapDescriptor bdC = BitmapDescriptorFactory
@@ -196,10 +204,10 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 				    addrtmp  = smsIntent.getExtras().getString("smsSourAddr");
 					Idtmp = smsIntent.getExtras().getString("smsSourId");
 					typetmp = smsIntent.getExtras().getString("smsType");
-					Message smsMessage = new Message();
-					smsMessage.what = MSG_UPDATE_SMS;
+					//Message smsMessage = new Message();
+					//smsMessage.what = MSG_UPDATE_SMS;
 					//gpsMessage.obj = jingwei;
-					gpsHandler.sendMessage(smsMessage);
+					gpsHandler.post(markeFlashRunnable);
 				}
 				
 			}
