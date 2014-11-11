@@ -55,7 +55,7 @@ public class ZigbeeSerivce extends Service {
 	private byte[] zigbeeBuffer = new byte[100];
 	private static String receiveData1=null;
 	private static List<String> listBuffer = new ArrayList<String>();
-	private static String receiveData2;
+	private static String receiveData2=null;
 	private static boolean isSms = false;
 	private static boolean isGps = false;
 	private static boolean isLongSms = false;
@@ -294,6 +294,20 @@ public class ZigbeeSerivce extends Service {
 	};
 	private static String typexxx="01";
 
+	public void handleGps(String data){
+		if(data.substring(2, 6).equals("3002")){
+			Log.i(Tag, "Receive beidou broadcast information! and data is "
+					+ data);
+			String beidou = data.substring(6, data.length());
+			Intent intent3 = new Intent(
+					"com.rtk.bdtest.service.BDService.broadcast");
+			intent3.setAction(("ACTION_UPDATE_GPS_INFO").toString());
+			intent3.putExtra("gps", beidou);
+			sendBroadcast(intent3);
+			Log.i(Tag, "send!!!!data!!!!");
+		}
+	}
+	
 	public void handleData(String data, byte[] b) {
 		if (data.equals(WRITE_ID_SUCCESS)) {
 			Message message = handler.obtainMessage(MSG_SHOW_TOAST);
@@ -464,13 +478,23 @@ public class ZigbeeSerivce extends Service {
 							}else if ((receivedData.substring(2, 6).equals("3002"))
 									&& (!isGps)) {
 								receiveData2 = receivedData;
-								isGps = true;
+							    isGps = true;
 								Log.i(Tag, "gps data is" + receiveData2);
 							} else if (isGps) {
 								Log.i(Tag, "isGps" + isGps + "");
-								isGps = false;
 								receiveData2 = receiveData2 + receivedData;
-								Log.i(Tag, "gps data is" + receiveData2);
+								String lenstr = receiveData2.substring(0, 2);
+								byte[]  gpslength = CharConverter.hexStringToBytes(lenstr);
+								int gpslenth2 = gpslength[0];
+								Log.i(Tag,"gps data length is" +gpslenth2 );
+								if( CharConverter.hexStringToBytes(receiveData2).length>=gpslenth2){
+								    isGps = true;
+								    Log.i(Tag,"The gps whole data is "+receiveData2 );
+									Log.i(Tag, "gps data is" + receiveData2);
+									isGps = false;
+									handleGps(receiveData2);
+								}
+
 							} else {
 								Log.d(TAG,
 										"zigbee data = " + receivedData
@@ -484,6 +508,10 @@ public class ZigbeeSerivce extends Service {
 				}
 			}
 		}
+	}
+	
+	private void handleGps() {
+		
 	}
 
 	private void handleLongSMS(List<String> listBuffer2) {

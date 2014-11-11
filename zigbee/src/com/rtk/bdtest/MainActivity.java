@@ -68,7 +68,7 @@ public class MainActivity extends FragmentActivity implements
 			// 定时发送gps信息到zigbee，这样zigbee才能发送gps广播信息
 			defaultLatitude = arg1.getExtras().getString("defaultLatitude");
 			Log.i(Tag, "send location to zigbee");
-			//sendLocation();
+			sendLocation();
 		}
 
 	};

@@ -61,7 +61,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 	private static Marker mMarkerB;
 	private static Marker mMarkerC;
 	private static Marker mMarkerD;
-	private static Marker mMarkerSelf;
+	private static Marker mMarkerSelf = null;
 	private InfoWindow mInfoWindow;
 	private MKOfflineMap mOffline = null;
 	private final static String Tag = "MapActivity";
@@ -191,7 +191,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 		@Override
 		public void onReceive(Context arg0, Intent smsIntent) {
 			// TODO Auto-generated method stub
-			if (smsIntent.getAction().equals("ACTION_ZIGBEE_SMS")) {
+			if (smsIntent.getAction().equals("ACTION_ZIGBEE_SMS2")) {
 /*				for (int i = 0; i<gpsdevices.size(); i++) {
 					if (gpsdevices.get(i).deviceName!=null) {
 						if(gpsdevices.get(i).deviceName.contains("本机")) {
@@ -207,7 +207,11 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 					//Message smsMessage = new Message();
 					//smsMessage.what = MSG_UPDATE_SMS;
 					//gpsMessage.obj = jingwei;
-					gpsHandler.post(markeFlashRunnable);
+					if(gpsdevices.get(0).unread = true) {
+					    gpsHandler.post(markeFlashRunnable);
+					} else {
+						
+					}
 				}
 				
 			}
@@ -274,6 +278,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 					//mMarkerSelf.setPosition(jingwei2);
 					Log.i(Tag, " new position!");
 					LatLng temp = mMarkerSelf.getPosition();
+					Log.i(Tag,"new position"+temp.latitude + "  " + temp.longitude);
 					LatLng llNew = new LatLng(latitude,longitude);
 					CoordinateConverter converter2 = new CoordinateConverter();
 					converter2.from(CoordType.GPS);
@@ -303,7 +308,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 				FragmentManager rightfm = getActivity()
 						.getSupportFragmentManager();
 				Fragment lfm = rightfm.findFragmentById(R.id.list_container);
-				if (lfm instanceof FragmentList2) {
+				if (lfm instanceof FragmentList2) {/*
 					// 得到B和C设备列表
 					if(((FragmentList2) lfm).devicesB.size()>0) {
 					gpsdevices = ((FragmentList2) lfm).devicesB;
@@ -336,7 +341,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 						}
 					}
 					}
-				}
+				*/}
 				// 刷新所有marker点的gps经纬度信息
 
 			}
@@ -387,7 +392,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 							if (gpsdevices.get(i).unread) {
 								button.setText("来自" + Idtmp + "短信内容: "
 										+ smsdata);
-								gpsHandler.removeCallbacks(markeFlashRunnable);
+								//gpsHandler.removeCallbacks(markeFlashRunnable);
 								gpsdevices.get(i).unread = false;
 							} else {
 								button.setText("无未读短信");
@@ -522,7 +527,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 		filter.addAction("ACTION_UPDATE_GPS_INFO");
 		IntentFilter filterSms = new IntentFilter(
 				"com.rtk.bdtest.service.ZigbeeService.broadcastMap");
-		filterSms.addAction("ACTION_ZIGBEE_SMS");
+		filterSms.addAction("ACTION_ZIGBEE_SMS2");
 		getActivity().registerReceiver(receiver, filter);
 		getActivity().registerReceiver(receiverSms, filterSms);
 		//gpsHandler.postDelayed(gpsselfRunnable, 1000);

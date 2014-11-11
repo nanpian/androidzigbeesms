@@ -110,10 +110,10 @@ public class HistoryActivity extends Fragment {
 			}
 		}*/
 	//if(list.size()==0) {
-			smsHelper.insert("张三", "201210121", "你好测试信息", "true");
-			smsHelper.insert("张三", "201210121", "你好测试信息2", "false");
-			smsHelper.insert("李四", "201210121", "你好测试信息", "false");
-			smsHelper.insert("李四", "201210121", "你好测试信息22222", "true");
+	//	smsHelper.insert("张三", "201210121", "你好测试信息", "true");
+	//		smsHelper.insert("张三", "201210121", "你好测试信息2", "false");
+	//		smsHelper.insert("李四", "201210121", "你好测试信息", "false");
+	//		smsHelper.insert("李四", "201210121", "你好测试信息22222", "true");
 	//}
 			/*
 			if(isSend) {

@@ -120,7 +120,7 @@ public class FragmentList2 extends Fragment {
 				}
 			}
 
-			mHandler.sendEmptyMessageDelayed(MSG_REDUCE_DEVICE_COUNT, 9 * 1000);
+			mHandler.sendEmptyMessageDelayed(MSG_REDUCE_DEVICE_COUNT, 7 * 1000);
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
@@ -178,7 +178,6 @@ public class FragmentList2 extends Fragment {
 				Date tmpDate = new Date();
 				SimpleDateFormat formatt = new SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒");
 				String xx = formatt.format(tmpDate);
-				smsHelper.insert(devicename, xx, data, "false");
 				if (typetmp2.equals("04")) {
 					ProgressDialog dialog = ProgressDialog.show(getActivity(), "",
 							"进入系统自毁流程......", true);
@@ -197,10 +196,11 @@ public class FragmentList2 extends Fragment {
 				} else if (typetmp2.equals("07")){
 					Toast.makeText(getActivity(), "密钥已过期！", Toast.LENGTH_LONG).show();
 				} else if (typetmp2.equals("01")) {
+					smsHelper.insert(devicename, xx, data, "false");
 					devicesB.get(0).unread = true; //显示未读信息图标
 					Intent smsintent = new Intent(
 							"com.rtk.bdtest.service.ZigbeeService.broadcastMap");
-					smsintent.setAction(("ACTION_ZIGBEE_SMS").toString());
+					smsintent.setAction(("ACTION_ZIGBEE_SMS2").toString());
 					smsintent.putExtra("zigbee_sms", data);
 					smsintent.putExtra("smsSourAddr", addrtmp);
 					smsintent.putExtra("smsSourId", Idtmp);
@@ -387,8 +387,11 @@ public class FragmentList2 extends Fragment {
 					devices.get(i).deviceID = data.substring(12, 16);
 					devices.get(i).deviceType = data.substring(6, 8);
 					devices.get(i).parentAddress = data.substring(16, 20);
+					//显示在线
+					devices.get(i).online = true;
+					devices.get(i).count = 5;
 					// 如果终端父亲地址等于路由地址，则显示在线
-					if (devices.get(i).parentAddress.equals(selfpadAddress)) {
+/*					if (devices.get(i).parentAddress.equals(selfpadAddress)) {
 						devices.get(i).online = true;
 	                    devicesA.set(0, devices);
 						if (devices.get(i).count < 5) {
@@ -396,7 +399,7 @@ public class FragmentList2 extends Fragment {
 						} else {
 							devices.get(i).count = 5;
 						}
-					}
+					}*/
 					adapter.notifyDataSetChanged();
 				}
 			}
