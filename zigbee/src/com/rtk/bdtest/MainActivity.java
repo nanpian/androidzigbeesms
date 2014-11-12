@@ -727,7 +727,7 @@ public class MainActivity extends FragmentActivity implements
 			break;
 		}
 
-		return true;
+		return super.onMenuItemSelected(featureId, item);
 	}
 
 	public boolean execCommand(String cmd) {
