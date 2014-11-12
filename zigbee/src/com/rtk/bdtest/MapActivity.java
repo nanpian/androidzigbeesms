@@ -130,7 +130,8 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 				isVisble = true;
 			}
 			if(gpsdevices.get(0).unread) {
-			    gpsHandler.postDelayed(markeFlashRunnable, 2000);
+				Log.i(Tag,"gps device is unread, so should flash!");
+			    gpsHandler.postDelayed(markeFlashRunnable, 500);
 			}
 		}
 		
@@ -206,7 +207,9 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 					//Message smsMessage = new Message();
 					//smsMessage.what = MSG_UPDATE_SMS;
 					//gpsMessage.obj = jingwei;
+					
 					if(gpsdevices.get(0).unread = true) {
+						Log.i(Tag,"unread is true ,sms data is " + smsdata);
 					    gpsHandler.post(markeFlashRunnable);
 					} else {
 						
@@ -408,6 +411,8 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 										+ smsdata);
 								//gpsHandler.removeCallbacks(markeFlashRunnable);
 								gpsdevices.get(i).unread = false;
+							    mMarkerSelf.setVisible(true);
+								Log.i(Tag,"gps device is unread " +gpsdevices.get(i).unread);
 							} else {
 								button.setText("无未读短信");
 							}
@@ -451,6 +456,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 						listener = new OnInfoWindowClickListener() {
 							public void onInfoWindowClick() {
 								mBaiduMap.hideInfoWindow();
+							    mMarkerSelf.setVisible(true);
 							}
 						};
 						LatLng ll = marker.getPosition();
