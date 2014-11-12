@@ -35,11 +35,11 @@
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="自毁"/>
-        <item
+<!--         <item
         android:id="@+id/copy"
         android:orderInCategory="100"
         android:showAsAction="never"
-        android:title="拷贝地图资源"/>
+        android:title="拷贝地图资源"/> -->
     <item
         android:id="@+id/settings6"
         android:orderInCategory="100"

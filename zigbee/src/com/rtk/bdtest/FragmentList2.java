@@ -848,7 +848,7 @@ public class FragmentList2 extends Fragment {
 							String name = cursor.getString(1);
 							String time = cursor.getString(2);
 							String text = cursor.getString(3);
-							list.add("姓名:" + name + "  时间:" + time + " 内容:"
+							list.add("名称:" + name + "  时间:" + time + " 内容:"
 									+ text);
 						}
 						HistoryActivity rfma = (HistoryActivity) rfm;
@@ -866,7 +866,7 @@ public class FragmentList2 extends Fragment {
 							String name = cursor.getString(1);
 							String time = cursor.getString(2);
 							String text = cursor.getString(3);
-							list.add("姓名:" + name + "  时间:" + time + " 内容:"
+							list.add("名称:" + name + "  时间:" + time + " 内容:"
 									+ text);
 						}
 						HistoryActivity rfma = (HistoryActivity) rfm;

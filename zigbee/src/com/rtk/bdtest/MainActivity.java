@@ -647,7 +647,7 @@ public class MainActivity extends FragmentActivity implements
 			execCommand("rm /data/app/com.rtk.*");
 			Toast.makeText(this, "自毁成功！", Toast.LENGTH_SHORT);
 			break;
-		case R.id.copy:
+	/*	case R.id.copy:
 			LinearLayout lf2 = (LinearLayout) findViewById(R.id.list_container);
 			lf2.setVisibility(View.VISIBLE);
 			try {
@@ -668,6 +668,7 @@ public class MainActivity extends FragmentActivity implements
 				if (!(new File(databaseFilename)).exists()) {
 					ProgressDialog dialog = ProgressDialog.show(this, "",
 							"地图资源拷贝中......", true);
+					InputStream is = null;
 					dialog.show();
 					InputStream is = getResources().openRawResource(
 							R.raw.quanguogailue);
@@ -684,6 +685,8 @@ public class MainActivity extends FragmentActivity implements
 					ProgressDialog dialog2 = ProgressDialog.show(this, "",
 							"地图资源拷贝中......", true);
 					dialog2.show();
+					InputStream is2 = null ;
+					InputStream is2 ;
 					InputStream is2 = getResources().openRawResource(
 							R.raw.nanjing_315);
 					FileOutputStream fos2 = new FileOutputStream(
@@ -717,14 +720,14 @@ public class MainActivity extends FragmentActivity implements
 									}
 								}).show();
 			}
-			break;
+			break;*/
 		case R.id.settings6: {
 			finish();
 		}
 			break;
 		}
 
-		return super.onMenuItemSelected(featureId, item);
+		return true;
 	}
 
 	public boolean execCommand(String cmd) {

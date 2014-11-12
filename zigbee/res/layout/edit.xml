@@ -79,6 +79,13 @@
                 android:layout_weight="1"
                 android:text="备注"
                 android:textStyle="bold" />
+                        <TextView
+                android:id="@+id/banji222"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:text="班级"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <View

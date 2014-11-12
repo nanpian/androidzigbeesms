@@ -301,11 +301,10 @@ public class ZigbeeSerivce extends Service {
 			//String beidou = new String(data);
 			String duanAddress = data.substring(6,10);
 			byte[] gpsdata = CharConverter.hexStringToBytes(data);
-			String beidous;
-			try {
-				beidous = new String(gpsdata,"GB2312");
+
+				String beidous = new String(gpsdata);
 				Log.i(Tag, "Receive beidous data is " +beidous );
-				String beidou = beidous.substring(4, beidous.length());
+				String beidou = beidous.substring(5, beidous.length());
 				Intent intent3 = new Intent(
 						"com.rtk.bdtest.service.BDService.broadcast");
 				intent3.setAction(("ACTION_UPDATE_GPS_INFO").toString());
@@ -313,10 +312,7 @@ public class ZigbeeSerivce extends Service {
 				intent3.putExtra("address", duanAddress);
 				sendBroadcast(intent3);
 				Log.i(Tag, "send!!!!data!!!!");
-			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+
 
 		}
 	}

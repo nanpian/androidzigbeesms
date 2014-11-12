@@ -92,7 +92,7 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 		holder.id = (TextView) convertView.findViewById(R.id.device_id);
 		holder.parentAddress = (TextView) convertView
 				.findViewById(R.id.parent_address);
-		holder.name.setText("姓名:" + listB.get(groupPosition).deviceName);
+		holder.name.setText("名称:" + listB.get(groupPosition).deviceName);
 		if ((listB.get(groupPosition) != null)
 				&& (listB.get(groupPosition).online)) {
 			if(listB.get(groupPosition).unread) {
@@ -149,7 +149,7 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 		holder.id = (TextView) convertView.findViewById(R.id.device_id);
 		holder.parentAddress = (TextView) convertView
 				.findViewById(R.id.parent_address);
-		holder.name.setText("姓名:"
+		holder.name.setText("名称:"
 				+ listA.get(groupPosition).get(childPosition).deviceName);
 		/*if ((listA.get(groupPosition).get(childPosition) != null)
 				&& (listA.get(groupPosition).get(childPosition).online)) {
