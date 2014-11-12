@@ -57,11 +57,12 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 
 	private MapView mMapView;
 	private static BaiduMap mBaiduMap;
-	private static Marker mMarkerA;
-	private static Marker mMarkerB;
-	private static Marker mMarkerC;
-	private static Marker mMarkerD;
-	private static Marker mMarkerSelf = null;
+	private  Marker mMarkerA;
+	private  Marker mMarkerB;
+	private  Marker mMarkerC;
+	private  Marker mMarkerD;
+	private  static Marker mMarkerSelf = null;
+	private  static Marker mMarkerSelf2 = null;
 	private InfoWindow mInfoWindow;
 	private MKOfflineMap mOffline = null;
 	private final static String Tag = "MapActivity";
@@ -121,18 +122,16 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
-			Message smsMessage = new Message();
+			gpsHandler.sendEmptyMessage(MSG_UPDATE_SMS);
+
 			if(isVisble) {
-			    mMarkerSelf.setVisible(true);
 			    isVisble = false;
 			} else {
-				mMarkerSelf.setVisible(false);
 				isVisble = true;
 			}
-			//smsMessage.what = MSG_UPDATE_SMS;
-			//gpsMessage.obj = jingwei;
-			//gpsHandler.sendMessage(smsMessage);
-			gpsHandler.postDelayed(markeFlashRunnable, 3000);
+			if(gpsdevices.get(0).unread) {
+			    gpsHandler.postDelayed(markeFlashRunnable, 2000);
+			}
 		}
 		
 	};
@@ -145,8 +144,8 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 			switch (msg.what) {
 			case MSG_UPDATE_SMS:
 				//闪烁图标
-				mMarkerSelf.setVisible(false);
-				gpsHandler.postDelayed(markeFlashRunnable, 5000);
+				    mMarkerSelf.setVisible(isVisble);
+
 				break;
 			case MSG_UPDATE_SELF_GPS:
 				BitmapDescriptor bdC = BitmapDescriptorFactory
@@ -302,51 +301,66 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 
 			} else if (gpsIntent.getAction().equals("ACTION_UPDATE_GPS_INFO")) {
 				String jingweidu = gpsIntent.getExtras().getString("gps");
-				String deviceAddress = jingweidu.substring(0, 4);
-				String gps = jingweidu.substring(4,jingweidu.length());
-				Log.i(Tag, " gps address is " +deviceAddress + "gps info is " +gps);
+				Log.i(Tag,"the source jingweidu is "+ jingweidu);
+				String deviceAddress = gpsIntent.getExtras().getString("address");
+				String longitude = jingweidu.split(",")[2];
+				String latitude = jingweidu.split(",")[0];
+				Log.i(Tag,"the longitude of other is " + longitude+ "latitude is" + latitude);
+				Double longitudef = Double.parseDouble(longitude) * 0.01f;
+				Double latitudef = Double.parseDouble(latitude) * 0.01f;;
+				Double longitude1 = longitudef%1*100/60+(int)(longitudef/1);
+				Double latitude1 = latitudef%1*100/60+ (int)(latitudef/1);
+				Log.i(Tag, " gps address is " +deviceAddress + "gps info is " +longitude1 +" "+
+						latitude1);
 				FragmentManager rightfm = getActivity()
 						.getSupportFragmentManager();
 				Fragment lfm = rightfm.findFragmentById(R.id.list_container);
-				if (lfm instanceof FragmentList2) {/*
-					// 得到B和C设备列表
-					if(((FragmentList2) lfm).devicesB.size()>0) {
-					gpsdevices = ((FragmentList2) lfm).devicesB;
-					for (int i = 0; i < gpsdevices.size(); i++) {
-						if(gpsdevices.get(i).deviceAddress!=null ) {
-						if (gpsdevices.get(i).deviceAddress
-								.equals(deviceAddress)) {
-							gpsdevices.get(i).deviceAddress = deviceAddress;
-							String longitude = gps.split(",")[2];
-							String latitude = gps.split(",")[0];
-							gpsdevices.get(i).jingdu = Float
-									.parseFloat(longitude) * 0.01f;
-							gpsdevices.get(i).weidu = Float
-									.parseFloat(latitude) * 0.01f;
-							LatLng jw = new LatLng(gpsdevices.get(i).jingdu,
-									gpsdevices.get(i).weidu);
-							if (gpsdevices.get(i).gpsMarker != null) {
-								gpsdevices.get(i).gpsMarker.setPosition(jw);
-							} else {
-								OverlayOptions ooA = new MarkerOptions()
-										.position(jw).icon(bdA).zIndex(9)
-										.draggable(true);
-								Marker markertmp;
-								markertmp = (Marker) (mBaiduMap.addOverlay(ooA));
-								gpsdevices.get(i).gpsMarker = mMarkerA;
-							}
-						}
-						} else {
-							// 设备没在设备列表里
-						}
-					}
-					}
-				*/}
-				// 刷新所有marker点的gps经纬度信息
+				if(((FragmentList2) lfm).devicesB.size()>0) {
+					gpsdevices = ((FragmentList2) lfm).devicesB;				
+				} 
+               if(gpsdevices.size()>0) {
+            		BitmapDescriptor bdb = BitmapDescriptorFactory
+    						.fromResource(R.drawable.icon_markb);
+    				jingwei2 = new LatLng(latitude1, longitude1);
+    				Log.i(Tag,"The convert水水水水 gps lat is " + jingwei2.latitude +" the lng is " + jingwei2.longitude);
+    				// 将GPS设备采集的原始GPS坐标转换成百度坐标
+    				CoordinateConverter converter = new CoordinateConverter();
+    				converter.from(CoordType.GPS);
+    				// sourceLatLng待转换坐标
+    				converter.coord(jingwei2);
+
+    				LatLng desLatLng = converter.convert();
+    				Log.i(Tag,"The destinationssssss convert gps lat is " + desLatLng.latitude +" the lng is " + desLatLng.longitude);
+    				if(mMarkerSelf2==null) {
+    					OverlayOptions selfgps = new MarkerOptions().position(desLatLng)
+    							.icon(bdb).perspective(false).anchor(0.5f, 0.5f)
+    							.rotate(30).zIndex(7);
+    					mMarkerSelf2 = (Marker) (mBaiduMap.addOverlay(selfgps));
+    					
+    					for (int i = 0; i<gpsdevices.size(); i++) {
+    						if(gpsdevices.get(i).deviceAddress!=null) {
+    						if (gpsdevices.get(i).deviceAddress.equals(deviceAddress)) {
+       								gpsdevices.get(i).gpsMarker = mMarkerSelf2;
+    						}
+    						}
+    					}
+    					MapStatus mMapStatus = new MapStatus.Builder().target(desLatLng).zoom(12).build();
+    					MapStatusUpdate status = MapStatusUpdateFactory.newMapStatus(mMapStatus);
+    					mBaiduMap.setMapStatus(status);
+
+    					} else {
+    						Log.i(Tag, " new positiosssssn!");
+    						LatLng temp = mMarkerSelf2.getPosition();
+    						Log.i(Tag,"new positionssss"+temp.latitude + "  " + temp.longitude);
+    						//LatLng llNew = new LatLng(latitude,longitude);
+
+    						mMarkerSelf2.setPosition(desLatLng);
+    					}
+               }
 
 			}
-		}
 
+	}
 	};
 
 	public void importFromSDCard(View view) {
@@ -446,7 +460,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 					}
 				}
 				return true;
-			}
+			}				
 		});
 	}
 

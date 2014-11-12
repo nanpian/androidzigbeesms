@@ -820,7 +820,7 @@ public class FragmentList2 extends Fragment {
 									detailFragment);
 							fragmentTransaction.commit();
 						} else {
-                           Toast.makeText(getActivity(), "无未读信息！", Toast.LENGTH_LONG).show();
+/*                           Toast.makeText(getActivity(), "无未读信息！", Toast.LENGTH_LONG).show();*/
 						}
 					}
 				} else if (rfm instanceof HistoryActivity) {
