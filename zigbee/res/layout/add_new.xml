@@ -7,10 +7,11 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
+
         <Spinner
-        android:id="@+id/type111"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+            android:id="@+id/type111"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
         <EditText
             android:id="@+id/name"
@@ -25,40 +26,49 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:inputType="number" 
-            android:hint="ID" />
+            android:hint="ID"
+            android:inputType="number" />
+
         <EditText
             android:id="@+id/type"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:visibility="gone"
-            android:hint="类型" />
+            android:hint="类型"
+            android:visibility="gone" />
+
         <Spinner
-        android:id="@+id/rank111"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+            android:id="@+id/person_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Spinner
+            android:id="@+id/rank111"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
         <EditText
             android:id="@+id/rank"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-                        android:visibility="gone"
-            android:hint="军衔" />
-                <Spinner
-        android:id="@+id/job111"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+            android:hint="军衔"
+            android:visibility="gone" />
+
+        <Spinner
+            android:id="@+id/job111"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
         <EditText
             android:id="@+id/job"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-                        android:visibility="gone"
-            android:hint="职务" />
-                <EditText
+            android:hint="职务"
+            android:visibility="gone" />
+
+        <EditText
             android:id="@+id/classl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

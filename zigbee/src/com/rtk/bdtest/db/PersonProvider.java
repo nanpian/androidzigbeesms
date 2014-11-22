@@ -32,6 +32,7 @@ public class PersonProvider extends ContentProvider {
 	private static final String DEVICE_TYPE = "device_type";
 	private static final String DEVICE_PADDRESS = "parentaddress";
 	private static final String  DEVICE_BANJI ="banji";
+	private static final String DEVICE_STATUS = "status";
 	// 授权“域名”,必须唯一，且与AndroidManifest里面注册的须一致
 	private final static String AUTHORITY = "Personxxx";
 	private static final UriMatcher URI_MATCHER;
@@ -181,8 +182,9 @@ public class PersonProvider extends ContentProvider {
 					+ " text," + PERSON_RANK + " text ," + PERSON_JOB
 					+ " text," + PERSON_YEAR + " text ," + PERSON_SEX
 					+ " text," + PERSON_BEIZHU + " text ," + DEVICE_BANJI
-					+ " text," + DEVICE_ADDRESS_ + " text ," + DEVICE_TYPE
-					+ " integer ," + DEVICE_PADDRESS + " text);";
+					+ " text," + DEVICE_STATUS + "text ," + DEVICE_ADDRESS_
+					+ " text ," + DEVICE_TYPE + " integer ," + DEVICE_PADDRESS
+					+ " text);";
 			db.execSQL(sql);
 
 		}

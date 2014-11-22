@@ -85,6 +85,7 @@ public class FragmentList2 extends Fragment {
 	private static final int MSG_GET_SELF_ID = 18;
 	protected static final int MENU_BEIZHU = 3;
 	protected static final int MENU_MODIFY = 0;
+	protected static final int MENU_QUERY = 1;
 	public static boolean isBind = false;
 	public static String padinfo=null;
     public static String selfpadAddress;
@@ -222,7 +223,35 @@ public class FragmentList2 extends Fragment {
 								}).setNegativeButton(R.string.cancel, null)
 						.create();*/
 				//dialog.show();
-				}
+				} else if (typetmp2.equals("09")) {
+                    Log.i(Tag,"receive bind info from B"+data);
+				    Toast.makeText(getActivity(),"收到队员绑定信息！", Toast.LENGTH_SHORT);
+					ContentValues values = new ContentValues();
+					values.put("name", "xx");
+					values.put("id", "xxx");
+					values.put("typep", "xxxx");
+					values.put("rank", "xdsd");
+					values.put("job", "sdfdsf");
+					values.put("year", "dwer");
+					values.put("sex", "sdfsdf");
+					values.put("beizhu", "sdfdsf");
+					values.put("banji", "dsdfsf");
+					getActivity()
+							.getContentResolver()
+							.insert(PersonProvider.CONTENT_URI,
+									values);
+				} else if (typetmp2.equals("0B")) {
+                    Log.i(Tag,"receive A query bind info from B"+data);
+                    
+				    Toast.makeText(getActivity(),"查询成功,收到队员绑定信息！", Toast.LENGTH_SHORT);
+					ContentValues values = new ContentValues();
+					values.put("name", data.substring(4));
+					values.put("id", data.substring(0,4));
+					getActivity()
+							.getContentResolver()
+							.insert(PersonProvider.CONTENT_URI,
+									values);
+				} 
 			} else if (intent.getAction().equals("ACTION_NOTIFY_DEVICE"))  {
 			   String data = intent.getExtras().getString("zigbee_devicelist");
 			   Log.i(Tag,"Receive device notify broadcast"+data);
@@ -748,6 +777,7 @@ public class FragmentList2 extends Fragment {
 						//menu.add(Menu.NONE, MENU_MODIFY, 0, "修改备注名");
 					  } else if (type == 1) {// 长按好友列表项
 							menu.add(Menu.NONE, MENU_MODIFY, 0, "修改备注名");
+							menu.add(Menu.NONE,MENU_QUERY,1,"查询" );
 							idxx = child;
 					  }
 			}
@@ -938,6 +968,11 @@ public class FragmentList2 extends Fragment {
 					.create();
 			dialog2.show();
 			break;
+		case MENU_QUERY:
+			String idSend = devices.get(idxx).deviceID;
+			Toast.makeText(getActivity(), "查询设备id为"+idSend+"的名称", Toast.LENGTH_SHORT).show();
+			MainActivity.instance.sendQuerySMS(idSend, "0000", "FFFF");
+		break;
 
 		}
 		return super.onContextItemSelected(item);

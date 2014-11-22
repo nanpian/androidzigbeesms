@@ -126,6 +126,55 @@ public class MainActivity extends FragmentActivity implements
 
 	}
 	
+	void sendQuerySMS(String id, String destAddr, String destId){
+
+		try {
+			//0x2D为length，3003短信息标志位，00为index，01为包数，destAddr目标短地址
+			//destId为目标id，0xffff，0xffff，短信息内容为32字节
+			byte[] smsdata,sms2;
+		    String sms = id;
+			if (EnableDES) {
+				sms2 = sms.getBytes("UTF-8");
+			    DesCrypt DesCryptInstance = new DesCrypt();
+			    byte[] smsdatatmp;
+			    if(((ZigbeeApplication) getApplication()).getKey()!=null) {
+			    	String key = (String) ((ZigbeeApplication) getApplication()).getKey();
+				     smsdatatmp = DesCryptInstance.desCrypto(sms2, key.getBytes("UTF-8"));
+			    } else {
+				     smsdatatmp = DesCryptInstance.desCrypto(sms2, ("hellomys").getBytes("UTF-8"));
+			    }
+	            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+	            smsdata = Base64.encode(smsdatatmp, Base64.DEFAULT);
+			} else {
+				sms2 = sms.getBytes("UTF-8");
+			    smsdata = sms2;
+			}
+			byte[] temp = new byte[44]; 
+            String head = "2C30030001"+destAddr+destId;
+			System.arraycopy(CharConverter.hexStringToBytes(head), 0, temp, 0,
+					9);
+			byte[] souDest = {(byte) 0xff,(byte) 0xff};
+			byte[] sourId = {(byte) 0xff,(byte) 0xff};
+ 			System.arraycopy(souDest, 0, temp,9 , 2);
+ 			System.arraycopy(sourId, 0, temp,11 , 2);
+ 			int smslength = smsdata.length+2;
+ 			String l = String.format("%02x", smslength);	
+ 			
+ 			System.arraycopy(CharConverter.hexStringToBytes(l), 0, temp, 13, 1 ); //字串长度
+ 			System.arraycopy(CharConverter.hexStringToBytes("0A"), 0, temp, 14, 1);//类型为03
+			String head2 = "2D30030001"+destAddr+destId+l+"03";
+ 			System.arraycopy(smsdata, 0, temp, 15, smsdata.length);
+ 			Log.i(Tag,"The sms query send data string is " + temp);
+ 			sendData2Zigbee(temp);
+			//sendData2Zigbee(data.getBytes("UTF-8"));
+			//sendData2Zigbee(data.getBytes("Unicode"));
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+	
+	}
+	
 	//分包发送长短信息！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
 	void sendLongSms(String sms, String destAddr, String destId, String type) throws InterruptedException {
 		Log.i(Tag, "send long sms" + sms + " to zigbee!plz wait and verify");
