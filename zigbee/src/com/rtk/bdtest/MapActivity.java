@@ -558,10 +558,14 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 		// TODO Auto-generated method stub
 		mMapView.onDestroy();
 		super.onDestroy();
-		/*
-		 * bdA.recycle(); bdB.recycle(); bdC.recycle(); bdD.recycle();
-		 * bd.recycle(); bdGround.recycle();
-		 */
+
+		 bdA.recycle(); 
+		 bdB.recycle(); 
+		 bdC.recycle(); 
+		 bdD.recycle();
+		 bd.recycle();
+		 bdGround.recycle();
+	
 	}
 
 	@Override

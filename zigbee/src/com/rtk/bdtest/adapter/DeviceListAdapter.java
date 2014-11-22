@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.rtk.bdtest.util.Device;
@@ -48,7 +49,7 @@ public class DeviceListAdapter extends BaseAdapter {
 		holder = new ViewHolder();
 		convertView = inflater.inflate(R.layout.device_list_item_layout, null);
 		holder.name = (TextView)convertView.findViewById(R.id.device_name);
-		holder.online = (TextView)convertView.findViewById(R.id.online);
+		holder.online = (ImageView)convertView.findViewById(R.id.online);
 		holder.address = (TextView) convertView
 				.findViewById(R.id.device_address);
 		holder.type = (TextView) convertView.findViewById(R.id.device_type);
@@ -57,9 +58,9 @@ public class DeviceListAdapter extends BaseAdapter {
 				.findViewById(R.id.parent_address);
         holder.name.setText("名称:"+list.get(position).deviceName);
         if((list.get(position)!=null)&&(list.get(position).online)) {
-        	holder.online.setText("在线");
+        	holder.online.setImageResource(R.drawable.online);
         } else {
-        	holder.online.setText("离线");
+        	holder.online.setImageResource(R.drawable.offline);
         }       
 		holder.address.setText(context.getString(R.string.device_address)
 				+ list.get(position).deviceAddress);
@@ -85,7 +86,7 @@ public class DeviceListAdapter extends BaseAdapter {
 		TextView type;
 		TextView id;
 		TextView parentAddress;
-		TextView online;
+		ImageView online;
 	}
 
 }

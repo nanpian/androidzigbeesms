@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.rtk.bdtest.CharConverter;
-import com.rtk.bdtest.FragmentList;
+import com.rtk.bdtest.FragmentList_useless;
 import com.rtk.bdtest.R;
 import com.rtk.bdtest.SerialPort;
 import com.rtk.bdtest.ZigbeeApplication;

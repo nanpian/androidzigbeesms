@@ -47,7 +47,7 @@ import android.widget.Toast;
  * @author zhudewei 
  * 
  */  
-public class FragmentList extends Fragment {  
+public class FragmentList_useless extends Fragment {  
       
     private List<String> mDataSourceList = new ArrayList<String>();  
     private List<FragmentTransaction> mBackStackList = new ArrayList<FragmentTransaction>();

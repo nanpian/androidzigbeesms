@@ -12,58 +12,68 @@
             android:id="@+id/name"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
+            android:gravity="center"
             android:layout_weight="1" />
 
         <TextView
             android:id="@+id/id"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
+            android:gravity="center"
             android:layout_weight="1" />
 
         <TextView
             android:id="@+id/type"
+            android:gravity="center"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="1" />
 
         <TextView
             android:id="@+id/rank"
+            android:gravity="center"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="1" />
 
         <TextView
             android:id="@+id/job"
+            android:gravity="center"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="1" />
 
         <TextView
             android:id="@+id/year"
+            android:gravity="center"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="1" />
 
         <TextView
             android:id="@+id/sex"
+            android:gravity="center"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="1" />
 
         <TextView
             android:id="@+id/beizhu"
+            android:gravity="center"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="1" />
 
         <TextView
             android:id="@+id/banji"
+            android:gravity="center"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="1" />
 
         <TextView
             android:id="@+id/status"
+            android:gravity="center"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="1" />

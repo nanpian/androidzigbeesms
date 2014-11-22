@@ -85,7 +85,7 @@ public class FragmentList2 extends Fragment {
 	private static final int MSG_GET_SELF_ID = 18;
 	protected static final int MENU_BEIZHU = 3;
 	protected static final int MENU_MODIFY = 0;
-	protected static final int MENU_QUERY = 1;
+	protected static final int MENU_QUERY = 12;
 	public static boolean isBind = false;
 	public static String padinfo=null;
     public static String selfpadAddress;
@@ -224,22 +224,21 @@ public class FragmentList2 extends Fragment {
 						.create();*/
 				//dialog.show();
 				} else if (typetmp2.equals("09")) {
-                    Log.i(Tag,"receive bind info from B"+data);
 				    Toast.makeText(getActivity(),"收到队员绑定信息！", Toast.LENGTH_SHORT);
-					ContentValues values = new ContentValues();
-					values.put("name", "xx");
-					values.put("id", "xxx");
-					values.put("typep", "xxxx");
-					values.put("rank", "xdsd");
-					values.put("job", "sdfdsf");
-					values.put("year", "dwer");
-					values.put("sex", "sdfsdf");
-					values.put("beizhu", "sdfdsf");
-					values.put("banji", "dsdfsf");
-					getActivity()
-							.getContentResolver()
-							.insert(PersonProvider.CONTENT_URI,
-									values);
+				    String bindName = data.substring(4);
+				    String bindId = data.substring(0,4);
+                    Log.i(Tag,"receive bind info from B    "+data + "  bind name is " + bindName +
+                    	 "bindId is " +bindId);
+				    if ((bindName!=null) && (bindId!=null)) {
+						ContentValues values = new ContentValues();
+						values.put("name", data.substring(4));
+						values.put("id", data.substring(0,4));
+						getActivity()
+								.getContentResolver()
+								.insert(PersonProvider.CONTENT_URI,
+										values);
+				    }
+
 				} else if (typetmp2.equals("0B")) {
                     Log.i(Tag,"receive A query bind info from B"+data);
                     
@@ -247,10 +246,9 @@ public class FragmentList2 extends Fragment {
 					ContentValues values = new ContentValues();
 					values.put("name", data.substring(4));
 					values.put("id", data.substring(0,4));
-					getActivity()
+		/*			getActivity()
 							.getContentResolver()
-							.insert(PersonProvider.CONTENT_URI,
-									values);
+						    .update(uri, values, where, selectionArgs)*/
 				} 
 			} else if (intent.getAction().equals("ACTION_NOTIFY_DEVICE"))  {
 			   String data = intent.getExtras().getString("zigbee_devicelist");
@@ -616,57 +614,62 @@ public class FragmentList2 extends Fragment {
 
 	};
 	
-	//更新人员姓名列表
+	// 更新人员姓名列表
 	Runnable runnableUI2 = new Runnable() {
 		@Override
 		public void run() {
 			// 更新界面
 			Log.i(Tag, "notify the new data changed listener!");
-			devices.clear();
-			devicesB.clear();
-			Device tmp = new Device();
-			tmp.deviceName = "持有人";
-			devicesB.add(tmp);
-			Device deviceC1 = new Device();
-			deviceC1.deviceName = "协调器";
-			devicesB.add(deviceC1);
+			//devices.clear();
+			//devicesB.clear();
+			//Device tmp = new Device();
+			//tmp.deviceName = "持有人";
+			//devicesB.add(tmp);
+			//Device deviceC1 = new Device();
+			//deviceC1.deviceName = "协调器";
+			//devicesB.add(deviceC1);
 			Cursor cursor = getActivity().getContentResolver().query(
 					PersonProvider.CONTENT_URI, null, null, null, null);
-           deviceB1tmp = null;
-           deviceBtmp = null;
-            boolean hasSelfName = false;
+			deviceB1tmp = null;
+			deviceBtmp = null;
+			boolean hasSelfName = false;
 			if (cursor != null) {
 				while (cursor.moveToNext()) {
-					//如果备注是持有人，则是修改路由器设备的名称
-					if(cursor.getString(8).contains("持有人")) {
-						hasSelfName = true;
-						deviceB1tmp = new Device();
-						deviceB1tmp.deviceName = cursor.getString(1);
-						deviceB1tmp.deviceID = cursor.getString(2);
-						devicesB.get(0).deviceName = deviceB1tmp.deviceName;
-						//adapter.notifyDataSetChanged();
-					} else if (cursor.getString(8).contains("队长")) {
-						deviceBtmp = new Device();
-						deviceBtmp.deviceName = cursor.getString(1);
-					    deviceBtmp.deviceID = cursor.getString(2);
-					    devicesB.add(deviceBtmp);
-					} else if (cursor.getString(8).contains("协调器")) {
-						deviceBtmp = new Device();
-						deviceBtmp.deviceName = cursor.getString(1);
-					    deviceBtmp.deviceID = cursor.getString(2);
-					    devicesB.get(0).deviceName =  deviceBtmp.deviceName;
+					// 如果备注是持有人，则是修改路由器设备的名称
+
+
+					if (cursor.getString(8) != null) {
+						if (cursor.getString(8).contains("持有人")) {
+							hasSelfName = true;
+							deviceB1tmp = new Device();
+							deviceB1tmp.deviceName = cursor.getString(1);
+							deviceB1tmp.deviceID = cursor.getString(2);
+							devicesB.get(0).deviceName = deviceB1tmp.deviceName;
+							// adapter.notifyDataSetChanged();
+						} else if (cursor.getString(8).contains("队长")) {
+							deviceBtmp = new Device();
+							deviceBtmp.deviceName = cursor.getString(1);
+							deviceBtmp.deviceID = cursor.getString(2);
+							devicesB.add(deviceBtmp);
+						} else if (cursor.getString(8).contains("协调器")) {
+							deviceBtmp = new Device();
+							deviceBtmp.deviceName = cursor.getString(1);
+							deviceBtmp.deviceID = cursor.getString(2);
+							devicesB.get(0).deviceName = deviceBtmp.deviceName;
+						}
 					} else {
-					String nametmp = cursor.getString(1);
-					Log.i(Tag,"dewei dewei name is " +nametmp);
-					String bindid = cursor.getString(2);
-					Device devicetmp = new Device();
-					devicetmp.deviceName = nametmp;
-					devicetmp.deviceID = bindid;
-					devices.add(devicetmp);
+						String nametmp = cursor.getString(1);
+						Log.i(Tag, "dewei dewei name is " + nametmp);
+						String bindid = cursor.getString(2);
+						Device devicetmp = new Device();
+						devicetmp.deviceName = nametmp;
+						devicetmp.deviceID = bindid;
+						devices.add(devicetmp);
 					}
 				}
 			}
-			if(!hasSelfName)devicesB.get(0).deviceName = "持有人";
+			if (!hasSelfName)
+				devicesB.get(0).deviceName = "持有人";
 			adapter.notifyDataSetChanged();
 		}
 
@@ -969,9 +972,14 @@ public class FragmentList2 extends Fragment {
 			dialog2.show();
 			break;
 		case MENU_QUERY:
-			String idSend = devices.get(idxx).deviceID;
-			Toast.makeText(getActivity(), "查询设备id为"+idSend+"的名称", Toast.LENGTH_SHORT).show();
-			MainActivity.instance.sendQuerySMS(idSend, "0000", "FFFF");
+			if(devices!=null) {
+				if(devices.get(idxx)!=null) {
+					String idSend = devices.get(idxx).deviceID;
+					Toast.makeText(getActivity(), "查询设备id为"+idSend+"的名称", Toast.LENGTH_SHORT).show();
+					MainActivity.instance.sendQuerySMS(idSend, "0000", "FFFF");
+				}
+			}
+
 		break;
 
 		}

@@ -182,7 +182,7 @@ public class PersonProvider extends ContentProvider {
 					+ " text," + PERSON_RANK + " text ," + PERSON_JOB
 					+ " text," + PERSON_YEAR + " text ," + PERSON_SEX
 					+ " text," + PERSON_BEIZHU + " text ," + DEVICE_BANJI
-					+ " text," + DEVICE_STATUS + "text ," + DEVICE_ADDRESS_
+					+ " text," + DEVICE_STATUS + " text ," + DEVICE_ADDRESS_
 					+ " text ," + DEVICE_TYPE + " integer ," + DEVICE_PADDRESS
 					+ " text);";
 			db.execSQL(sql);

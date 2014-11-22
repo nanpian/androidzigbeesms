@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.rtk.bdtest.R;
@@ -85,7 +86,7 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 		GroupHolder holder = new GroupHolder();
 		convertView = inflater.inflate(R.layout.device_list_item_layout, null);
 		holder.name = (TextView) convertView.findViewById(R.id.device_name);
-		holder.online = (TextView) convertView.findViewById(R.id.online);
+		holder.online = (ImageView)convertView.findViewById(R.id.online);
 		holder.address = (TextView) convertView
 				.findViewById(R.id.device_address);
 		holder.type = (TextView) convertView.findViewById(R.id.device_type);
@@ -96,24 +97,12 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 		if ((listB.get(groupPosition) != null)
 				&& (listB.get(groupPosition).online)) {
 			if(listB.get(groupPosition).unread) {
-				 BadgeView badgeView = new BadgeView(context,holder.online);
-			        badgeView.setText("在线");
-
-			   //     badgeView.setTextColor(Color.DKGRAY);
-			        badgeView.show();
+                 holder.online.setImageResource(R.drawable.online);
 			} else {
-			 BadgeView badgeView = new BadgeView(context,holder.online);
-		        badgeView.setText("在线");
-
-		      //  badgeView.setTextColor(Color.DKGRAY);
-		        badgeView.show();
+				   holder.online.setImageResource(R.drawable.online);
 			}
 		} else {
-			 BadgeView badgeView = new BadgeView(context, holder.online);
-		        badgeView.setText("离线");
-		        //badgeView.setTextSize(5.5f);
-		       // badgeView.setTextColor(Color.DKGRAY);
-		        badgeView.show();
+			   holder.online.setImageResource(R.drawable.offline);
 		}
 	
 		holder.address.setText(context.getString(R.string.device_address)
@@ -142,7 +131,7 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 		convertView = (View) inflater.inflate(R.layout.device_list_item_layout3,
 				null);
 		holder.name = (TextView) convertView.findViewById(R.id.device_name);
-		holder.online = (TextView) convertView.findViewById(R.id.online);
+		holder.online = (ImageView) convertView.findViewById(R.id.online);
 		holder.address = (TextView) convertView
 				.findViewById(R.id.device_address);
 		holder.type = (TextView) convertView.findViewById(R.id.device_type);
@@ -160,24 +149,27 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 		if ((listA.get(groupPosition).get(childPosition) != null)
 				&& (listA.get(groupPosition).get(childPosition).online)) {
 			if(listA.get(groupPosition).get(childPosition).unread) {
-				 BadgeView badgeView = new BadgeView(context,holder.online);
+				holder.online.setImageResource(R.drawable.online);
+			/*	 BadgeView badgeView = new BadgeView(context,holder.online);
 			        badgeView.setText("在线");
 			        //badgeView.setTextSize(5.5f);
 			        //badgeView.setTextColor(Color.DKGRAY);
-			        badgeView.show();
+			        badgeView.show();*/
 			} else {
-			 BadgeView badgeView = new BadgeView(context,holder.online);
+				holder.online.setImageResource(R.drawable.online);
+	/*		 BadgeView badgeView = new BadgeView(context,holder.online);
 		        badgeView.setText("在线");
 		        //badgeView.setTextSize(5.5f);
 		        //badgeView.setTextColor(Color.DKGRAY);
-		        badgeView.show();
+		        badgeView.show();*/
 			}
 		} else {
-			 BadgeView badgeView = new BadgeView(context, holder.online);
+			holder.online.setImageResource(R.drawable.offline);
+	/*		 BadgeView badgeView = new BadgeView(context, holder.online);
 		       // badgeView.setText("离线");
 		        badgeView.setTextSize(5.5f);
 		       // badgeView.setTextColor(Color.DKGRAY);
-		        badgeView.show();
+		        badgeView.show();*/
 		}
 		holder.address.setText(context.getString(R.string.device_address)
 				+ listA.get(groupPosition).get(childPosition).deviceAddress);
@@ -210,7 +202,7 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 		TextView type;
 		TextView id;
 		TextView parentAddress;
-		TextView online;
+		ImageView online;
 	}
 
 	class GroupHolder {
@@ -219,6 +211,6 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 		TextView type;
 		TextView id;
 		TextView parentAddress;
-		TextView online;
+		ImageView online;
 	}
 }
