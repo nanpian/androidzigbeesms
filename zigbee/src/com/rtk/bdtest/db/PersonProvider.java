@@ -178,7 +178,7 @@ public class PersonProvider extends ContentProvider {
 			// TODO Auto-generated method stub
 			String sql = "Create table " + TABLE_NAME + "(" + PERSON_ID
 					+ " integer primary key autoincrement," + PERSON_NAME
-					+ " text," + PERSON_BID + " text ," + PERSON_TYPE
+					+ " text," + PERSON_BID + " VARCHAR UNIQUE," + PERSON_TYPE
 					+ " text," + PERSON_RANK + " text ," + PERSON_JOB
 					+ " text," + PERSON_YEAR + " text ," + PERSON_SEX
 					+ " text," + PERSON_BEIZHU + " text ," + DEVICE_BANJI
@@ -208,6 +208,14 @@ public class PersonProvider extends ContentProvider {
 			SQLiteDatabase db = this.getReadableDatabase();
 			Cursor cursor = db.query(TABLE_NAME, null, PERSON_NAME + "=?",
 					new String[] { String.valueOf(name) }, null, null,
+					" _id desc");
+			return cursor;
+		}
+		
+		public Cursor select(String id,String xx) {
+			SQLiteDatabase db = this.getReadableDatabase();
+			Cursor cursor = db.query(TABLE_NAME, null, PERSON_ID + "=?",
+					new String[] { String.valueOf(id) }, null, null,
 					" _id desc");
 			return cursor;
 		}

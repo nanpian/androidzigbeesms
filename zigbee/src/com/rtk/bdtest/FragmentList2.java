@@ -77,6 +77,7 @@ public class FragmentList2 extends Fragment {
 	public  ArrayList<Device> devices;
 	public Device deviceBtmp;
 	public Device deviceB1tmp;
+	public static  boolean HasInitSelf = false;
 	private ArrayList<List<Device>> devicesA = new ArrayList<List<Device>>();  //所有的设备A
 	public  ArrayList<Device> devicesB = new ArrayList<Device>();  //设备B和C
 	private DeviceExpandableListAdapter adapter;
@@ -224,31 +225,55 @@ public class FragmentList2 extends Fragment {
 						.create();*/
 				//dialog.show();
 				} else if (typetmp2.equals("09")) {
-				    Toast.makeText(getActivity(),"收到队员绑定信息！", Toast.LENGTH_SHORT);
+				    Toast.makeText(getActivity(),"收到队长绑定信息！", Toast.LENGTH_SHORT);
 				    String bindName = data.substring(4);
 				    String bindId = data.substring(0,4);
                     Log.i(Tag,"receive bind info from B    "+data + "  bind name is " + bindName +
                     	 "bindId is " +bindId);
 				    if ((bindName!=null) && (bindId!=null)) {
-						ContentValues values = new ContentValues();
-						values.put("name", data.substring(4));
-						values.put("id", data.substring(0,4));
-						getActivity()
+						   if( isContainInSQL(bindId)){
+								ContentValues values = new ContentValues();
+								values.put("name", data.substring(4));
+								values.put("id", data.substring(0,4));
+								String selection = "id= '" + data.substring(0, 4) + "'";
+								getActivity()
+										.getContentResolver()
+										.update(PersonProvider.CONTENT_URI,
+												values,selection,null);
+						   } else {
+								ContentValues values = new ContentValues();
+								values.put("name", data.substring(4));
+								values.put("id", data.substring(0,4));
+								getActivity()
 								.getContentResolver()
 								.insert(PersonProvider.CONTENT_URI,
 										values);
+						   }
 				    }
 
 				} else if (typetmp2.equals("0B")) {
                     Log.i(Tag,"receive A query bind info from B"+data);
-                    
+                    String bindName = data.substring(4);
+                    String bindId  = data.substring(0,4);
 				    Toast.makeText(getActivity(),"查询成功,收到队员绑定信息！", Toast.LENGTH_SHORT);
-					ContentValues values = new ContentValues();
-					values.put("name", data.substring(4));
-					values.put("id", data.substring(0,4));
-		/*			getActivity()
-							.getContentResolver()
-						    .update(uri, values, where, selectionArgs)*/
+				   if( isContainInSQL(bindId)){
+						ContentValues values = new ContentValues();
+						values.put("name", data.substring(4));
+						values.put("id", data.substring(0,4));
+						String selection = "id= '" + data.substring(0, 4) + "'";
+						getActivity()
+								.getContentResolver()
+								.update(PersonProvider.CONTENT_URI,
+										values,selection,null);
+				   } else {
+						ContentValues values = new ContentValues();
+						values.put("name", data.substring(4));
+						values.put("id", data.substring(0,4));
+						getActivity()
+						.getContentResolver()
+						.insert(PersonProvider.CONTENT_URI,
+								values);
+				   }
 				} 
 			} else if (intent.getAction().equals("ACTION_NOTIFY_DEVICE"))  {
 			   String data = intent.getExtras().getString("zigbee_devicelist");
@@ -267,11 +292,21 @@ public class FragmentList2 extends Fragment {
                    notifyDeviceB1(padinfo);
 				   
 			} else {
-				
 			}
 			//notifyDeviceList(data) ;
 		}     
 	};
+	
+	public boolean isContainInSQL(String deviceId) {
+		String selection = "id= '" +deviceId+"'";
+		Cursor cursor = getActivity().getContentResolver().query(
+				PersonProvider.CONTENT_URI, null, selection, null, null);
+		while (cursor.moveToNext()) {
+			String id = cursor.getString(2);
+			if (id.equals(deviceId))return false;
+		}
+		return true;
+	}
 	
 	
 	public boolean execCommand(String cmd) {
@@ -307,6 +342,7 @@ public class FragmentList2 extends Fragment {
 		selfpadAddress  = devicesB.get(0).deviceAddress;
 		devicesB.get(0).online = true;
 		devicesB.get(0).count = 5;
+		HasInitSelf = true;
 /*		for (int i = 0; i < devicesB.size(); i++) {
 			if (devicesB.get(i).deviceID != null) {
 				if (devicesB.get(i).deviceID.equals(data.substring(10,14))) {
@@ -636,8 +672,6 @@ public class FragmentList2 extends Fragment {
 			if (cursor != null) {
 				while (cursor.moveToNext()) {
 					// 如果备注是持有人，则是修改路由器设备的名称
-
-
 					if (cursor.getString(8) != null) {
 						if (cursor.getString(8).contains("持有人")) {
 							hasSelfName = true;
@@ -656,6 +690,14 @@ public class FragmentList2 extends Fragment {
 							deviceBtmp.deviceName = cursor.getString(1);
 							deviceBtmp.deviceID = cursor.getString(2);
 							devicesB.get(0).deviceName = deviceBtmp.deviceName;
+						} else if (isContainInA2(cursor.getString(2))){
+							String bindName = cursor.getString(1);
+							String bindId = cursor.getString(2);
+							updateA2(bindId,bindName);
+						} else if(isCotainInA1(cursor.getString(2))){
+							String bindName = cursor.getString(1);
+							String bindId = cursor.getString(2);
+							updateA1(bindId,bindName);
 						}
 					} else {
 						String nametmp = cursor.getString(1);
@@ -670,10 +712,51 @@ public class FragmentList2 extends Fragment {
 			}
 			if (!hasSelfName)
 				devicesB.get(0).deviceName = "持有人";
-			adapter.notifyDataSetChanged();
+			     adapter.notifyDataSetChanged();
 		}
-
 	};
+	
+	public void updateA2(String bindId, String bindName){
+		if (HasInitSelf) {
+			if (devicesB.size() > 0) {
+				for (int i = 0; i < devicesB.size(); i++) {
+					if(devicesB.get(i).deviceID.equals(bindId))devicesB.get(i).setDeviceName(bindName);
+				}
+			}
+		}
+	}
+	
+	public void updateA1(String bindId, String bindName){
+		if (HasInitSelf) {
+			if (devices.size() > 0) {
+				for (int i = 0; i < devices.size(); i++) {
+					if(devices.get(i).deviceID.equals(bindId))devices.get(i).setDeviceName(bindName);
+				}
+			}
+		}
+	}
+
+	boolean isContainInA2(String bindid) {
+		if (HasInitSelf) {
+			if (devicesB.size() > 0) {
+				for (int i = 0; i < devicesB.size(); i++) {
+					if(devicesB.get(i).deviceID.equals(bindid))return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	boolean isCotainInA1(String bindid) {
+		if (HasInitSelf) {
+			if (devices.size() > 0) {
+				for (int i = 0; i < devices.size(); i++) {
+					if(devices.get(i).deviceID.equals(bindid))return true;
+				}
+			}
+		}
+		return false;
+	}
 	
 	private DbDeviceHelper dbDeviceHelper;
 	private boolean send;
