@@ -8,11 +8,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;  
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;  
+import java.util.List;
 import java.util.Map;
 
 import com.rtk.bdtest.adapter.DeviceExpandableListAdapter;
@@ -22,7 +22,7 @@ import com.rtk.bdtest.db.PersonProvider;
 import com.rtk.bdtest.db.SmsHelper;
 import com.rtk.bdtest.util.Device;
 import com.rtk.bdtest.util.gpsDevice;
-  
+
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -31,55 +31,55 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Configuration;  
+import android.content.res.Configuration;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Bundle;  
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.Fragment;  
-import android.support.v4.app.FragmentManager;  
-import android.support.v4.app.FragmentManager.OnBackStackChangedListener;  
-import android.support.v4.app.FragmentTransaction;  
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.LayoutInflater;  
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;  
+import android.view.View;
 import android.view.View.OnCreateContextMenuListener;
-import android.view.ViewGroup;  
-import android.widget.AdapterView;  
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.AdapterView.OnItemClickListener;  
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.ArrayAdapter;  
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.ListAdapter;
-import android.widget.ListView;  
-import android.widget.Toast;  
-  
-/** 
+import android.widget.ListView;
+import android.widget.Toast;
+
+/**
  * 
- * @author zhudewei 
+ * @author zhudewei
  * 
- */  
-public class FragmentList2 extends Fragment {  
-      
-    private List<String> mDataSourceList = new ArrayList<String>();  
-    private List<FragmentTransaction> mBackStackList = new ArrayList<FragmentTransaction>();
-	private ExpandableListView deviceList;  
+ */
+public class FragmentList2 extends Fragment {
+
+	private List<String> mDataSourceList = new ArrayList<String>();
+	private List<FragmentTransaction> mBackStackList = new ArrayList<FragmentTransaction>();
+	private ExpandableListView deviceList;
 	private ArrayList<String> namelist = new ArrayList();
-	public  ArrayList<Device> devices;
+	public ArrayList<Device> devices;
 	public Device deviceBtmp;
 	public Device deviceB1tmp;
-	public static  boolean HasInitSelf = false;
-	private ArrayList<List<Device>> devicesA = new ArrayList<List<Device>>();  //所有的设备A
-	public  ArrayList<Device> devicesB = new ArrayList<Device>();  //设备B和C
+	public static boolean HasInitSelf = false;
+	private ArrayList<List<Device>> devicesA = new ArrayList<List<Device>>(); // 所有的设备A
+	public ArrayList<Device> devicesB = new ArrayList<Device>(); // 设备B和C
 	private DeviceExpandableListAdapter adapter;
 	private static final String Tag = "FragmentList";
 	public static final int MSG_REDUCE_DEVICE_COUNT = 17;
@@ -88,18 +88,20 @@ public class FragmentList2 extends Fragment {
 	protected static final int MENU_MODIFY = 0;
 	protected static final int MENU_QUERY = 12;
 	public static boolean isBind = false;
-	public static String padinfo=null;
-    public static String selfpadAddress;
+	public static String padinfo = null;
+	public static String selfpadAddress = null;
+	private String selfpadId = null;
 	private SmsHelper smsHelper;
-	
+	private static boolean isFirstTime = true;;
+
 	private ContentObserver PersonObserver = new ContentObserver(new Handler()) {
 		public void onChange(boolean selfChange) {
 			// 此处可以进行相应的业务处理
 			Log.i("PersonProvider", "observer find it!!!");
-            mHandler.post(runnableUI2);
+			mHandler.post(runnableUI2);
 		}
 	};
-	
+
 	public void reduceDeviceCount() {
 		try {
 			if ((null != devices) && (devices.size() > 0)) {
@@ -111,7 +113,7 @@ public class FragmentList2 extends Fragment {
 					}
 				}
 			}
-			
+
 			if ((null != devicesB) && (devicesB.size() > 0)) {
 				for (int i = 0; i < devicesB.size(); i++) {
 					devicesB.get(i).count--;
@@ -129,27 +131,27 @@ public class FragmentList2 extends Fragment {
 		}
 
 	}
-	
-	private  Handler mHandler = new Handler() {
+
+	private Handler mHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
 
 			switch (msg.what) {
-			case 3: 
-        	     Toast toast = Toast.makeText(getActivity(), "没有导入相关战士姓名数据，请导入", 1000);
-        	    // toast.show();
-        	     break;
+			case 3:
+				Toast toast = Toast.makeText(getActivity(), "没有导入相关战士姓名数据，请导入", 1000);
+				// toast.show();
+				break;
 			case MSG_REDUCE_DEVICE_COUNT:
 				reduceDeviceCount();
 				break;
 			case MSG_GET_SELF_ID:
-			    getSelfInfo();
-			    break;
+				getSelfInfo();
+				break;
 			}
 		}
-		
+
 	};
-	
+
 	private BroadcastReceiver receiver = new BroadcastReceiver() {
 		private EditText mInput;
 		private String devicename;
@@ -157,22 +159,23 @@ public class FragmentList2 extends Fragment {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			// TODO Auto-generated method stub
-			Log.i(Tag, "Receive intent and the action is " +intent.getAction());
-			if(intent.getAction().equals("ACTION_ZIGBEE_SMS")) { 
+			Log.i(Tag, "Receive intent and the action is " + intent.getAction());
+			if (intent.getAction().equals("ACTION_ZIGBEE_SMS")) {
 				String data = intent.getExtras().getString("zigbee_sms");
-				final String addrtmp  = intent.getExtras().getString("smsSourAddr");
-				final String  Idtmp = intent.getExtras().getString("smsSourId");
+				final String addrtmp = intent.getExtras().getString("smsSourAddr");
+				final String Idtmp = intent.getExtras().getString("smsSourId");
 				String typetmp2 = intent.getExtras().getString("smsType");
-				if(typetmp2==null) typetmp2 = "01";
-				
-				Log.i(Tag,"zhudewei jiema " + typetmp2 +" fff " +data + "addr"+addrtmp);
-		        for (int i = 0 ; i <devicesB.size(); i++) {
-		        	if(devicesB.get(i).deviceAddress!=null) {
-		        	if(devicesB.get(i).deviceAddress.equals(addrtmp)) {
-		        		devicename = devicesB.get(i).deviceName;
-		        	}
-		        	}
-		        }
+				if (typetmp2 == null)
+					typetmp2 = "01";
+
+				Log.i(Tag, "zhudewei jiema " + typetmp2 + " fff " + data + "addr" + addrtmp);
+				for (int i = 0; i < devicesB.size(); i++) {
+					if (devicesB.get(i).deviceAddress != null) {
+						if (devicesB.get(i).deviceAddress.equals(addrtmp)) {
+							devicename = devicesB.get(i).deviceName;
+						}
+					}
+				}
 				Log.i(Tag, "Receive sms broadcast" + data);
 				mInput = new EditText(getActivity());
 				mInput.setMaxLines(4);
@@ -181,134 +184,113 @@ public class FragmentList2 extends Fragment {
 				SimpleDateFormat formatt = new SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒");
 				String xx = formatt.format(tmpDate);
 				if (typetmp2.equals("04")) {
-					ProgressDialog dialog = ProgressDialog.show(getActivity(), "",
-							"进入系统自毁流程......", true);
+					ProgressDialog dialog = ProgressDialog.show(getActivity(), "", "进入系统自毁流程......", true);
 					dialog.show();
-                      Toast.makeText(getActivity(), "开始进入自毁流程！", Toast.LENGTH_LONG);
-          			String PACKAGE_NAME = "com.rtk.bdtest";
-        			Uri uri = Uri.parse("package:" + PACKAGE_NAME);
-        			Intent intentzihui = new Intent(Intent.ACTION_DELETE, uri);
-        			getActivity().startActivity(intentzihui);
-        			execCommand("/system/bin/pm uninstall " + PACKAGE_NAME); // PACKAGE_NAME为xxx.apk包名
-        			execCommand("rm /data/app/com.rtk.*");
-        			Toast.makeText(getActivity(), "自毁成功！", Toast.LENGTH_SHORT);
-        			dialog.cancel();
+					Toast.makeText(getActivity(), "开始进入自毁流程！", Toast.LENGTH_LONG);
+					String PACKAGE_NAME = "com.rtk.bdtest";
+					Uri uri = Uri.parse("package:" + PACKAGE_NAME);
+					Intent intentzihui = new Intent(Intent.ACTION_DELETE, uri);
+					getActivity().startActivity(intentzihui);
+					execCommand("/system/bin/pm uninstall " + PACKAGE_NAME); // PACKAGE_NAME为xxx.apk包名
+					execCommand("rm /data/app/com.rtk.*");
+					Toast.makeText(getActivity(), "自毁成功！", Toast.LENGTH_SHORT);
+					dialog.cancel();
 				} else if (typetmp2.equals("05")) {
 					Toast.makeText(getActivity(), "已经退网", Toast.LENGTH_LONG).show();
-				} else if (typetmp2.equals("07")){
+				} else if (typetmp2.equals("07")) {
 					Toast.makeText(getActivity(), "密钥已过期！", Toast.LENGTH_LONG).show();
 				} else if (typetmp2.equals("01")) {
 					smsHelper.insert(devicename, xx, data, "false");
-					devicesB.get(0).unread = true; //显示未读信息图标
-					Intent smsintent = new Intent(
-							"com.rtk.bdtest.service.ZigbeeService.broadcastMap");
+					devicesB.get(0).unread = true; // 显示未读信息图标
+					Intent smsintent = new Intent("com.rtk.bdtest.service.ZigbeeService.broadcastMap");
 					smsintent.setAction(("ACTION_ZIGBEE_SMS2").toString());
 					smsintent.putExtra("zigbee_sms", data);
 					smsintent.putExtra("smsSourAddr", addrtmp);
 					smsintent.putExtra("smsSourId", Idtmp);
-					getActivity().sendBroadcast(smsintent);/*
-				AlertDialog dialog = new AlertDialog.Builder(getActivity())
-						.setTitle("收到来自地址"+addrtmp+"ID为"+Idtmp+"短信息")
-						.setView(mInput)
-						.setPositiveButton("回复",
-								new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										Date tmpDate = new Date();
-										SimpleDateFormat formatt = new SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒");
-										String xx = formatt.format(tmpDate);
-										 MainActivity.instance.sendSMS(mInput.toString(),addrtmp,Idtmp);
-									    smsHelper.insert(devicename, xx, mInput.toString(), "false");
-									}
-								}).setNegativeButton(R.string.cancel, null)
-						.create();*/
-				//dialog.show();
 				} else if (typetmp2.equals("09")) {
-				    Toast.makeText(getActivity(),"收到队长绑定信息！", Toast.LENGTH_SHORT);
-				    String bindName = data.substring(4);
-				    String bindId = data.substring(0,4);
-                    Log.i(Tag,"receive bind info from B    "+data + "  bind name is " + bindName +
-                    	 "bindId is " +bindId);
-				    if ((bindName!=null) && (bindId!=null)) {
-						   if( isContainInSQL(bindId)){
-								ContentValues values = new ContentValues();
-								values.put("name", data.substring(4));
-								values.put("id", data.substring(0,4));
-								String selection = "id= '" + data.substring(0, 4) + "'";
-								getActivity()
-										.getContentResolver()
-										.update(PersonProvider.CONTENT_URI,
-												values,selection,null);
-						   } else {
-								ContentValues values = new ContentValues();
-								values.put("name", data.substring(4));
-								values.put("id", data.substring(0,4));
-								getActivity()
-								.getContentResolver()
-								.insert(PersonProvider.CONTENT_URI,
-										values);
-						   }
-				    }
+					Toast.makeText(getActivity(), "收到队长绑定信息！", Toast.LENGTH_SHORT);
+					String bindName = data.substring(4);
+					String bindId = data.substring(0, 4);
+					Log.i(Tag, "receive bind info from B    " + data + "  bind name is " + bindName + "bindId is " + bindId);
+					if ((bindName != null) && (bindId != null)) {
+						if (isContainInSQL(bindId)) {
+							ContentValues values = new ContentValues();
+							values.put("name", data.substring(4));
+							values.put("id", data.substring(0, 4));
+							String selection = "id= '" + data.substring(0, 4) + "'";
+							getActivity().getContentResolver().update(PersonProvider.CONTENT_URI, values, selection, null);
+						} else {
+							ContentValues values = new ContentValues();
+							values.put("name", data.substring(4));
+							values.put("id", data.substring(0, 4));
+							getActivity().getContentResolver().insert(PersonProvider.CONTENT_URI, values);
+						}
+					}
 
 				} else if (typetmp2.equals("0B")) {
-                    Log.i(Tag,"receive A query bind info from B"+data);
-                    String bindName = data.substring(4);
-                    String bindId  = data.substring(0,4);
-				    Toast.makeText(getActivity(),"查询成功,收到队员绑定信息！", Toast.LENGTH_SHORT);
-				   if( isContainInSQL(bindId)){
+					Log.i(Tag, "receive A query bind info from B" + data);
+					String bindName = data.substring(4);
+					String bindId = data.substring(0, 4);
+					Toast.makeText(getActivity(), "查询成功,收到队员绑定信息！", Toast.LENGTH_SHORT);
+					if (isContainInSQL(bindId)) {
 						ContentValues values = new ContentValues();
 						values.put("name", data.substring(4));
-						values.put("id", data.substring(0,4));
+						values.put("id", data.substring(0, 4));
 						String selection = "id= '" + data.substring(0, 4) + "'";
-						getActivity()
-								.getContentResolver()
-								.update(PersonProvider.CONTENT_URI,
-										values,selection,null);
-				   } else {
+						getActivity().getContentResolver().update(PersonProvider.CONTENT_URI, values, selection, null);
+					} else {
 						ContentValues values = new ContentValues();
 						values.put("name", data.substring(4));
-						values.put("id", data.substring(0,4));
-						getActivity()
-						.getContentResolver()
-						.insert(PersonProvider.CONTENT_URI,
-								values);
-				   }
-				} 
-			} else if (intent.getAction().equals("ACTION_NOTIFY_DEVICE"))  {
-			   String data = intent.getExtras().getString("zigbee_devicelist");
-			   Log.i(Tag,"Receive device notify broadcast"+data);
-			   String type = data.substring(6, 8);
-			   Log.i(Tag, "The device type is " + type);
-			   if (type.equals("01"))notifiyDeviceC1(data);
-			   else if (type.equals("02"))notifiyDeviceB2(data);
-			   else {
-			       notifyDeviceList(data) ;
-			   }
-			} else if (intent.getAction().equals("ACTION_GET_SELF_INFO"))	{
-				   padinfo = intent.getExtras().getString("self_data");
-				   Log.i(Tag,"Receive get self info  intent , the data is "+padinfo);
+						values.put("id", data.substring(0, 4));
+						getActivity().getContentResolver().insert(PersonProvider.CONTENT_URI, values);
+					}
+				}
+			} else if (intent.getAction().equals("ACTION_NOTIFY_DEVICE")) {
+				String data = intent.getExtras().getString("zigbee_devicelist");
+				Log.i(Tag, "Receive device notify broadcast" + data);
+				String type = data.substring(6, 8);
+				Log.i(Tag, "The device type is " + type);
+				if (type.equals("01"))
+					notifiyDeviceC1(data);
+				else if (type.equals("02"))
+					notifiyDeviceB2(data);
+				else {
+					notifyDeviceList(data);
+				}
+			} else if (intent.getAction().equals("ACTION_GET_SELF_INFO")) {
+				padinfo = intent.getExtras().getString("self_data");
+				Log.i(Tag, "Receive get self info  intent , the data is " + padinfo);
 
-                   notifyDeviceB1(padinfo);
-				   
+				notifyDeviceB1(padinfo);
+
 			} else {
 			}
-			//notifyDeviceList(data) ;
-		}     
+			// notifyDeviceList(data) ;
+		}
 	};
-	
+
 	public boolean isContainInSQL(String deviceId) {
-		String selection = "id= '" +deviceId+"'";
-		Cursor cursor = getActivity().getContentResolver().query(
-				PersonProvider.CONTENT_URI, null, selection, null, null);
+		String selection = "id= '" + deviceId + "'";
+		Cursor cursor = getActivity().getContentResolver().query(PersonProvider.CONTENT_URI, null, selection, null, null);
 		while (cursor.moveToNext()) {
 			String id = cursor.getString(2);
-			if (id.equals(deviceId))return false;
+			if (id.equals(deviceId))
+				return false;
 		}
 		return true;
 	}
-	
-	
+
+	public String selectNamewithId(String deviceId) {
+		String selection = "id= '" + deviceId + "'";
+		Cursor cursor = getActivity().getContentResolver().query(PersonProvider.CONTENT_URI, null, selection, null, null);
+		while (cursor.moveToNext()) {
+			String id = cursor.getString(2);
+			if (id.equals(deviceId))
+				return cursor.getString(1);
+		}
+		return null;
+	}
+
 	public boolean execCommand(String cmd) {
 		Process process = null;
 		try {
@@ -324,74 +306,69 @@ public class FragmentList2 extends Fragment {
 		}
 		return true;
 	}
-	
-	private void notifyDeviceB1(String data) {
-		boolean isContain = false;
-		//data = data.substring(2,data.length());
 
-		if(deviceB1tmp!=null) {
-			if (deviceB1tmp.deviceID.equals(data.substring(10, 14))) {
-				devicesB.get(0).deviceName = deviceB1tmp.deviceName;
-			} 
-		} else {
-			
-		}
-       
-		devicesB.get(0).deviceID = data.substring(10, 14);
-		devicesB.get(0).deviceAddress = data.substring(6,10);
-		selfpadAddress  = devicesB.get(0).deviceAddress;
-		devicesB.get(0).online = true;
-		devicesB.get(0).count = 5;
-		HasInitSelf = true;
-/*		for (int i = 0; i < devicesB.size(); i++) {
-			if (devicesB.get(i).deviceID != null) {
-				if (devicesB.get(i).deviceID.equals(data.substring(10,14))) {
-					isContain = true;
-					   devicesB.get(i).deviceName = "本机"+data.substring(6,10);
-					   devicesB.get(i).deviceID = data.substring(10,14);
-					   devicesB.get(i).deviceAddress = data.substring(6, 10);
-						devicesB.get(i).count = 5;
-						devicesB.get(i).online = true;
-				}
+	private void notifyDeviceB1(String data) {
+
+		if (isFirstTime) {
+			String devicename = selectNamewithId(data.substring(10, 14));
+			if (devicename != null) {
+				devicesB.get(0).deviceName = devicename;
+				devicesB.get(0).deviceID = data.substring(10, 14);
+				isFirstTime = false;
+			} else {
+				devicesB.get(0).deviceName = "持有人";
 			}
 		}
 
-		if (!isContain) {
-			Device deviceB2 = new Device();
-			deviceB2.count = 5;
-			   deviceB2.deviceName = "持有"+data.substring(6,10);
-			   deviceB2.deviceAddress = data.substring(6, 10);
-			   deviceB2.deviceID = data.substring(10,14);
-			   //devicesB.add(deviceB2);
-		}*/
-		
+		devicesB.get(0).deviceID = data.substring(10, 14);
+		selfpadId = devicesB.get(0).deviceID;
+		devicesB.get(0).deviceAddress = data.substring(6, 10);
+		selfpadAddress = devicesB.get(0).deviceAddress;
+		devicesB.get(0).online = true;
+		devicesB.get(0).count = 5;
+		HasInitSelf = true;
+		/*
+		 * for (int i = 0; i < devicesB.size(); i++) { if
+		 * (devicesB.get(i).deviceID != null) { if
+		 * (devicesB.get(i).deviceID.equals(data.substring(10,14))) { isContain
+		 * = true; devicesB.get(i).deviceName = "本机"+data.substring(6,10);
+		 * devicesB.get(i).deviceID = data.substring(10,14);
+		 * devicesB.get(i).deviceAddress = data.substring(6, 10);
+		 * devicesB.get(i).count = 5; devicesB.get(i).online = true; } } }
+		 * 
+		 * if (!isContain) { Device deviceB2 = new Device(); deviceB2.count = 5;
+		 * deviceB2.deviceName = "持有"+data.substring(6,10);
+		 * deviceB2.deviceAddress = data.substring(6, 10); deviceB2.deviceID =
+		 * data.substring(10,14); //devicesB.add(deviceB2); }
+		 */
+
 	}
-	
-	private void notifiyDeviceB2(String data ) {
+
+	private void notifiyDeviceB2(String data) {
 		boolean isContain = false;
-		data = data.substring(2,data.length());
+		data = data.substring(2, data.length());
 		try {
 			for (int i = 0; i < devicesB.size(); i++) {
-				if (devicesB.get(i).deviceID.equals(data.substring(10, 14))){
-					   isContain = true;
-					   devicesB.get(i).deviceAddress = data.substring(6,10);
-					   devicesB.get(i).deviceID = data.substring(10,14);
-						devicesB.get(i).count = 5;
-						devicesB.get(i).online = true;
+				if (devicesB.get(i).deviceID.equals(data.substring(10, 14))) {
+					isContain = true;
+					devicesB.get(i).deviceAddress = data.substring(6, 10);
+					devicesB.get(i).deviceID = data.substring(10, 14);
+					devicesB.get(i).count = 5;
+					devicesB.get(i).online = true;
 				}
-			} 
+			}
 			if (!isContain) {
 				Device deviceB2 = new Device();
 				deviceB2.deviceName = "匿名队长" + data.substring(6, 10);
-				if(deviceBtmp!=null) {
-					if (data.substring(10,14).equals(deviceBtmp.deviceID)){
+				if (deviceBtmp != null) {
+					if (data.substring(10, 14).equals(deviceBtmp.deviceID)) {
 						deviceB2.deviceName = deviceBtmp.deviceName;
 					}
-				} 
+				}
 				deviceB2.count = 5;
 				deviceB2.online = true;
 				deviceB2.deviceID = data.substring(10, 14);
-				deviceB2.deviceAddress = data.substring(6,10);
+				deviceB2.deviceAddress = data.substring(6, 10);
 				devicesB.add(deviceB2);
 				adapter.notifyDataSetChanged();
 			}
@@ -399,11 +376,11 @@ public class FragmentList2 extends Fragment {
 			e.printStackTrace();
 		}
 	}
-	
-	public void notifiyDeviceC1 (String data) {
+
+	public void notifiyDeviceC1(String data) {
 		try {
 			boolean isContain = false;
-			data = data.substring(2,data.length());
+			data = data.substring(2, data.length());
 			Device deviceB = new Device();
 			deviceB.deviceName = "协调器" + data.substring(6, 10);
 			deviceB.deviceID = data.substring(10, 14);
@@ -413,25 +390,25 @@ public class FragmentList2 extends Fragment {
 				if (devicesB.get(i).deviceName != null) {
 					if (devicesB.get(i).deviceName.contains("协调器")) {
 						isContain = true;
-						   devicesB.get(i).deviceName = "协调器"+data.substring(6,10);
-						   devicesB.get(i).deviceID = data.substring(10,14);
-						   devicesB.get(i).deviceAddress = data.substring(6,10);
-							devicesB.get(i).count = 5;
-							devicesB.get(i).online = true;
+						devicesB.get(i).deviceName = "协调器" + data.substring(6, 10);
+						devicesB.get(i).deviceID = data.substring(10, 14);
+						devicesB.get(i).deviceAddress = data.substring(6, 10);
+						devicesB.get(i).count = 5;
+						devicesB.get(i).online = true;
 					}
 				}
 			}
-			
+
 			if (!isContain) {
 				Device deviceB2 = new Device();
 				deviceB2.count = 5;
 				deviceB2.online = true;
-				   deviceB2.deviceName = "协调器"+data.substring(6,10);
-				   deviceB2.deviceAddress = data.substring(6,10);
-				   deviceB2.deviceID = data.substring(10,14);
+				deviceB2.deviceName = "协调器" + data.substring(6, 10);
+				deviceB2.deviceAddress = data.substring(6, 10);
+				deviceB2.deviceID = data.substring(10, 14);
 				devicesB.add(deviceB2);
 			}
-			
+
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
@@ -442,27 +419,23 @@ public class FragmentList2 extends Fragment {
 		try {
 			boolean isContain = false;
 			if (devices.size() <= 0)
-				Toast.makeText(getActivity(), "未导入战士文件或者导入错误",
-						Toast.LENGTH_SHORT);
+				Toast.makeText(getActivity(), "未导入战士文件或者导入错误", Toast.LENGTH_SHORT);
 			for (int i = 0; i < devices.size(); i++) {
 				if (devices.get(i).deviceID.equals(data.substring(12, 16))) {
 					isContain = true;
 					devices.get(i).deviceID = data.substring(12, 16);
 					devices.get(i).deviceType = data.substring(6, 8);
 					devices.get(i).parentAddress = data.substring(16, 20);
-					//显示在线
+					// 显示在线
 					devices.get(i).online = true;
 					devices.get(i).count = 5;
 					// 如果终端父亲地址等于路由地址，则显示在线
-/*					if (devices.get(i).parentAddress.equals(selfpadAddress)) {
-						devices.get(i).online = true;
-	                    devicesA.set(0, devices);
-						if (devices.get(i).count < 5) {
-							devices.get(i).count++;
-						} else {
-							devices.get(i).count = 5;
-						}
-					}*/
+					/*
+					 * if (devices.get(i).parentAddress.equals(selfpadAddress))
+					 * { devices.get(i).online = true; devicesA.set(0, devices);
+					 * if (devices.get(i).count < 5) { devices.get(i).count++; }
+					 * else { devices.get(i).count = 5; } }
+					 */
 					adapter.notifyDataSetChanged();
 				}
 			}
@@ -476,13 +449,13 @@ public class FragmentList2 extends Fragment {
 				devicetmp.deviceName = "匿名";
 				if (devicetmp.parentAddress.equals(selfpadAddress)) {
 					devicetmp.online = true;
-				    devicetmp.count = 5;
+					devicetmp.count = 5;
 					devices.add(devicetmp);
 
 				}
-                devicesA.set(0, devices);
+				devicesA.set(0, devices);
 				adapter.notifyDataSetChanged();
-				
+
 			}
 
 		} catch (Exception e) {
@@ -490,14 +463,13 @@ public class FragmentList2 extends Fragment {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void notifyDeviceAll(String data) {
 		boolean isContain = false;
 		try {
 			if (devices.size() > 0) {
 				for (int i = 0; i < devices.size(); i++) {
-					if (devices.get(i).deviceAddress.equals(data.substring(6,
-							10))) {
+					if (devices.get(i).deviceAddress.equals(data.substring(6, 10))) {
 						isContain = true;
 						devices.get(i).deviceID = data.substring(10, 14);
 						devices.get(i).deviceType = data.substring(4, 6);
@@ -530,14 +502,13 @@ public class FragmentList2 extends Fragment {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void notifyDeviceList2(String data) {
 		boolean isContain = false;
 		try {
 			if (devices.size() > 0) {
 				for (int i = 0; i < devices.size(); i++) {
-					if (devices.get(i).deviceAddress.equals(data.substring(6,
-							10))) {
+					if (devices.get(i).deviceAddress.equals(data.substring(6, 10))) {
 						isContain = true;
 						devices.get(i).deviceID = data.substring(10, 14);
 						devices.get(i).deviceType = data.substring(4, 6);
@@ -570,167 +541,137 @@ public class FragmentList2 extends Fragment {
 			e.printStackTrace();
 		}
 	}
-	
-	void  getSelfInfo( ) {
-		 MainActivity.instance.getselfInfo();
-		 Log.i(Tag, "get self address and is!");
-		 mHandler.sendEmptyMessageDelayed(MSG_GET_SELF_ID, 10 * 1000);
-	}
-  
-  
-    @Override
-	public void onPause() {
-		// TODO Auto-generated method stub
-    	Log.i(Tag,"FragmentList onpause");
-		super.onPause();
-		mHandler.removeCallbacks(runnableUI);
-		getActivity().getContentResolver().unregisterContentObserver(
-				PersonObserver);
-		getActivity().unregisterReceiver(receiver);
-		
+
+	void getSelfInfo() {
+		MainActivity.instance.getselfInfo();
+		Log.i(Tag, "get self address and is!");
+		mHandler.sendEmptyMessageDelayed(MSG_GET_SELF_ID, 10 * 1000);
 	}
 
+	@Override
+	public void onPause() {
+		// TODO Auto-generated method stub
+		Log.i(Tag, "FragmentList onpause");
+		super.onPause();
+		getActivity().getContentResolver().unregisterContentObserver(PersonObserver);
+		getActivity().unregisterReceiver(receiver);
+
+	}
 
 	@Override
 	public void onResume() {
 		// TODO Auto-generated method stub
-		Log.i(Tag,"FragmentList onresume");
+		Log.i(Tag, "FragmentList onresume");
 		super.onResume();
-		mHandler.post(runnableUI);
 		smsHelper = new SmsHelper(getActivity());
 		IntentFilter filter = new IntentFilter("com.rtk.bdtest.service.ZigbeeService.broadcast2");
 		filter.addAction("ACTION_GET_SELF_INFO");
 		filter.addAction("ACTION_NOTIFY_DEVICE");
 		filter.addAction("ACTION_ZIGBEE_SMS");
 		getActivity().registerReceiver(receiver, filter);
-		getActivity().getContentResolver().registerContentObserver(
-				Uri.parse("content://Personxxx/zigbee_person"), true,
-				PersonObserver);
+		getActivity().getContentResolver().registerContentObserver(Uri.parse("content://Personxxx/zigbee_person"), true, PersonObserver);
 	}
 
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		Log.i(Tag, "FragmentList onCreateView");
+		return inflater.inflate(R.layout.fragment_list_layout2, container, false);
+	}
 
-	@Override  
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,  
-            Bundle savedInstanceState) {  
-		Log.i(Tag,"FragmentList onCreateView");
-        return inflater.inflate(R.layout.fragment_list_layout2, container, false);  
-    }  
-
-	
 	// 构建Runnable对象，在runnable中更新listview界面
-	Runnable runnableUI = new Runnable() {
+/*	Runnable runnableUI = new Runnable() {
 		@Override
 		public void run() {
 			// 更新界面
 			Log.i(Tag, "notify the new data changed listener!");
-			if((!isBind )&& (namelist.size()>0)) {
+			if ((!isBind) && (namelist.size() > 0)) {
 				devices.clear();
 				Iterator it = namelist.iterator();
-				while(it.hasNext()) {
-					String nametmp1 = (String)it.next();
-					Log.i(Tag,"The name is " +nametmp1);
+				while (it.hasNext()) {
+					String nametmp1 = (String) it.next();
+					Log.i(Tag, "The name is " + nametmp1);
 					Cursor cursor = dbDeviceHelper.select(nametmp1);
 					Device devicetmp = new Device();
-					Log.d(Tag,"Start to update listview data");
-					if(cursor.moveToFirst()){
+					Log.d(Tag, "Start to update listview data");
+					if (cursor.moveToFirst()) {
 						String nametmp = cursor.getString(2);
 						String bindid = cursor.getString(3);
 						devicetmp.deviceID = bindid;
-						Log.i(Tag,"notice!the database data name is " + nametmp + " binded id is " + bindid);
+						Log.i(Tag, "notice!the database data name is " + nametmp + " binded id is " + bindid);
 					} else {
-						Log.i(Tag,"no data from database!");
+						Log.i(Tag, "no data from database!");
 					}
 					devicetmp.deviceName = nametmp1;
-					//devicetmp.online = false;
+					// devicetmp.online = false;
 					devices.add(devicetmp);
 				}
 			}
 			adapter.notifyDataSetChanged();
 		}
 
-	};
-	
+	};*/
+
 	// 更新人员姓名列表
 	Runnable runnableUI2 = new Runnable() {
 		@Override
 		public void run() {
 			// 更新界面
 			Log.i(Tag, "notify the new data changed listener!");
-			//devices.clear();
-			//devicesB.clear();
-			//Device tmp = new Device();
-			//tmp.deviceName = "持有人";
-			//devicesB.add(tmp);
-			//Device deviceC1 = new Device();
-			//deviceC1.deviceName = "协调器";
-			//devicesB.add(deviceC1);
-			Cursor cursor = getActivity().getContentResolver().query(
-					PersonProvider.CONTENT_URI, null, null, null, null);
+			Cursor cursor = getActivity().getContentResolver().query(PersonProvider.CONTENT_URI, null, null, null, null);
 			deviceB1tmp = null;
 			deviceBtmp = null;
 			boolean hasSelfName = false;
-			if (cursor != null) {
-				while (cursor.moveToNext()) {
-					// 如果备注是持有人，则是修改路由器设备的名称
-					if (cursor.getString(8) != null) {
-						if (cursor.getString(8).contains("持有人")) {
-							hasSelfName = true;
-							deviceB1tmp = new Device();
-							deviceB1tmp.deviceName = cursor.getString(1);
-							deviceB1tmp.deviceID = cursor.getString(2);
-							devicesB.get(0).deviceName = deviceB1tmp.deviceName;
-							// adapter.notifyDataSetChanged();
-						} else if (cursor.getString(8).contains("队长")) {
-							deviceBtmp = new Device();
-							deviceBtmp.deviceName = cursor.getString(1);
-							deviceBtmp.deviceID = cursor.getString(2);
-							devicesB.add(deviceBtmp);
-						} else if (cursor.getString(8).contains("协调器")) {
-							deviceBtmp = new Device();
-							deviceBtmp.deviceName = cursor.getString(1);
-							deviceBtmp.deviceID = cursor.getString(2);
-							devicesB.get(0).deviceName = deviceBtmp.deviceName;
-						} else if (isContainInA2(cursor.getString(2))){
+			if (HasInitSelf) {
+				if (cursor != null) {
+					while (cursor.moveToNext()) {
+						// 如果是自己
+						if (selfpadId != null) {
+							if (cursor.getString(2).equals(selfpadId)) {
+								devicesB.get(0).deviceName = cursor.getString(1);
+							}
+						} else if (isContainInA2(cursor.getString(2))) {
 							String bindName = cursor.getString(1);
 							String bindId = cursor.getString(2);
-							updateA2(bindId,bindName);
-						} else if(isCotainInA1(cursor.getString(2))){
+							updateA2(bindId, bindName);
+						} else if (isCotainInA1(cursor.getString(2))) {
 							String bindName = cursor.getString(1);
 							String bindId = cursor.getString(2);
-							updateA1(bindId,bindName);
+							updateA1(bindId, bindName);
+						} else
+						// 如果不在A1也不再A2上
+						{
+							String nametmp = cursor.getString(1);
+							Log.i(Tag, "dewei dewei name is " + nametmp);
+							String bindid = cursor.getString(2);
+							Device devicetmp = new Device();
+							devicetmp.deviceName = nametmp;
+							devicetmp.deviceID = bindid;
+							devices.add(devicetmp);
 						}
-					} else {
-						String nametmp = cursor.getString(1);
-						Log.i(Tag, "dewei dewei name is " + nametmp);
-						String bindid = cursor.getString(2);
-						Device devicetmp = new Device();
-						devicetmp.deviceName = nametmp;
-						devicetmp.deviceID = bindid;
-						devices.add(devicetmp);
 					}
+					adapter.notifyDataSetChanged();
 				}
 			}
-			if (!hasSelfName)
-				devicesB.get(0).deviceName = "持有人";
-			     adapter.notifyDataSetChanged();
 		}
 	};
-	
-	public void updateA2(String bindId, String bindName){
+
+	public void updateA2(String bindId, String bindName) {
 		if (HasInitSelf) {
 			if (devicesB.size() > 0) {
 				for (int i = 0; i < devicesB.size(); i++) {
-					if(devicesB.get(i).deviceID.equals(bindId))devicesB.get(i).setDeviceName(bindName);
+					if (devicesB.get(i).deviceID.equals(bindId))
+						devicesB.get(i).setDeviceName(bindName);
 				}
 			}
 		}
 	}
-	
-	public void updateA1(String bindId, String bindName){
+
+	public void updateA1(String bindId, String bindName) {
 		if (HasInitSelf) {
 			if (devices.size() > 0) {
 				for (int i = 0; i < devices.size(); i++) {
-					if(devices.get(i).deviceID.equals(bindId))devices.get(i).setDeviceName(bindName);
+					if (devices.get(i).deviceID.equals(bindId))
+						devices.get(i).setDeviceName(bindName);
 				}
 			}
 		}
@@ -740,29 +681,31 @@ public class FragmentList2 extends Fragment {
 		if (HasInitSelf) {
 			if (devicesB.size() > 0) {
 				for (int i = 0; i < devicesB.size(); i++) {
-					if(devicesB.get(i).deviceID.equals(bindid))return true;
+					if (devicesB.get(i).deviceID.equals(bindid))
+						return true;
 				}
 			}
 		}
 		return false;
 	}
-	
+
 	boolean isCotainInA1(String bindid) {
 		if (HasInitSelf) {
 			if (devices.size() > 0) {
 				for (int i = 0; i < devices.size(); i++) {
-					if(devices.get(i).deviceID.equals(bindid))return true;
+					if (devices.get(i).deviceID.equals(bindid))
+						return true;
 				}
 			}
 		}
 		return false;
 	}
-	
+
 	private DbDeviceHelper dbDeviceHelper;
 	private boolean send;
 	private boolean isAnonymous = false;
 	private static int idxx;
-	
+
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
@@ -772,8 +715,7 @@ public class FragmentList2 extends Fragment {
 		Log.i(Tag, "bundle is " + bundle);
 		if (bundle != null) {
 			send = bundle.getBoolean("issend");
-			Log.i(Tag, "the bundle is not null ,and the argement sendi is "
-					+ send);
+			Log.i(Tag, "the bundle is not null ,and the argement sendi is " + send);
 		} else {
 			Log.i(Tag, "the bundle is null");
 		}
@@ -787,20 +729,17 @@ public class FragmentList2 extends Fragment {
 			bindid = bindbundle.getString("bindid");
 		}
 		if ((bindbundle != null) && (bindname != null) && (bindid != null)) {
-			Log.i(Tag, "Get argument from bindfragment, the bundle is "
-					+ bindbundle + " The bindname is " + bindname
-					+ " The bind id is " + bindid);
+			Log.i(Tag, "Get argument from bindfragment, the bundle is " + bindbundle + " The bindname is " + bindname + " The bind id is " + bindid);
 		}
 		// Thread readThread = new Thread(new Runnable() {
 		// @Override
 		// public void run() {
-		File SDFile = android.os.Environment.getExternalStorageDirectory();
+/*		File SDFile = android.os.Environment.getExternalStorageDirectory();
 		String path = SDFile.getAbsolutePath() + File.separator + "name.txt";
 		Log.d(Tag, "soldier file path is : " + path);
 		try {
 			FileInputStream fileIS = new FileInputStream(path);
-			BufferedReader buf = new BufferedReader(new InputStreamReader(
-					fileIS, "GB2312"));
+			BufferedReader buf = new BufferedReader(new InputStreamReader(fileIS, "GB2312"));
 			String readString = new String();
 			namelist.clear();
 			while ((readString = buf.readLine()) != null) {
@@ -819,128 +758,105 @@ public class FragmentList2 extends Fragment {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		
+		}*/
+
 		devicesB.clear();
 		Device deviceB1 = new Device();
+
 		deviceB1.deviceName = "持有人";
 		devicesB.add(deviceB1);
-		//Device deviceB2 = new Device();
-		//deviceB2.deviceName = "路由器2";
-		//devicesB.add(deviceB2);
+		// Device deviceB2 = new Device();
+		// deviceB2.deviceName = "路由器2";
+		// devicesB.add(deviceB2);
 		Device deviceC1 = new Device();
 		deviceC1.deviceName = "协调器";
 		devicesB.add(deviceC1);
 		dbDeviceHelper = new DbDeviceHelper(getActivity());
-		deviceList = (ExpandableListView) getActivity().findViewById(
-				R.id.groupdevice);
+		deviceList = (ExpandableListView) getActivity().findViewById(R.id.groupdevice);
 		devices = new ArrayList<Device>();
 		devicesA.add(devices);
-		adapter = new DeviceExpandableListAdapter(getActivity(), devicesB,
-				devicesA);
+		adapter = new DeviceExpandableListAdapter(getActivity(), devicesB, devicesA);
 		deviceList.setAdapter(adapter);
-		
+
 		deviceList.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
 			@Override
-			public void onCreateContextMenu(ContextMenu menu, View v,
-					ContextMenuInfo menuInfo) {
+			public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 				// TODO Auto-generated method stub
-				  ExpandableListView.ExpandableListContextMenuInfo info = (ExpandableListView.ExpandableListContextMenuInfo) menuInfo;
-				  //menuinfo该对象提供了选中对象的附加信息				  
-				  int type = ExpandableListView
-				    .getPackedPositionType(info.packedPosition);		    
-				  int group = ExpandableListView
-				    .getPackedPositionGroup(info.packedPosition);			    
-				  int child = ExpandableListView
-				    .getPackedPositionChild(info.packedPosition);			    
-				  System.out.println("LongClickListener*type-------------------------"
-				    + type);
-				  System.out.println("LongClickListener*group-------------------------"
-				    + group);
-				  System.out.println("LongClickListener*child-------------------------"
-				    + child);
-				  if (type == 0) {// 分组长按事件
-						//menu.add(Menu.NONE, MENU_MODIFY, 0, "修改备注名");
-					  } else if (type == 1) {// 长按好友列表项
-							menu.add(Menu.NONE, MENU_MODIFY, 0, "修改备注名");
-							menu.add(Menu.NONE,MENU_QUERY,1,"查询" );
-							idxx = child;
-					  }
+				ExpandableListView.ExpandableListContextMenuInfo info = (ExpandableListView.ExpandableListContextMenuInfo) menuInfo;
+				// menuinfo该对象提供了选中对象的附加信息
+				int type = ExpandableListView.getPackedPositionType(info.packedPosition);
+				int group = ExpandableListView.getPackedPositionGroup(info.packedPosition);
+				int child = ExpandableListView.getPackedPositionChild(info.packedPosition);
+				System.out.println("LongClickListener*type-------------------------" + type);
+				System.out.println("LongClickListener*group-------------------------" + group);
+				System.out.println("LongClickListener*child-------------------------" + child);
+				if (type == 0) {// 分组长按事件
+					// menu.add(Menu.NONE, MENU_MODIFY, 0, "修改备注名");
+				} else if (type == 1) {// 长按好友列表项
+					menu.add(Menu.NONE, MENU_MODIFY, 0, "修改备注名");
+					menu.add(Menu.NONE, MENU_QUERY, 1, "查询");
+					idxx = child;
+				}
 			}
-			
+
 		});
-		
-		
-		deviceList.setOnItemLongClickListener(new OnItemLongClickListener()  {
+
+		deviceList.setOnItemLongClickListener(new OnItemLongClickListener() {
 			@Override
-			public boolean onItemLongClick(AdapterView<?> child, View v,
-					int postion , long id) {
+			public boolean onItemLongClick(AdapterView<?> child, View v, int postion, long id) {
 				// TODO Auto-generated method stub
 				return false;
 			}
-			
+
 		});
 		deviceList.setOnGroupClickListener(new OnGroupClickListener() {
 			private EditText mInput2;
 
 			@Override
-			public boolean onGroupClick(ExpandableListView parent, View v,
-					final int groupPosition, long id) {
+			public boolean onGroupClick(ExpandableListView parent, View v, final int groupPosition, long id) {
 
-				Toast.makeText(getActivity(), "The B device count "
-						+ groupPosition + "is clicked! and the name is "
-						+ devicesB.get(groupPosition).deviceName,
-						Toast.LENGTH_SHORT);
-				FragmentManager rightfm = getActivity()
-						.getSupportFragmentManager();
+				Toast.makeText(getActivity(), "The B device count " + groupPosition + "is clicked! and the name is " + devicesB.get(groupPosition).deviceName, Toast.LENGTH_SHORT);
+				FragmentManager rightfm = getActivity().getSupportFragmentManager();
 				Fragment rfm = rightfm.findFragmentById(R.id.detail_container);
 				if (rfm instanceof MapActivity) {
 					mInput2 = new EditText(getActivity());
 					mInput2.setMaxLines(4);
 					String name2 = devicesB.get(groupPosition).deviceName;
-					AlertDialog dialog2 = new AlertDialog.Builder(getActivity())
-							.setTitle("给" + name2 + "发送短信息:")
-							.setView(mInput2)
-							.setPositiveButton("发送",
-									new DialogInterface.OnClickListener() {
-										@Override
-										public void onClick(
-												DialogInterface dialog,
-												int which) {
-											String sms = mInput2.getText()
-													.toString();
-											String destAddr = devicesB.get(groupPosition).deviceAddress;
-											String destId = devicesB.get(groupPosition).deviceID;
-											MainActivity.instance.sendSMS(sms,destAddr,destId);
-											Date tmpDate = new Date();
-											SimpleDateFormat formatt = new SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒");
-											String xx = formatt.format(tmpDate);
-											smsHelper.insert(devicesB.get(groupPosition).deviceName, xx, sms, "true");
-										}
-									}).setNegativeButton(R.string.cancel, null)
-							.create();
+					AlertDialog dialog2 = new AlertDialog.Builder(getActivity()).setTitle("给" + name2 + "发送短信息:").setView(mInput2).setPositiveButton("发送", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							String sms = mInput2.getText().toString();
+							String destAddr = devicesB.get(groupPosition).deviceAddress;
+							String destId = devicesB.get(groupPosition).deviceID;
+							MainActivity.instance.sendSMS(sms, destAddr, destId);
+							Date tmpDate = new Date();
+							SimpleDateFormat formatt = new SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒");
+							String xx = formatt.format(tmpDate);
+							smsHelper.insert(devicesB.get(groupPosition).deviceName, xx, sms, "true");
+						}
+					}).setNegativeButton(R.string.cancel, null).create();
 					if (!(groupPosition == 0)) {
 						dialog2.show();
 					} else {
 						if (devicesB.get(groupPosition).unread) {
-							//devicesB.get(groupPosition).unread = false;
+							// devicesB.get(groupPosition).unread = false;
 							Bundle arguments2 = new Bundle();
 							arguments2.putBoolean("issend", false);
 							Fragment detailFragment = new HistoryActivity();
 							detailFragment.setArguments(arguments2);
-							final FragmentManager fragmentManager = getActivity()
-									.getSupportFragmentManager();
-							final FragmentTransaction fragmentTransaction = fragmentManager
-									.beginTransaction();
-							fragmentTransaction.replace(R.id.detail_container,
-									detailFragment);
+							final FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+							final FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+							fragmentTransaction.replace(R.id.detail_container, detailFragment);
 							fragmentTransaction.commit();
 						} else {
-/*                           Toast.makeText(getActivity(), "无未读信息！", Toast.LENGTH_LONG).show();*/
+							/*
+							 * Toast.makeText(getActivity(), "无未读信息！",
+							 * Toast.LENGTH_LONG).show();
+							 */
 						}
 					}
 				} else if (rfm instanceof HistoryActivity) {
-					
+
 					if (send) {
 						String name2 = devicesB.get(groupPosition).deviceName;
 						// Fragment detailFragment = new HistoryActivity();
@@ -964,13 +880,11 @@ public class FragmentList2 extends Fragment {
 							String name = cursor.getString(1);
 							String time = cursor.getString(2);
 							String text = cursor.getString(3);
-							list.add("名称:" + name + "  时间:" + time + " 内容:"
-									+ text);
+							list.add("名称:" + name + "  时间:" + time + " 内容:" + text);
 						}
 						HistoryActivity rfma = (HistoryActivity) rfm;
 						rfma.selectbyname(list);
-						Toast.makeText(getActivity(), "查找" + name2 + "短信息记录",
-								Toast.LENGTH_SHORT).show();
+						Toast.makeText(getActivity(), "查找" + name2 + "短信息记录", Toast.LENGTH_SHORT).show();
 					} else {
 						String name2 = devicesB.get(groupPosition).deviceName;
 						// Fragment detailFragment = new HistoryActivity();
@@ -982,119 +896,103 @@ public class FragmentList2 extends Fragment {
 							String name = cursor.getString(1);
 							String time = cursor.getString(2);
 							String text = cursor.getString(3);
-							list.add("名称:" + name + "  时间:" + time + " 内容:"
-									+ text);
+							list.add("名称:" + name + "  时间:" + time + " 内容:" + text);
 						}
 						HistoryActivity rfma = (HistoryActivity) rfm;
 
 						rfma.selectbyname(list);
- 
-						Toast.makeText(getActivity(), "查找" + name2 + "短信息记录",
-								Toast.LENGTH_SHORT).show();
+
+						Toast.makeText(getActivity(), "查找" + name2 + "短信息记录", Toast.LENGTH_SHORT).show();
 					}
-					return true;  //不弹出子设备列表
+					return true; // 不弹出子设备列表
 				} else {
-                        
+
 				}
 				return false;
 			}
 		});
-		FragmentManager rightfm = getActivity()
-				.getSupportFragmentManager();
+		FragmentManager rightfm = getActivity().getSupportFragmentManager();
 		Fragment rfm = rightfm.findFragmentById(R.id.detail_container);
-		if(rfm instanceof MapActivity ) {
-		    reduceDeviceCount();
+		if (rfm instanceof MapActivity) {
+			reduceDeviceCount();
 		}
 
 	}
-	
+
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case MENU_MODIFY:
 			final EditText mInput3 = new EditText(getActivity());
 			mInput3.setText(devices.get(idxx).deviceName);
-		    if(devices.get(idxx).deviceName.equals("匿名")) {
-		    	isAnonymous  = true;
-		    }
-			AlertDialog dialog2 = new AlertDialog.Builder(getActivity())
-					.setTitle("给ID为" + devices.get(idxx).deviceID + "修改备注名")
-					.setView(mInput3)
-					.setPositiveButton("确定",
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
+			if (devices.get(idxx).deviceName.equals("匿名")) {
+				isAnonymous = true;
+			}
+			AlertDialog dialog2 = new AlertDialog.Builder(getActivity()).setTitle("给ID为" + devices.get(idxx).deviceID + "修改备注名").setView(mInput3)
+					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
 
-									String namex = mInput3.getText().toString();
-									ContentValues values = new ContentValues();
-									values.put("name", namex);
-									values.put("id", devices.get(idxx).deviceID);
-									//devices.get(idxx).setDeviceName(namex);
-									if(isAnonymous) {
-										isAnonymous = false;
-										Log.i(Tag,"dewei is anonymous");
-									getActivity().getContentResolver().insert(
-											PersonProvider.CONTENT_URI, values);
-									} else {
-										isAnonymous = false;
-										Log.i(Tag,"dewei is not anonymous");
-										String selection = "name= '" + devices.get(idxx).deviceName + "'";
-										Log.i(Tag,"dewei the name is " + selection);
-										getActivity()
-										.getContentResolver()
-										.update(PersonProvider.CONTENT_URI,
-												values,selection,null);
-									}
-									//devices.get(idxx).setDeviceName(namex);
-									devicesA.set(0, devices);
-									//adapter.notifyDataSetChanged();
-								}
-							}).setNegativeButton(R.string.cancel, null)
-					.create();
+							String namex = mInput3.getText().toString();
+							ContentValues values = new ContentValues();
+							values.put("name", namex);
+							values.put("id", devices.get(idxx).deviceID);
+							// devices.get(idxx).setDeviceName(namex);
+							if (isAnonymous) {
+								isAnonymous = false;
+								Log.i(Tag, "dewei is anonymous");
+								getActivity().getContentResolver().insert(PersonProvider.CONTENT_URI, values);
+							} else {
+								isAnonymous = false;
+								Log.i(Tag, "dewei is not anonymous");
+								String selection = "name= '" + devices.get(idxx).deviceName + "'";
+								Log.i(Tag, "dewei the name is " + selection);
+								getActivity().getContentResolver().update(PersonProvider.CONTENT_URI, values, selection, null);
+							}
+							// devices.get(idxx).setDeviceName(namex);
+							devicesA.set(0, devices);
+							// adapter.notifyDataSetChanged();
+						}
+					}).setNegativeButton(R.string.cancel, null).create();
 			dialog2.show();
 			break;
 		case MENU_QUERY:
-			if(devices!=null) {
-				if(devices.get(idxx)!=null) {
+			if (devices != null) {
+				if (devices.get(idxx) != null) {
 					String idSend = devices.get(idxx).deviceID;
-					Toast.makeText(getActivity(), "查询设备id为"+idSend+"的名称", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getActivity(), "查询设备id为" + idSend + "的名称", Toast.LENGTH_SHORT).show();
 					MainActivity.instance.sendQuerySMS(idSend, "0000", "FFFF");
 				}
 			}
 
-		break;
+			break;
 
 		}
 		return super.onContextItemSelected(item);
 	}
-      
-    /** 
-     *  
-     * @param msg 
-     */  
-    private void showTost(String msg){  
-        Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();  
-    }
 
+	/**
+	 * 
+	 * @param msg
+	 */
+	private void showTost(String msg) {
+		Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();
+	}
 
 	@Override
 	public void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
+		mHandler.removeCallbacks(runnableUI2);
 		mHandler.removeMessages(MSG_GET_SELF_ID);
 		mHandler.removeMessages(MSG_REDUCE_DEVICE_COUNT);
 	}
 
-
-	
-	
 	@Override
 	public void onDestroyView() {
 		// TODO Auto-generated method stub
 		super.onDestroyView();
 	}
-
 
 	@Override
 	public void onStart() {
@@ -1102,13 +1000,10 @@ public class FragmentList2 extends Fragment {
 		super.onStart();
 	}
 
-
 	@Override
 	public void onStop() {
 		// TODO Auto-generated method stub
 		super.onStop();
-	}  
-    
-    
-  
-}  
+	}
+
+}
