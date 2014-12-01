@@ -96,13 +96,21 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 		holder.name.setText("名称:" + listB.get(groupPosition).deviceName);
 		if ((listB.get(groupPosition) != null)
 				&& (listB.get(groupPosition).online)) {
-			if(listB.get(groupPosition).unread) {
+			    if(listB.get(groupPosition)==null) holder.online.setImageResource(R.drawable.online);
+			    else if(listB.get(groupPosition).deviceType == null) holder.online.setImageResource(R.drawable.online);
+			    else if(listB.get(groupPosition).deviceType.equals("01")){
+					 holder.online.setImageResource(R.drawable.c1_online);
+				} else {
                  holder.online.setImageResource(R.drawable.online);
-			} else {
-				   holder.online.setImageResource(R.drawable.online);
-			}
+				}
 		} else {
-			   holder.online.setImageResource(R.drawable.offline);
+			    if(listB.get(groupPosition)==null) holder.online.setImageResource(R.drawable.offline);
+			    else if(listB.get(groupPosition).deviceType == null) holder.online.setImageResource(R.drawable.offline);
+			    else if(listB.get(groupPosition).deviceType.equals("01")){
+					 holder.online.setImageResource(R.drawable.c1_offline);
+				} else {
+                holder.online.setImageResource(R.drawable.offline);
+				}
 		}
 	
 		holder.address.setText(context.getString(R.string.device_address)
@@ -114,13 +122,13 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 				.getString(R.string.device_parent_address)
 				+ listB.get(groupPosition).parentAddress);
 		// 在线和不在线颜色不同
-		if (!(listB.get(groupPosition).online)) {
+/*		if (!(listB.get(groupPosition).online)) {
 			convertView.setBackgroundColor(this.context.getResources()
 					.getColor(R.color.white));
 		} else {
 			convertView.setBackgroundColor(this.context.getResources()
 					.getColor(R.color.green));
-		}
+		}*/
 		return convertView;
 	}
 

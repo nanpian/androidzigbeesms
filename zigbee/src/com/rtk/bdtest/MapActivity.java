@@ -474,7 +474,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 		// TODO Auto-generated method stub
 		mMapView.onPause();
 		//gpsHandler.removeCallbacks(gpsselfRunnable);
-		mMarkerSelf = null;
+/*		mMarkerSelf = null;*/
 		getActivity().unregisterReceiver(receiver);
 		getActivity().unregisterReceiver(receiverSms);
 		super.onPause();

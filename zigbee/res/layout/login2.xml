@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#fffff0"
+    android:background="@drawable/junduibg"
+    android:gravity="center"
     android:orientation="vertical" >
 
     <LinearLayout
@@ -16,18 +17,12 @@
 
     <LinearLayout
         android:id="@+id/linearLayout01"
-        android:layout_width="fill_parent"
+        android:layout_centerHorizontal="true"
+        android:layout_width="240dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/image_logo"
-        android:layout_marginLeft="42dp"
-        android:layout_marginRight="42dp"
         android:background="@drawable/login_input"
         android:orientation="vertical" >
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal" >
 
             <EditText
                 android:id="@+id/username"
@@ -37,7 +32,6 @@
                 android:hint="请输入用户名"
                 android:paddingLeft="10dp"
                 android:saveEnabled="true" />
-        </LinearLayout>
 
         <View
             android:layout_width="fill_parent"
@@ -56,18 +50,23 @@
             android:paddingLeft="10dp" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/ok"
-        android:layout_width="fill_parent"
-        android:layout_height="44dp"
-        android:layout_below="@id/linearLayout01"
-        android:layout_marginLeft="42dp"
-        android:layout_marginRight="42dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/login_button_select"
-        android:text="登陆"
-        android:textAlignment="center"
-        android:textSize="22dp" />
+    <LinearLayout 
+         android:layout_width="match_parent" 
+         android:layout_height="wrap_content"
+         android:layout_marginTop="20dp"
+         android:layout_below="@id/linearLayout01"
+         android:gravity="center"
+        >
+        <Button
+            android:id="@+id/ok"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/linearLayout01"
+            android:layout_gravity="center"
+            android:background="@drawable/login_button_select"
+            android:textAlignment="center"
+            android:textSize="22dp" />
+    </LinearLayout>
 
     <RelativeLayout
         android:layout_width="fill_parent"

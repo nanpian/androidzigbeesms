@@ -124,7 +124,7 @@ public class FragmentList2 extends Fragment {
 				}
 			}
 
-			mHandler.sendEmptyMessageDelayed(MSG_REDUCE_DEVICE_COUNT, 7 * 1000);
+			mHandler.sendEmptyMessageDelayed(MSG_REDUCE_DEVICE_COUNT, 8 * 1000);
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
@@ -271,22 +271,37 @@ public class FragmentList2 extends Fragment {
 
 	public boolean isContainInSQL(String deviceId) {
 		String selection = "id= '" + deviceId + "'";
-		Cursor cursor = getActivity().getContentResolver().query(PersonProvider.CONTENT_URI, null, selection, null, null);
-		while (cursor.moveToNext()) {
-			String id = cursor.getString(2);
-			if (id.equals(deviceId))
-				return false;
+		Cursor cursor = null;
+		try {
+			cursor = getActivity().getContentResolver().query(PersonProvider.CONTENT_URI, null, selection, null, null);
+			while (cursor.moveToNext()) {
+				String id = cursor.getString(2);
+				if (id.equals(deviceId))
+					return false;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			cursor.close();
 		}
+
 		return true;
 	}
 
 	public String selectNamewithId(String deviceId) {
 		String selection = "id= '" + deviceId + "'";
-		Cursor cursor = getActivity().getContentResolver().query(PersonProvider.CONTENT_URI, null, selection, null, null);
-		while (cursor.moveToNext()) {
-			String id = cursor.getString(2);
-			if (id.equals(deviceId))
-				return cursor.getString(1);
+		Cursor cursor = null;
+		try {
+			cursor = getActivity().getContentResolver().query(PersonProvider.CONTENT_URI, null, selection, null, null);
+			while (cursor.moveToNext()) {
+				String id = cursor.getString(2);
+				if (id.equals(deviceId))
+					return cursor.getString(1);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			cursor.close();
 		}
 		return null;
 	}
@@ -327,6 +342,7 @@ public class FragmentList2 extends Fragment {
 		devicesB.get(0).online = true;
 		devicesB.get(0).count = 5;
 		HasInitSelf = true;
+		adapter.notifyDataSetChanged();
 		/*
 		 * for (int i = 0; i < devicesB.size(); i++) { if
 		 * (devicesB.get(i).deviceID != null) { if
@@ -355,6 +371,7 @@ public class FragmentList2 extends Fragment {
 					devicesB.get(i).deviceID = data.substring(10, 14);
 					devicesB.get(i).count = 5;
 					devicesB.get(i).online = true;
+					adapter.notifyDataSetChanged();
 				}
 			}
 			if (!isContain) {
@@ -395,6 +412,7 @@ public class FragmentList2 extends Fragment {
 						devicesB.get(i).deviceAddress = data.substring(6, 10);
 						devicesB.get(i).count = 5;
 						devicesB.get(i).online = true;
+						adapter.notifyDataSetChanged();
 					}
 				}
 			}
@@ -407,6 +425,7 @@ public class FragmentList2 extends Fragment {
 				deviceB2.deviceAddress = data.substring(6, 10);
 				deviceB2.deviceID = data.substring(10, 14);
 				devicesB.add(deviceB2);
+				adapter.notifyDataSetChanged();
 			}
 
 		} catch (Exception e) {
@@ -579,77 +598,78 @@ public class FragmentList2 extends Fragment {
 	}
 
 	// 构建Runnable对象，在runnable中更新listview界面
-/*	Runnable runnableUI = new Runnable() {
-		@Override
-		public void run() {
-			// 更新界面
-			Log.i(Tag, "notify the new data changed listener!");
-			if ((!isBind) && (namelist.size() > 0)) {
-				devices.clear();
-				Iterator it = namelist.iterator();
-				while (it.hasNext()) {
-					String nametmp1 = (String) it.next();
-					Log.i(Tag, "The name is " + nametmp1);
-					Cursor cursor = dbDeviceHelper.select(nametmp1);
-					Device devicetmp = new Device();
-					Log.d(Tag, "Start to update listview data");
-					if (cursor.moveToFirst()) {
-						String nametmp = cursor.getString(2);
-						String bindid = cursor.getString(3);
-						devicetmp.deviceID = bindid;
-						Log.i(Tag, "notice!the database data name is " + nametmp + " binded id is " + bindid);
-					} else {
-						Log.i(Tag, "no data from database!");
-					}
-					devicetmp.deviceName = nametmp1;
-					// devicetmp.online = false;
-					devices.add(devicetmp);
-				}
-			}
-			adapter.notifyDataSetChanged();
-		}
-
-	};*/
+	/*
+	 * Runnable runnableUI = new Runnable() {
+	 * 
+	 * @Override public void run() { // 更新界面 Log.i(Tag,
+	 * "notify the new data changed listener!"); if ((!isBind) &&
+	 * (namelist.size() > 0)) { devices.clear(); Iterator it =
+	 * namelist.iterator(); while (it.hasNext()) { String nametmp1 = (String)
+	 * it.next(); Log.i(Tag, "The name is " + nametmp1); Cursor cursor =
+	 * dbDeviceHelper.select(nametmp1); Device devicetmp = new Device();
+	 * Log.d(Tag, "Start to update listview data"); if (cursor.moveToFirst()) {
+	 * String nametmp = cursor.getString(2); String bindid =
+	 * cursor.getString(3); devicetmp.deviceID = bindid; Log.i(Tag,
+	 * "notice!the database data name is " + nametmp + " binded id is " +
+	 * bindid); } else { Log.i(Tag, "no data from database!"); }
+	 * devicetmp.deviceName = nametmp1; // devicetmp.online = false;
+	 * devices.add(devicetmp); } } adapter.notifyDataSetChanged(); }
+	 * 
+	 * };
+	 */
 
 	// 更新人员姓名列表
 	Runnable runnableUI2 = new Runnable() {
 		@Override
 		public void run() {
 			// 更新界面
-			Log.i(Tag, "notify the new data changed listener!");
-			Cursor cursor = getActivity().getContentResolver().query(PersonProvider.CONTENT_URI, null, null, null, null);
-			deviceB1tmp = null;
-			deviceBtmp = null;
-			boolean hasSelfName = false;
-			if (HasInitSelf) {
-				if (cursor != null) {
-					while (cursor.moveToNext()) {
-						// 如果是自己
-						if (selfpadId != null) {
-							if (cursor.getString(2).equals(selfpadId)) {
-								devicesB.get(0).deviceName = cursor.getString(1);
+			synchronized (this) {
+				Log.i(Tag, "notify the new data changed listener!");
+				Cursor cursor = null;
+				try {
+					cursor = getActivity().getContentResolver().query(PersonProvider.CONTENT_URI, null, null, null, null);
+					deviceB1tmp = null;
+					deviceBtmp = null;
+					boolean hasSelfName = false;
+					if (HasInitSelf) {
+						if (cursor != null) {
+							while (cursor.moveToNext()) {
+								Log.i(Tag, "The cursor is  id" + cursor.getString(2));
+								// 如果是自己
+								if( (selfpadId != null) && (cursor.getString(2).equals(selfpadId))) {
+										Log.i(Tag, "the self id is " + cursor.getString(2));
+										devicesB.get(0).deviceName = cursor.getString(1);
+								} else if (isContainInA2(cursor.getString(2))) {
+									Log.i(Tag, "the a2 id is " + cursor.getString(2));
+									String bindName = cursor.getString(1);
+									String bindId = cursor.getString(2);
+									updateA2(bindId, bindName);
+								} else if (isCotainInA1(cursor.getString(2))) {
+									Log.i(Tag, "the a1 id is " + cursor.getString(2));
+									String bindName = cursor.getString(1);
+									String bindId = cursor.getString(2);
+									updateA1(bindId, bindName);
+								} else
+								// 如果不在A1也不再A2上
+								{
+									String nametmp = cursor.getString(1);
+									Log.i(Tag, "dewei dewei name is " + nametmp);
+									String bindid = cursor.getString(2);
+									Device devicetmp = new Device();
+									devicetmp.deviceName = nametmp;
+									devicetmp.deviceID = bindid;
+									devices.add(devicetmp);
+								}
 							}
-						} else if (isContainInA2(cursor.getString(2))) {
-							String bindName = cursor.getString(1);
-							String bindId = cursor.getString(2);
-							updateA2(bindId, bindName);
-						} else if (isCotainInA1(cursor.getString(2))) {
-							String bindName = cursor.getString(1);
-							String bindId = cursor.getString(2);
-							updateA1(bindId, bindName);
-						} else
-						// 如果不在A1也不再A2上
-						{
-							String nametmp = cursor.getString(1);
-							Log.i(Tag, "dewei dewei name is " + nametmp);
-							String bindid = cursor.getString(2);
-							Device devicetmp = new Device();
-							devicetmp.deviceName = nametmp;
-							devicetmp.deviceID = bindid;
-							devices.add(devicetmp);
+							adapter.notifyDataSetChanged();
 						}
+					} else {
+						Log.i(Tag, "The B1 has not instanted!");
 					}
-					adapter.notifyDataSetChanged();
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					cursor.close();
 				}
 			}
 		}
@@ -734,31 +754,20 @@ public class FragmentList2 extends Fragment {
 		// Thread readThread = new Thread(new Runnable() {
 		// @Override
 		// public void run() {
-/*		File SDFile = android.os.Environment.getExternalStorageDirectory();
-		String path = SDFile.getAbsolutePath() + File.separator + "name.txt";
-		Log.d(Tag, "soldier file path is : " + path);
-		try {
-			FileInputStream fileIS = new FileInputStream(path);
-			BufferedReader buf = new BufferedReader(new InputStreamReader(fileIS, "GB2312"));
-			String readString = new String();
-			namelist.clear();
-			while ((readString = buf.readLine()) != null) {
-				Log.d(Tag, "line: " + readString);
-				namelist.add(readString);
-			}
-			if (namelist.size() != 0) {
-				mHandler.post(runnableUI);
-			}
-			fileIS.close();
-		} catch (FileNotFoundException e) {
-			mHandler.post(runnableUI2);
-			Message msg = new Message();
-			msg.what = 3;
-			mHandler.sendMessage(msg);
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}*/
+		/*
+		 * File SDFile = android.os.Environment.getExternalStorageDirectory();
+		 * String path = SDFile.getAbsolutePath() + File.separator + "name.txt";
+		 * Log.d(Tag, "soldier file path is : " + path); try { FileInputStream
+		 * fileIS = new FileInputStream(path); BufferedReader buf = new
+		 * BufferedReader(new InputStreamReader(fileIS, "GB2312")); String
+		 * readString = new String(); namelist.clear(); while ((readString =
+		 * buf.readLine()) != null) { Log.d(Tag, "line: " + readString);
+		 * namelist.add(readString); } if (namelist.size() != 0) {
+		 * mHandler.post(runnableUI); } fileIS.close(); } catch
+		 * (FileNotFoundException e) { mHandler.post(runnableUI2); Message msg =
+		 * new Message(); msg.what = 3; mHandler.sendMessage(msg);
+		 * e.printStackTrace(); } catch (IOException e) { e.printStackTrace(); }
+		 */
 
 		devicesB.clear();
 		Device deviceB1 = new Device();
@@ -873,36 +882,51 @@ public class FragmentList2 extends Fragment {
 						// .beginTransaction();
 						// fragmentTransaction.replace(R.id.detail_container,
 						// detailFragment);
-						Cursor cursor = smsHelper.select(name2, "true");
-						ArrayList<String> list = new ArrayList<String>();
-						list.clear();
-						while (cursor.moveToNext()) {
-							String name = cursor.getString(1);
-							String time = cursor.getString(2);
-							String text = cursor.getString(3);
-							list.add("名称:" + name + "  时间:" + time + " 内容:" + text);
+						Cursor cursor = null;
+						try {
+							cursor = smsHelper.select(name2, "true");
+							ArrayList<String> list = new ArrayList<String>();
+							list.clear();
+							while (cursor.moveToNext()) {
+								String name = cursor.getString(1);
+								String time = cursor.getString(2);
+								String text = cursor.getString(3);
+								list.add("名称:" + name + "  时间:" + time + " 内容:" + text);
+							}
+							HistoryActivity rfma = (HistoryActivity) rfm;
+							rfma.selectbyname(list);
+							Toast.makeText(getActivity(), "查找" + name2 + "短信息记录", Toast.LENGTH_SHORT).show();
+						} catch (Exception e) {
+							e.printStackTrace();
+						} finally {
+							cursor.close();
 						}
-						HistoryActivity rfma = (HistoryActivity) rfm;
-						rfma.selectbyname(list);
-						Toast.makeText(getActivity(), "查找" + name2 + "短信息记录", Toast.LENGTH_SHORT).show();
+
 					} else {
 						String name2 = devicesB.get(groupPosition).deviceName;
 						// Fragment detailFragment = new HistoryActivity();
-						SmsHelper smsHelper = new SmsHelper(getActivity());
-						Cursor cursor = smsHelper.select(name2, "false");
-						ArrayList<String> list = new ArrayList<String>();
-						list.clear();
-						while (cursor.moveToNext()) {
-							String name = cursor.getString(1);
-							String time = cursor.getString(2);
-							String text = cursor.getString(3);
-							list.add("名称:" + name + "  时间:" + time + " 内容:" + text);
+						Cursor cursor = null;
+						try {
+							SmsHelper smsHelper = new SmsHelper(getActivity());
+							cursor = smsHelper.select(name2, "false");
+							ArrayList<String> list = new ArrayList<String>();
+							list.clear();
+							while (cursor.moveToNext()) {
+								String name = cursor.getString(1);
+								String time = cursor.getString(2);
+								String text = cursor.getString(3);
+								list.add("名称:" + name + "  时间:" + time + " 内容:" + text);
+							}
+							HistoryActivity rfma = (HistoryActivity) rfm;
+
+							rfma.selectbyname(list);
+
+							Toast.makeText(getActivity(), "查找" + name2 + "短信息记录", Toast.LENGTH_SHORT).show();
+						} catch (Exception e) {
+							e.printStackTrace();
+						} finally {
+							cursor.close();
 						}
-						HistoryActivity rfma = (HistoryActivity) rfm;
-
-						rfma.selectbyname(list);
-
-						Toast.makeText(getActivity(), "查找" + name2 + "短信息记录", Toast.LENGTH_SHORT).show();
 					}
 					return true; // 不弹出子设备列表
 				} else {

@@ -18,23 +18,23 @@
             android:name=".db.PersonProvider"
             android:authorities="Personxxx" >
         </provider>
+
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="MEfrLtbKGAWZQho70mHnF9a5" />
+
         <activity
             android:name=".LoginActivity"
             android:label="@string/app_name"
             android:screenOrientation="landscape" >
-
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name="com.rtk.bdtest.MainActivity"
             android:screenOrientation="landscape" >
-                        <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name="com.rtk.bdtest.MainActivity2"
