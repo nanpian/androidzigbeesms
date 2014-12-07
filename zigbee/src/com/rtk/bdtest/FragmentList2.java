@@ -92,7 +92,7 @@ public class FragmentList2 extends Fragment {
 	public static String selfpadAddress = null;
 	private String selfpadId = null;
 	private SmsHelper smsHelper;
-	private static boolean isFirstTime = true;;
+	private boolean isFirstTime = true;;
 
 	private ContentObserver PersonObserver = new ContentObserver(new Handler()) {
 		public void onChange(boolean selfChange) {
@@ -323,15 +323,21 @@ public class FragmentList2 extends Fragment {
 	}
 
 	private void notifyDeviceB1(String data) {
-
+        Log.i(Tag,"dewei firsttime");
 		if (isFirstTime) {
+			Log.i(Tag,"first time dewei");
 			String devicename = selectNamewithId(data.substring(10, 14));
+			Log.i(Tag,"first time dewei devicename" + devicename);
 			if (devicename != null) {
 				devicesB.get(0).deviceName = devicename;
 				devicesB.get(0).deviceID = data.substring(10, 14);
+				HasInitSelf = true;
+				Log.i(Tag,"deweidewei");
 				isFirstTime = false;
 			} else {
 				devicesB.get(0).deviceName = "持有人";
+				HasInitSelf = true;
+				isFirstTime = false;
 			}
 		}
 
@@ -342,6 +348,7 @@ public class FragmentList2 extends Fragment {
 		devicesB.get(0).online = true;
 		devicesB.get(0).count = 5;
 		HasInitSelf = true;
+		mHandler.post(runnableUI2);
 		adapter.notifyDataSetChanged();
 		/*
 		 * for (int i = 0; i < devicesB.size(); i++) { if
@@ -630,6 +637,8 @@ public class FragmentList2 extends Fragment {
 					cursor = getActivity().getContentResolver().query(PersonProvider.CONTENT_URI, null, null, null, null);
 					deviceB1tmp = null;
 					deviceBtmp = null;
+					if(cursor!=null) Log.i(Tag,"cursor is not null");
+					else Log.i(Tag,"cursor is null");
 					boolean hasSelfName = false;
 					if (HasInitSelf) {
 						if (cursor != null) {
@@ -649,9 +658,8 @@ public class FragmentList2 extends Fragment {
 									String bindName = cursor.getString(1);
 									String bindId = cursor.getString(2);
 									updateA1(bindId, bindName);
-								} else
-								// 如果不在A1也不再A2上
-								{
+								} else {
+									// 如果不在A1也不再A2上
 									String nametmp = cursor.getString(1);
 									Log.i(Tag, "dewei dewei name is " + nametmp);
 									String bindid = cursor.getString(2);
@@ -699,25 +707,36 @@ public class FragmentList2 extends Fragment {
 
 	boolean isContainInA2(String bindid) {
 		if (HasInitSelf) {
-			if (devicesB.size() > 0) {
+			Log.i(Tag,"is contian A2");
+			if (devicesB.size() > 0 ) {
 				for (int i = 0; i < devicesB.size(); i++) {
-					if (devicesB.get(i).deviceID.equals(bindid))
+					if(devicesB.get(i).deviceID!=null) {
+					if (devicesB.get(i).deviceID.equals(bindid)){
+						Log.i(Tag,"is contain a2222");
 						return true;
+					}
+					}
 				}
 			}
+		} else {
+			Log.i(Tag,"is not init self");
+			return false;
 		}
 		return false;
 	}
 
 	boolean isCotainInA1(String bindid) {
 		if (HasInitSelf) {
+			Log.i(Tag,"enter is containina1");
 			if (devices.size() > 0) {
 				for (int i = 0; i < devices.size(); i++) {
-					if (devices.get(i).deviceID.equals(bindid))
+					if (devices.get(i).deviceID.equals(bindid)){
+						Log.i(Tag,"is equal a1");
 						return true;
+					}
 				}
 			}
-		}
+		} else return false;
 		return false;
 	}
 
@@ -940,6 +959,7 @@ public class FragmentList2 extends Fragment {
 		if (rfm instanceof MapActivity) {
 			reduceDeviceCount();
 		}
+		//mHandler.post(runnableUI2);
 
 	}
 

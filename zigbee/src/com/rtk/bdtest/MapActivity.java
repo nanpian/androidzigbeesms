@@ -68,7 +68,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 	private static BitmapDescriptor bdC = BitmapDescriptorFactory
 			.fromResource(R.drawable.icon_markb);
 
-	Runnable gpsselfRunnable = new Runnable() {
+/*	Runnable gpsselfRunnable = new Runnable() {
 		public void run() {
 			// 将GPS设备采集的原始GPS坐标转换成百度坐标
 			CoordinateConverter converter = new CoordinateConverter();
@@ -88,7 +88,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 			MapStatusUpdateFactory.newLatLng(jingwei);
 
 		}
-	};
+	};*/
 	public static boolean isVisble = true;
 	
 	public static Runnable markeFlashRunnable = new Runnable() {
@@ -354,8 +354,16 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 		importFromSDCard(mMapView);
 
 		mBaiduMap = mMapView.getMap();
-		//MapStatusUpdate msu = MapStatusUpdateFactory.zoomTo(14.0f);
-		//mBaiduMap.setMapStatus(msu);
+		LatLng cenpt = new LatLng(32.05253311, 118.80744145);
+        //定义地图状态
+        MapStatus mMapStatus = new MapStatus.Builder()
+        .target(cenpt)
+        .zoom(13)
+        .build();
+        //定义MapStatusUpdate对象，以便描述地图状态将要发生的变化
+        MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mMapStatus);
+        //改变地图状态
+        mBaiduMap.setMapStatus(mMapStatusUpdate);
 
 		initOverlay();
 

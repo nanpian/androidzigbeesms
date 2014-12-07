@@ -707,7 +707,7 @@ public class MainActivity extends FragmentActivity implements BindActivity.OnBin
 		 * DialogInterface dialoginterface, int i) { } }).show(); } break;
 		 */
 		case R.id.settings6: {
-			finish();
+			System.exit(0);
 		}
 			break;
 		}
