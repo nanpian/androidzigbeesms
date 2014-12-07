@@ -449,10 +449,12 @@ public class FragmentList2 extends Fragment {
 
 	public void notifyDeviceList(String data) {
 		try {
+			Log.i(Tag,"notify device list" +data);
 			boolean isContain = false;
 			if (devices.size() <= 0)
 				Toast.makeText(getActivity(), "未导入战士文件或者导入错误", Toast.LENGTH_SHORT);
 			for (int i = 0; i < devices.size(); i++) {
+				Log.i(Tag,"notify device list deviceid " + devices.get(i).deviceID + " xintiao deviceid" + data.substring(12, 16));
 				if (devices.get(i).deviceID.equals(data.substring(12, 16))) {
 					isContain = true;
 					devices.get(i).deviceID = data.substring(12, 16);
@@ -473,6 +475,7 @@ public class FragmentList2 extends Fragment {
 			}
 
 			if (!isContain) {
+				Log.i(Tag,"notify device list a1");
 				Device devicetmp = new Device();
 				devicetmp.deviceAddress = data.substring(6, 10);
 				devicetmp.deviceID = data.substring(10, 14);

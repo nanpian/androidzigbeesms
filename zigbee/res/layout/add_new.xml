@@ -65,15 +65,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:visibility="gone"
             android:hint="职务"
-            android:visibility="gone" />
+          />
 
         <EditText
             android:id="@+id/classl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="班级" />
+            android:hint="隶属" />
 
         <EditText
             android:id="@+id/year"

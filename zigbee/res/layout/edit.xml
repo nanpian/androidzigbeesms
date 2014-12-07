@@ -95,7 +95,7 @@
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="班级"
+                android:text="隶属"
                 android:textStyle="bold" />
 
             <TextView
