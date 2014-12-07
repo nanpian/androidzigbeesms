@@ -368,7 +368,6 @@ public class FragmentList_useless extends Fragment {
 							.create();
 					dialog2.show();
 				} else if (rfm instanceof HistoryActivity) {
-					if (send) {
 						String name2 = namelist.get(count);
 						//Fragment detailFragment = new HistoryActivity();
 						SmsHelper smsHelper = new SmsHelper(getActivity());
@@ -393,7 +392,12 @@ public class FragmentList_useless extends Fragment {
 							list.add("名称:" + name + "  时间:" + time + " 内容:" + text);
 						}
 						HistoryActivity rfma = (HistoryActivity)rfm;
-						rfma.selectbyname(list);
+						if (count == 0) {
+						 rfma.slectbyAll();
+						} else {
+							rfma.selectbyname(name2);
+						}
+							
 						Toast.makeText(getActivity(), "查找" + name2 + "发送短信息记录",
 								Toast.LENGTH_SHORT).show();
 					} else {
@@ -402,33 +406,20 @@ public class FragmentList_useless extends Fragment {
 						SmsHelper smsHelper = new SmsHelper(getActivity());
 						Cursor cursor = smsHelper.select(name2 , "false");
 						ArrayList<String> list = new ArrayList<String>();
-						list.clear();
-						while (cursor.moveToNext()) {
-							String name = cursor.getString(1);
-							String time = cursor.getString(2);
-							String text = cursor.getString(3);
-							list.add("名称:" + name + "  时间:" + time + " 内容:" + text);
-						}
+				
+
 						HistoryActivity rfma = (HistoryActivity)rfm;
 						
-						rfma.selectbyname(list);
-						//Fragment detailFragment = new HistoryActivity();
-						//Bundle mBundle = new Bundle();
-						//mBundle.putString("record_name", name2);
-						//mBundle.putString("record_send", "false");
-						//detailFragment.setArguments(mBundle);
-						//final FragmentManager fragmentManager = getActivity()
-						//		.getSupportFragmentManager();
-						//final FragmentTransaction fragmentTransaction = fragmentManager
-						//		.beginTransaction();
-						//fragmentTransaction.replace(R.id.detail_container,
-						//		detailFragment);
+						if (count == 0) {
+							 rfma.slectbyAll();
+							} else {
+								rfma.selectbyname(name2);
+							}
+
 						Toast.makeText(getActivity(), "查找" + name2 + "接收短信息记录",
 								Toast.LENGTH_SHORT).show();
 					}
-				} else {
 
-				}
 
 			}
 		});

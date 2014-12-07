@@ -207,6 +207,7 @@ public class FragmentList2 extends Fragment {
 					smsintent.putExtra("zigbee_sms", data);
 					smsintent.putExtra("smsSourAddr", addrtmp);
 					smsintent.putExtra("smsSourId", Idtmp);
+					getActivity().sendBroadcast(smsintent);
 				} else if (typetmp2.equals("09")) {
 					Toast.makeText(getActivity(), "收到队长绑定信息！", Toast.LENGTH_SHORT);
 					String bindName = data.substring(4);
@@ -214,12 +215,16 @@ public class FragmentList2 extends Fragment {
 					Log.i(Tag, "receive bind info from B    " + data + "  bind name is " + bindName + "bindId is " + bindId);
 					if ((bindName != null) && (bindId != null)) {
 						if (isContainInSQL(bindId)) {
+							Log.i(Tag, "receive bind info from B the name " + data.substring(4));
+							Log.i(Tag, "recevie bind info from B the name" + data.substring(0, 4));
 							ContentValues values = new ContentValues();
 							values.put("name", data.substring(4));
 							values.put("id", data.substring(0, 4));
 							String selection = "id= '" + data.substring(0, 4) + "'";
 							getActivity().getContentResolver().update(PersonProvider.CONTENT_URI, values, selection, null);
 						} else {
+							Log.i(Tag, "receive insert bind info from B the name " + data.substring(4));
+							Log.i(Tag, "recevie insert bind info from B the name" + data.substring(0, 4));
 							ContentValues values = new ContentValues();
 							values.put("name", data.substring(4));
 							values.put("id", data.substring(0, 4));
@@ -277,7 +282,7 @@ public class FragmentList2 extends Fragment {
 			while (cursor.moveToNext()) {
 				String id = cursor.getString(2);
 				if (id.equals(deviceId))
-					return false;
+					return true;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -285,7 +290,7 @@ public class FragmentList2 extends Fragment {
 			cursor.close();
 		}
 
-		return true;
+		return false;
 	}
 
 	public String selectNamewithId(String deviceId) {
@@ -323,21 +328,19 @@ public class FragmentList2 extends Fragment {
 	}
 
 	private void notifyDeviceB1(String data) {
-        Log.i(Tag,"dewei firsttime");
+		Log.i(Tag, "dewei firsttime");
 		if (isFirstTime) {
-			Log.i(Tag,"first time dewei");
+			Log.i(Tag, "first time dewei");
 			String devicename = selectNamewithId(data.substring(10, 14));
-			Log.i(Tag,"first time dewei devicename" + devicename);
+			Log.i(Tag, "first time dewei devicename" + devicename);
 			if (devicename != null) {
 				devicesB.get(0).deviceName = devicename;
 				devicesB.get(0).deviceID = data.substring(10, 14);
 				HasInitSelf = true;
-				Log.i(Tag,"deweidewei");
-				isFirstTime = false;
+				Log.i(Tag, "deweidewei");
 			} else {
 				devicesB.get(0).deviceName = "持有人";
 				HasInitSelf = true;
-				isFirstTime = false;
 			}
 		}
 
@@ -348,7 +351,10 @@ public class FragmentList2 extends Fragment {
 		devicesB.get(0).online = true;
 		devicesB.get(0).count = 5;
 		HasInitSelf = true;
-		mHandler.post(runnableUI2);
+		if (isFirstTime) {
+			mHandler.post(runnableUI2);
+		}
+		isFirstTime = false;
 		adapter.notifyDataSetChanged();
 		/*
 		 * for (int i = 0; i < devicesB.size(); i++) { if
@@ -637,17 +643,19 @@ public class FragmentList2 extends Fragment {
 					cursor = getActivity().getContentResolver().query(PersonProvider.CONTENT_URI, null, null, null, null);
 					deviceB1tmp = null;
 					deviceBtmp = null;
-					if(cursor!=null) Log.i(Tag,"cursor is not null");
-					else Log.i(Tag,"cursor is null");
+					if (cursor != null)
+						Log.i(Tag, "cursor is not null");
+					else
+						Log.i(Tag, "cursor is null");
 					boolean hasSelfName = false;
 					if (HasInitSelf) {
 						if (cursor != null) {
 							while (cursor.moveToNext()) {
 								Log.i(Tag, "The cursor is  id" + cursor.getString(2));
 								// 如果是自己
-								if( (selfpadId != null) && (cursor.getString(2).equals(selfpadId))) {
-										Log.i(Tag, "the self id is " + cursor.getString(2));
-										devicesB.get(0).deviceName = cursor.getString(1);
+								if ((selfpadId != null) && (cursor.getString(2).equals(selfpadId))) {
+									Log.i(Tag, "the self id is " + cursor.getString(2));
+									devicesB.get(0).deviceName = cursor.getString(1);
 								} else if (isContainInA2(cursor.getString(2))) {
 									Log.i(Tag, "the a2 id is " + cursor.getString(2));
 									String bindName = cursor.getString(1);
@@ -707,19 +715,19 @@ public class FragmentList2 extends Fragment {
 
 	boolean isContainInA2(String bindid) {
 		if (HasInitSelf) {
-			Log.i(Tag,"is contian A2");
-			if (devicesB.size() > 0 ) {
+			Log.i(Tag, "is contian A2");
+			if (devicesB.size() > 0) {
 				for (int i = 0; i < devicesB.size(); i++) {
-					if(devicesB.get(i).deviceID!=null) {
-					if (devicesB.get(i).deviceID.equals(bindid)){
-						Log.i(Tag,"is contain a2222");
-						return true;
-					}
+					if (devicesB.get(i).deviceID != null) {
+						if (devicesB.get(i).deviceID.equals(bindid)) {
+							Log.i(Tag, "is contain a2222");
+							return true;
+						}
 					}
 				}
 			}
 		} else {
-			Log.i(Tag,"is not init self");
+			Log.i(Tag, "is not init self");
 			return false;
 		}
 		return false;
@@ -727,16 +735,17 @@ public class FragmentList2 extends Fragment {
 
 	boolean isCotainInA1(String bindid) {
 		if (HasInitSelf) {
-			Log.i(Tag,"enter is containina1");
+			Log.i(Tag, "enter is containina1");
 			if (devices.size() > 0) {
 				for (int i = 0; i < devices.size(); i++) {
-					if (devices.get(i).deviceID.equals(bindid)){
-						Log.i(Tag,"is equal a1");
+					if (devices.get(i).deviceID.equals(bindid)) {
+						Log.i(Tag, "is equal a1");
 						return true;
 					}
 				}
 			}
-		} else return false;
+		} else
+			return false;
 		return false;
 	}
 
@@ -884,69 +893,14 @@ public class FragmentList2 extends Fragment {
 						}
 					}
 				} else if (rfm instanceof HistoryActivity) {
-
-					if (send) {
-						String name2 = devicesB.get(groupPosition).deviceName;
-						// Fragment detailFragment = new HistoryActivity();
-						SmsHelper smsHelper = new SmsHelper(getActivity());
-						// 从列表页面传递需要的参数到详情页面
-						// Bundle mBundle = new Bundle();
-						// mBundle.putString("record_name", name2);
-						// mBundle.putString("record_send", "true");
-						// detailFragment.setArguments(mBundle);
-						// final FragmentManager fragmentManager = getActivity()
-						// .getSupportFragmentManager();
-						// final FragmentTransaction fragmentTransaction =
-						// fragmentManager
-						// .beginTransaction();
-						// fragmentTransaction.replace(R.id.detail_container,
-						// detailFragment);
-						Cursor cursor = null;
-						try {
-							cursor = smsHelper.select(name2, "true");
-							ArrayList<String> list = new ArrayList<String>();
-							list.clear();
-							while (cursor.moveToNext()) {
-								String name = cursor.getString(1);
-								String time = cursor.getString(2);
-								String text = cursor.getString(3);
-								list.add("名称:" + name + "  时间:" + time + " 内容:" + text);
-							}
-							HistoryActivity rfma = (HistoryActivity) rfm;
-							rfma.selectbyname(list);
-							Toast.makeText(getActivity(), "查找" + name2 + "短信息记录", Toast.LENGTH_SHORT).show();
-						} catch (Exception e) {
-							e.printStackTrace();
-						} finally {
-							cursor.close();
-						}
-
+					String name2 = devicesB.get(groupPosition).deviceName;
+					HistoryActivity rfma = (HistoryActivity) rfm;
+					if (groupPosition == 0) {
+						rfma.slectbyAll();
 					} else {
-						String name2 = devicesB.get(groupPosition).deviceName;
-						// Fragment detailFragment = new HistoryActivity();
-						Cursor cursor = null;
-						try {
-							SmsHelper smsHelper = new SmsHelper(getActivity());
-							cursor = smsHelper.select(name2, "false");
-							ArrayList<String> list = new ArrayList<String>();
-							list.clear();
-							while (cursor.moveToNext()) {
-								String name = cursor.getString(1);
-								String time = cursor.getString(2);
-								String text = cursor.getString(3);
-								list.add("名称:" + name + "  时间:" + time + " 内容:" + text);
-							}
-							HistoryActivity rfma = (HistoryActivity) rfm;
-
-							rfma.selectbyname(list);
-
-							Toast.makeText(getActivity(), "查找" + name2 + "短信息记录", Toast.LENGTH_SHORT).show();
-						} catch (Exception e) {
-							e.printStackTrace();
-						} finally {
-							cursor.close();
-						}
+						rfma.selectbyname(name2);
 					}
+					Toast.makeText(getActivity(), "查找" + name2 + "短信息记录", Toast.LENGTH_SHORT).show();
 					return true; // 不弹出子设备列表
 				} else {
 
@@ -959,7 +913,7 @@ public class FragmentList2 extends Fragment {
 		if (rfm instanceof MapActivity) {
 			reduceDeviceCount();
 		}
-		//mHandler.post(runnableUI2);
+		// mHandler.post(runnableUI2);
 
 	}
 

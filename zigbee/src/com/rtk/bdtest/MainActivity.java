@@ -406,6 +406,12 @@ public class MainActivity extends FragmentActivity implements BindActivity.OnBin
 		Log.i(Tag, "send data2 zigbee!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		hexStringToBytesF = tmp111;
 		zigbeeService.sendData2Zigbee(hexStringToBytesF);
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		// handler.post(runnableSendSms);
 		// handler.removeCallbacks(runnableSendSms);
 

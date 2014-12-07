@@ -91,6 +91,7 @@ public class BDService extends Service{
 						gpsintent.setAction("ACTION_UPDATE_SELF_GPS");
 						defaultLatitude = gpsstring.substring(20, 48);
 						defaultLongitude = gpsstring.substring(34, 46);
+						try {
 						String longitude = defaultLatitude.split(",")[2];
 						String latitude = defaultLatitude.split(",")[0];
 						Double longitudef = Double.parseDouble(longitude) * 0.01f;
@@ -105,6 +106,9 @@ public class BDService extends Service{
 								+ " The latitude is " + latitudef);
 						sendBroadcast(gpsintent);
 						sendBroadcast(gpssend);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 				} 
 				}
