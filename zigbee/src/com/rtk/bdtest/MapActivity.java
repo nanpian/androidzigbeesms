@@ -50,18 +50,18 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 
 	private MapView mMapView;
 	private static BaiduMap mBaiduMap;
-	private static Marker mMarkerSelf ;
-	private static Marker mMarkerSelf2 ;
+	private static Marker mMarkerSelf;
+	private static Marker mMarkerSelf2;
 	private InfoWindow mInfoWindow;
 	private MKOfflineMap mOffline = null;
 	private final static String Tag = "MapActivity";
 	private static final int MSG_UPDATE_SELF_GPS = 0;
 	private static final int MSG_UPDATE_SMS = 2;
 	private static LatLng jingwei2;
-	private static String smsdata;
-	private static String addrtmp;
-	private static String Idtmp;
-	private static String typetmp;
+	private String smsdata;
+	private String addrtmp;
+	private String Idtmp;
+	private String typetmp;
 	// 默认南京经纬度
 	private static double[] jingwei = { 0, 0 };
 	public static ArrayList<Device> gpsdevices;
@@ -136,7 +136,13 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 				LatLng desLatLng = converter.convert();
 				Log.i(Tag, "The destination convert gps lat is " + desLatLng.latitude + " the lng is " + desLatLng.longitude);
 				// LatLng jingwei2 = new LatLng(jingwei[1], jingwei[0]);
-				OverlayOptions selfgps = new MarkerOptions().position(desLatLng).icon(bdC).title("自己").perspective(false).anchor(0.5f, 0.5f).rotate(30).zIndex(7);
+				OverlayOptions selfgps;
+				if (bdC == null) {
+					bdC = BitmapDescriptorFactory.fromResource(R.drawable.icon_markb);
+					selfgps = new MarkerOptions().position(desLatLng).icon(bdC).title("自己").perspective(false).anchor(0.5f, 0.5f).rotate(30).zIndex(7);
+				} else {
+					selfgps = new MarkerOptions().position(desLatLng).icon(bdC).title("自己").perspective(false).anchor(0.5f, 0.5f).rotate(30).zIndex(7);
+				}
 				mMarkerSelf = (Marker) (mBaiduMap.addOverlay(selfgps));
 				MapStatusUpdateFactory.newLatLng(jingwei2);
 				break;
@@ -225,14 +231,9 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 					Log.i(Tag, "The destination convert gps lat is " + desLatLng.latitude + " the lng is " + desLatLng.longitude);
 					if (mMarkerSelf == null) {
 						OverlayOptions selfgps = new MarkerOptions().title("自己").position(desLatLng).icon(bdC).perspective(false).anchor(0.5f, 0.5f).rotate(30).zIndex(7);
-						OverlayOptions textOption = new TextOptions()  
-					    .bgColor(0xAAFFFF00)  
-					    .fontSize(24)  
-					    .fontColor(0xFFFF00FF)  
-					    .text("自己")  
-					    .position(desLatLng);
+						OverlayOptions textOption = new TextOptions().bgColor(0xAAFFFF00).fontSize(24).fontColor(0xFFFF00FF).text("自己").position(desLatLng);
 						mMarkerSelf = (Marker) (mBaiduMap.addOverlay(selfgps));
-		
+
 						MapStatus mMapStatus = new MapStatus.Builder().target(desLatLng).zoom(12).build();
 						MapStatusUpdate status = MapStatusUpdateFactory.newMapStatus(mMapStatus);
 						mBaiduMap.setMapStatus(status);
@@ -368,6 +369,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 
 		mBaiduMap.setOnMarkerClickListener(new OnMarkerClickListener() {
 			public boolean onMarkerClick(final Marker marker) {
+				mMarkerSelf.setVisible(true);
 				Button button = new Button(getActivity());
 				button.setBackgroundResource(R.drawable.popup);
 				OnInfoWindowClickListener listener = null;
@@ -427,60 +429,19 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 									}
 								});
 							}
+							Log.i(Tag, "dewei dewei click click");
 							listener = new OnInfoWindowClickListener() {
 								public void onInfoWindowClick() {
 									for (int i = 0; i < gpsdevices.size(); i++) {
 										if ((gpsdevices.get(i).gpsMarker != null) && (marker == gpsdevices.get(0).gpsMarker)) {
 											mBaiduMap.hideInfoWindow();
-											mMarkerSelf.setVisible(true);
-										} else {
-											mBaiduMap.hideInfoWindow();
-											mMarkerSelf.setVisible(true);
-											/*
-											 * final String name2 =
-											 * gpsdevices.get(i).deviceName;
-											 * final String addrtmp =
-											 * gpsdevices.get(i).deviceAddress;
-											 * final String idtmp =
-											 * gpsdevices.get(i).deviceID;
-											 * if(gpsdevices
-											 * .get(i).deviceType.equals
-											 * ("01"))return; final EditText
-											 * mInput2 = new
-											 * EditText(getActivity());
-											 * mInput2.setMaxLines(4); new
-											 * AlertDialog
-											 * .Builder(getActivity())
-											 * .setTitle("给" + name2 +
-											 * "发送短信息:").
-											 * setView(mInput2).setPositiveButton
-											 * ("发送", new
-											 * DialogInterface.OnClickListener()
-											 * { private SmsHelper smsHelper;
-											 * 
-											 * @Override public void
-											 * onClick(DialogInterface dialog,
-											 * int which) { String sms =
-											 * mInput2.getText().toString();
-											 * String destAddr = addrtmp; String
-											 * destId = idtmp;
-											 * MainActivity.instance
-											 * .sendSMS(sms, destAddr, destId);
-											 * Date tmpDate = new Date();
-											 * SimpleDateFormat formatt = new
-											 * SimpleDateFormat
-											 * ("yyyy年MM月dd日HH时mm分ss秒"); String
-											 * xx = formatt.format(tmpDate);
-											 * smsHelper = new
-											 * SmsHelper(getActivity());
-											 * smsHelper.insert(name2, xx, sms,
-											 * "true"); }
-											 * }).setNegativeButton(R.
-											 * string.cancel,
-											 * null).create().show();
-											 */}
+											// if (smsdata != null) {
+											showAnswerDialog();
+											// }
+										}
 									}
 								}
+
 							};
 							Log.i(Tag, " show uread message");
 							LatLng ll = marker.getPosition();
@@ -494,6 +455,41 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 		});
 	}
 
+	private void showAnswerDialog() {
+		// TODO 回复短信息
+		try {
+			Log.i(Tag, "gps device is unread xxxx ");
+
+			final EditText mInput2 = new EditText(getActivity());
+
+			mInput2.setMaxLines(4);
+			new AlertDialog.Builder(getActivity()).setTitle("回复短信:").setView(mInput2).setPositiveButton("发送", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface arg0, int arg1) {
+					String sms = mInput2.getText().toString();
+					String destAddr = addrtmp;
+					String destId = Idtmp;
+
+					Date tmpDate = new Date();
+					SimpleDateFormat formatt = new SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒");
+					String xx = formatt.format(tmpDate);
+					SmsHelper smsHelper;
+					smsHelper = new SmsHelper(getActivity());
+					for (int i = 0; i < gpsdevices.size(); i++) {
+						if (gpsdevices.get(i).getDeviceID().equals(destId)) {
+							smsHelper.insert(gpsdevices.get(i).getDeviceName(), xx, sms, "true");
+						}
+					}
+					MainActivity.instance.sendSMS(sms, destAddr, destId);
+				}
+
+			}).setNegativeButton(R.string.cancel, null).create().show();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
 	public void initOverlay() {
 		CoordinateConverter converter = new CoordinateConverter();
 		converter.from(CoordType.GPS);
@@ -503,7 +499,6 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 		LatLng desLatLng = converter.convert();
 		OverlayOptions ooC = new MarkerOptions().position(desLatLng).title("自己").icon(bdC).perspective(false).anchor(0.5f, 0.5f).rotate(30).zIndex(7);
 		mMarkerSelf = (Marker) (mBaiduMap.addOverlay(ooC));
-		
 
 	}
 
@@ -558,7 +553,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 		mMapView.onDestroy();
 		mBaiduMap = null;
 		super.onDestroy();
-		bdC.recycle();
+		// bdC.recycle();
 
 	}
 

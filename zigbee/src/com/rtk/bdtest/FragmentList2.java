@@ -20,6 +20,7 @@ import com.rtk.bdtest.adapter.DeviceListAdapter;
 import com.rtk.bdtest.db.DbDeviceHelper;
 import com.rtk.bdtest.db.PersonProvider;
 import com.rtk.bdtest.db.SmsHelper;
+import com.rtk.bdtest.sharedpreference.ZigbeeSharedPreference;
 import com.rtk.bdtest.util.Device;
 import com.rtk.bdtest.util.gpsDevice;
 
@@ -264,6 +265,8 @@ public class FragmentList2 extends Fragment {
 				}
 			} else if (intent.getAction().equals("ACTION_GET_SELF_INFO")) {
 				padinfo = intent.getExtras().getString("self_data");
+				ZigbeeSharedPreference  zSp = new ZigbeeSharedPreference(getActivity());
+				zSp.setSelfData(padinfo);
 				Log.i(Tag, "Receive get self info  intent , the data is " + padinfo);
 
 				notifyDeviceB1(padinfo);

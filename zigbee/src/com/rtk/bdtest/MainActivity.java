@@ -19,6 +19,7 @@ import com.rtk.bdtest.db.DbDeviceHelper;
 import com.rtk.bdtest.service.*;
 import com.rtk.bdtest.service.BDService.BDBinder;
 import com.rtk.bdtest.service.ZigbeeSerivce.ZigbeeBinder;
+import com.rtk.bdtest.sharedpreference.ZigbeeSharedPreference;
 import com.rtk.bdtest.util.DesCrypt;
 
 import android.content.BroadcastReceiver;
@@ -113,11 +114,14 @@ public class MainActivity extends FragmentActivity implements BindActivity.OnBin
 
 	public void sendLocation() {
 		FragmentManager rightfm = this.getSupportFragmentManager();
-		Fragment lfm = rightfm.findFragmentById(R.id.list_container);
-		if (((FragmentList2) lfm).padinfo != null) {
-			Log.i(Tag, "The pad info address is " + ((FragmentList2) lfm).padinfo.substring(4, 8));
-			if (lfm instanceof FragmentList2) {
-				padAddress = ((FragmentList2) lfm).padinfo.substring(4, 8);
+	    Fragment lfm = rightfm.findFragmentById(R.id.list_container);
+		ZigbeeSharedPreference  zSp = new ZigbeeSharedPreference(getActivity());
+		String padinfo = zSp.getSelfData();
+		//if (((FragmentList2) lfm).padinfo != null) {
+		if(padinfo!=null)
+			//Log.i(Tag, "The pad info address is " + ((FragmentList2) lfm).padinfo.substring(4, 8));
+			//if (lfm instanceof FragmentList2) {
+				padAddress = padinfo.substring(4, 8);
 				if (!padAddress.equals("")) {
 					byte[] temp = new byte[("3002" + padAddress).getBytes().length + (defaultLatitude).getBytes().length + 2];
 					// byte[] temp = CharConverter.hexStringToBytes("3002") +
@@ -131,8 +135,8 @@ public class MainActivity extends FragmentActivity implements BindActivity.OnBin
 					sendData2Zigbee(temp);
 				}
 			}
-		}
-	}
+		//}
+	//}
 
 	@Override
 	protected void onPause() {
@@ -613,13 +617,14 @@ public class MainActivity extends FragmentActivity implements BindActivity.OnBin
 			detailFragment.setArguments(arguments);
 			final FragmentManager fragmentManager = this.getSupportFragmentManager();
 			final FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-			fragmentTransaction.addToBackStack(null);
+
 			fragmentTransaction.replace(R.id.detail_container, detailFragment);
 
-			Fragment listFragment = new FragmentList2();
+			Fragment listFragment = new HistroyNameFragment();
 			listFragment.setArguments(arguments);
 			fragmentTransaction.replace(R.id.list_container, listFragment);
-
+			
+			fragmentTransaction.addToBackStack(null);
 			fragmentTransaction.commit();
 		}
 			break;
@@ -647,6 +652,8 @@ public class MainActivity extends FragmentActivity implements BindActivity.OnBin
 			Fragment detailFragment = new MapActivity();
 			final FragmentManager fragmentManager = this.getSupportFragmentManager();
 			final FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+			Fragment listFragment = new FragmentList2();
+			fragmentTransaction.replace(R.id.list_container, listFragment);
 			fragmentTransaction.replace(R.id.detail_container, detailFragment);
 			fragmentTransaction.commit();
 		}
