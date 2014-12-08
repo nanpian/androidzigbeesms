@@ -20,6 +20,7 @@ import com.rtk.bdtest.adapter.DeviceListAdapter;
 import com.rtk.bdtest.db.DbDeviceHelper;
 import com.rtk.bdtest.db.PersonProvider;
 import com.rtk.bdtest.db.SmsHelper;
+import com.rtk.bdtest.db.TeamProvider;
 import com.rtk.bdtest.sharedpreference.ZigbeeSharedPreference;
 import com.rtk.bdtest.util.Device;
 import com.rtk.bdtest.util.gpsDevice;
@@ -221,15 +222,33 @@ public class FragmentList2 extends Fragment {
 							ContentValues values = new ContentValues();
 							values.put("name", data.substring(4));
 							values.put("id", data.substring(0, 4));
-							String selection = "id= '" + data.substring(0, 4) + "'";
-							getActivity().getContentResolver().update(PersonProvider.CONTENT_URI, values, selection, null);
+							ZigbeeSharedPreference  zSp = new ZigbeeSharedPreference(getActivity());
+							String selfId = zSp.getSeflId();
+							if(bindId.equals(selfId)) {
+								Log.i(Tag,"self id is "+ selfId);
+							    String selection = "id= '" + data.substring(0, 4) + "'";
+							    getActivity().getContentResolver().update(PersonProvider.CONTENT_URI, values, selection, null);
+							} else {
+								values.put("beizhu", "others");
+							    String selection = "id= '" + data.substring(0, 4) + "'";
+							    getActivity().getContentResolver().update(PersonProvider.CONTENT_URI, values, selection, null);
+							}
 						} else {
 							Log.i(Tag, "receive insert bind info from B the name " + data.substring(4));
 							Log.i(Tag, "recevie insert bind info from B the name" + data.substring(0, 4));
 							ContentValues values = new ContentValues();
 							values.put("name", data.substring(4));
 							values.put("id", data.substring(0, 4));
-							getActivity().getContentResolver().insert(PersonProvider.CONTENT_URI, values);
+							ZigbeeSharedPreference  zSp = new ZigbeeSharedPreference(getActivity());
+							String selfId = zSp.getSeflId();
+							if(bindId.equals(selfId)) {
+								Log.i(Tag,"self id is "+ selfId);
+							    getActivity().getContentResolver().insert(PersonProvider.CONTENT_URI, values);
+							} else {
+								values.put("beizhu", "others");
+							    getActivity().getContentResolver().insert(PersonProvider.CONTENT_URI, values);
+							}
+							//getActivity().getContentResolver().insert(PersonProvider.CONTENT_URI, values);
 						}
 					}
 
@@ -267,6 +286,7 @@ public class FragmentList2 extends Fragment {
 				padinfo = intent.getExtras().getString("self_data");
 				ZigbeeSharedPreference  zSp = new ZigbeeSharedPreference(getActivity());
 				zSp.setSelfData(padinfo);
+				zSp.setSelfId(padinfo.substring(10,14));
 				Log.i(Tag, "Receive get self info  intent , the data is " + padinfo);
 
 				notifyDeviceB1(padinfo);

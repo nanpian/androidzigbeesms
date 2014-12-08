@@ -33,6 +33,7 @@ public class PersonProvider extends ContentProvider {
 	private static final String DEVICE_PADDRESS = "parentaddress";
 	private static final String  DEVICE_BANJI ="banji";
 	private static final String DEVICE_STATUS = "status";
+	private static final String DEVICE_OTHER = "other";
 	// 授权“域名”,必须唯一，且与AndroidManifest里面注册的须一致
 	private final static String AUTHORITY = "Personxxx";
 	private static final UriMatcher URI_MATCHER;
