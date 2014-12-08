@@ -462,9 +462,10 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 								public void onInfoWindowClick() {
 									for (int i = 0; i < gpsdevices.size(); i++) {
 										if ((gpsdevices.get(i).gpsMarker != null) && (marker == gpsdevices.get(0).gpsMarker)) {
-											mBaiduMap.hideInfoWindow();
 											// if (smsdata != null) {
-											showAnswerDialog();
+											showAnswerDialog();			
+											mBaiduMap.hideInfoWindow();
+											break;
 											// }
 										}
 									}
