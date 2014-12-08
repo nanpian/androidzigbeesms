@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">zigbee</string>
+    <string name="app_name">野外定位系统</string>
     <string name="login">登陆界面</string>
     <string name="username">用户名:</string>
     <string name="password">密    码 ：</string>
