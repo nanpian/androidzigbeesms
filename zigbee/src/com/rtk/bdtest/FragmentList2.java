@@ -94,7 +94,8 @@ public class FragmentList2 extends Fragment {
 	public static String selfpadAddress = null;
 	private String selfpadId = null;
 	private SmsHelper smsHelper;
-	private boolean isFirstTime = true;;
+	private boolean isFirstTime = true;
+	private boolean isFirstTime2 = true;
 
 	private ContentObserver PersonObserver = new ContentObserver(new Handler()) {
 		public void onChange(boolean selfChange) {
@@ -424,6 +425,10 @@ public class FragmentList2 extends Fragment {
 				deviceB2.deviceAddress = data.substring(6, 10);
 				devicesB.add(deviceB2);
 				adapter.notifyDataSetChanged();
+			}
+			if (isFirstTime2) {
+				mHandler.post(runnableUI2);
+				isFirstTime2 = false;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

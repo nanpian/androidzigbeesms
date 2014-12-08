@@ -59,7 +59,6 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 	private static BaiduMap mBaiduMap;
 	private static Marker mMarkerSelf;
 	private static Marker mMarkerSelf2;
-	private Marker mMarkerSelf11;
 	private InfoWindow mInfoWindow;
 	private MKOfflineMap mOffline = null;
 	private final static String Tag = "MapActivity";
@@ -127,7 +126,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 
 				break;
 			case MSG_UPDATE_SELF_GPS:
-				// 经纬度换算
+/*				// 经纬度换算
 				// 将GPS设备采集的原始GPS坐标转换成百度坐标
 				CoordinateConverter converter = new CoordinateConverter();
 				converter.from(CoordType.GPS);
@@ -147,12 +146,12 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 				OverlayOptions selfgps;
 				if (bdC == null) {
 					bdC = BitmapDescriptorFactory.fromResource(R.drawable.icon_markb);
-					selfgps = new MarkerOptions().position(desLatLng).icon(bdC).title("自己").perspective(false).anchor(0.5f, 0.5f).rotate(30).zIndex(7);
+					selfgps = new MarkerOptions().position(desLatLng).icon(bdC).title("自己").perspective(false).anchor(0.5f, 0.5f).zIndex(7);
 				} else {
-					selfgps = new MarkerOptions().position(desLatLng).icon(bdC).title("自己").perspective(false).anchor(0.5f, 0.5f).rotate(30).zIndex(7);
+					selfgps = new MarkerOptions().position(desLatLng).icon(bdC).title("自己").perspective(false).anchor(0.5f, 0.5f).zIndex(7);
 				}
 				mMarkerSelf = (Marker) (mBaiduMap.addOverlay(selfgps));
-				MapStatusUpdateFactory.newLatLng(jingwei2);
+				MapStatusUpdateFactory.newLatLng(jingwei2);*/
 				break;
 			}
 
@@ -222,13 +221,6 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 					if (((FragmentList2) lfm).devicesB.size() > 0) {
 						gpsdevices = ((FragmentList2) lfm).devicesB;
 					}
-					// GpsCorrect.transform(latitude, longitude, jingwei);
-					// Log.i(Tag,
-					// "update self gps  jiupian  info the longitude is "
-					// + jingwei[0]
-					// + "the latitude is " + jingwei[1]);
-					// jingwei[0] = longitude;
-					// jingwei[1] = latitude;
 					jingwei2 = new LatLng(latitude, longitude);
 					Log.i(Tag, "The convert self gps lat is " + jingwei2.latitude + " the lng is " + jingwei2.longitude);
 					// 将GPS设备采集的原始GPS坐标转换成百度坐标
@@ -239,8 +231,8 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 
 					LatLng desLatLng = converter.convert();
 					Log.i(Tag, "The destination convert gps lat is " + desLatLng.latitude + " the lng is " + desLatLng.longitude);
-					if (mMarkerSelf == null) {
-						OverlayOptions selfgps = new MarkerOptions().title("自己").position(desLatLng).icon(bdC).perspective(false).anchor(0.5f, 0.5f).rotate(30).zIndex(7);
+					if (mMarkerSelf == null) {/*
+						OverlayOptions selfgps = new MarkerOptions().title("自己").position(desLatLng).icon(bdC).perspective(false).anchor(0.5f, 0.5f).zIndex(7);
 						OverlayOptions textOption = new TextOptions().bgColor(0xAAFFFF00).fontSize(24).fontColor(0xFFFF00FF).text("自己").position(desLatLng);
 						mMarkerSelf = (Marker) (mBaiduMap.addOverlay(selfgps));
 
@@ -255,7 +247,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 							}
 						}
 						// .newLatLng(jingwei2);
-					} else {
+					*/} else {
 						// mMarkerSelf.setPosition(jingwei2);
 						Log.i(Tag, " new position!");
 						LatLng temp = mMarkerSelf.getPosition();
@@ -268,7 +260,6 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 
 						LatLng desLatLng2 = converter2.convert();
 						mMarkerSelf.setPosition(desLatLng2);
-						mMarkerSelf11.setPosition(desLatLng2);
 						for (int i = 0; i < gpsdevices.size(); i++) {
 							if (gpsdevices.get(i).deviceName != null) {
 								if (i == 0) {
@@ -280,17 +271,13 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				// Message gpsMessage = new Message();
-				// gpsMessage.what = MSG_UPDATE_SELF_GPS;
-				// gpsMessage.obj = jingwei;
-				// gpsHandler.sendMessage(gpsMessage);
-
 			} else if (gpsIntent.getAction().equals("ACTION_UPDATE_GPS_INFO")) {
 				try {
 					String jingweidu = gpsIntent.getExtras().getString("gps");
-					Log.i(Tag, "the source jingweidu is " + jingweidu);
 					String deviceAddress = gpsIntent.getExtras().getString("address");
+					Log.i(Tag, "the source jingweidu is " + jingweidu + " address" +deviceAddress);
 					if (gpsdevices != null) {
+						Log.i(Tag,"dewei address");
 						if (gpsdevices.size() > 0) {
 							for (int i = 0; i < gpsdevices.size(); i++) {
 								if (gpsdevices.get(i).getDeviceAddress().equals(deviceAddress)) {
@@ -326,11 +313,11 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 						Log.i(Tag, "The destinationssssss convert gps lat is " + desLatLng.latitude + " the lng is " + desLatLng.longitude);
 						if (mMarkerSelf2 == null) {
 							if (otherName == null) {
-								selfgps = new MarkerOptions().position(desLatLng).title("自己").icon(BitmapDescriptorFactory.fromBitmap(getBitMap(""))).perspective(false).anchor(0.5f, 0.5f).rotate(30)
+								selfgps = new MarkerOptions().position(desLatLng).title("自己").icon(BitmapDescriptorFactory.fromBitmap(getBitMap(""))).perspective(false).anchor(0.5f, 0.5f)
 										.zIndex(7);
 							} else {
 								selfgps = new MarkerOptions().position(desLatLng).title("自己").icon(BitmapDescriptorFactory.fromBitmap(getBitMap(otherName))).perspective(false).anchor(0.5f, 0.5f)
-										.rotate(30).zIndex(7);
+										.zIndex(7);
 							}
 							mMarkerSelf2 = (Marker) (mBaiduMap.addOverlay(selfgps));
 
@@ -338,6 +325,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 								if (gpsdevices.get(i).deviceAddress != null) {
 									if (gpsdevices.get(i).deviceAddress.equals(deviceAddress)) {
 										gpsdevices.get(i).gpsMarker = mMarkerSelf2;
+										
 									}
 								}
 							}
@@ -347,6 +335,19 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 
 						} else {
 							Log.i(Tag, " new positiosssssn!");
+							if (((FragmentList2) lfm).devicesB.size() > 0) {
+								gpsdevices = ((FragmentList2) lfm).devicesB;
+							}
+							for (int i = 0; i < gpsdevices.size(); i++) {
+								if (gpsdevices.get(i).deviceAddress != null) {
+									if (gpsdevices.get(i).deviceAddress.equals(deviceAddress)) {
+										gpsdevices.get(i).gpsMarker = mMarkerSelf2;
+										MarkerOptions selfgps11 = new MarkerOptions().position(desLatLng).title("自己").icon(BitmapDescriptorFactory.fromBitmap(getBitMap(gpsdevices.get(i).deviceName))).perspective(false).anchor(0.5f, 0.5f)
+												.zIndex(7);
+										mMarkerSelf2 = (Marker) (mBaiduMap.addOverlay(selfgps11));
+									}
+								}
+							}
 							LatLng temp = mMarkerSelf2.getPosition();
 							Log.i(Tag, "new positionssss" + temp.latitude + "  " + temp.longitude);
 							// LatLng llNew = new LatLng(latitude,longitude);
@@ -474,6 +475,8 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 							LatLng ll = marker.getPosition();
 							mInfoWindow = new InfoWindow(BitmapDescriptorFactory.fromView(button), ll, -47, listener);
 							mBaiduMap.showInfoWindow(mInfoWindow);
+						} else {
+							Log.i(Tag,"dewei oh no!");
 						}
 					}
 				}
@@ -531,9 +534,9 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 		bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight());
 		Canvas canvas = new Canvas(bitmap);
 		TextPaint textPaint = new TextPaint();
-		textPaint.setTextSize(20f);
+		textPaint.setTextSize(18f);
 		textPaint.setColor(Color.RED);
-		canvas.drawText(text, 30, 30, textPaint);// 设置bitmap上面的文字位置
+		canvas.drawText(text, 0, 35, textPaint);// 设置bitmap上面的文字位置
 		return bitmap;
 	}
 
@@ -551,18 +554,24 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 
 	}
 
+
 	/**
-	 * �������Overlay
-	 * 
+	*  日期 2014-12-8
+	*  作者 lenovo
+	*  说明 zhudewei
+	*  返回 void
 	 * @param view
 	 */
 	public void clearOverlay(View view) {
 		mBaiduMap.clear();
 	}
 
+
 	/**
-	 * �������Overlay
-	 * 
+	*  日期 2014-12-8
+	*  作者 zhudewei
+	*  说明 TODO
+	*  返回 void
 	 * @param view
 	 */
 	public void resetOverlay(View view) {
