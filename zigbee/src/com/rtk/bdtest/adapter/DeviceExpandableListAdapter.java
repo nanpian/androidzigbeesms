@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,23 +94,29 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 		holder.id = (TextView) convertView.findViewById(R.id.device_id);
 		holder.parentAddress = (TextView) convertView
 				.findViewById(R.id.parent_address);
-		holder.name.setText("名称:" + listB.get(groupPosition).deviceName);
+		holder.name.setText( listB.get(groupPosition).deviceName);
 		if ((listB.get(groupPosition) != null)
 				&& (listB.get(groupPosition).online)) {
+			Log.i("deweitype","type is list "+listB.get(groupPosition).type);
 			    if(listB.get(groupPosition)==null) holder.online.setImageResource(R.drawable.online);
-			    else if(listB.get(groupPosition).deviceType == null) holder.online.setImageResource(R.drawable.online);
-			    else if(listB.get(groupPosition).deviceType.equals("01")){
-					 holder.online.setImageResource(R.drawable.c1_online);
-				} else {
-                 holder.online.setImageResource(R.drawable.online);
+			    else if(listB.get(groupPosition).type == null) holder.online.setImageResource(R.drawable.online);
+			    else if(listB.get(groupPosition).type.equals("人")){
+					 holder.online.setImageResource(R.drawable.online);
+			    }else if(listB.get(groupPosition).type.equals("物资")){
+                     holder.online.setImageResource(R.drawable.wuzi_online);
+				}else if(listB.get(groupPosition).type.equals("装备")){
+					holder.online.setImageResource(R.drawable.zhuangbei_online);
 				}
 		} else {
+			Log.i("deweitype","type is list "+listB.get(groupPosition).type);
 			    if(listB.get(groupPosition)==null) holder.online.setImageResource(R.drawable.offline);
-			    else if(listB.get(groupPosition).deviceType == null) holder.online.setImageResource(R.drawable.offline);
-			    else if(listB.get(groupPosition).deviceType.equals("01")){
-					 holder.online.setImageResource(R.drawable.c1_offline);
-				} else {
-                holder.online.setImageResource(R.drawable.offline);
+			    else if(listB.get(groupPosition).type == null) holder.online.setImageResource(R.drawable.offline);
+			    else if(listB.get(groupPosition).type.equals("人")){
+					 holder.online.setImageResource(R.drawable.offline);
+			    }else if(listB.get(groupPosition).type.equals("物资")){
+                     holder.online.setImageResource(R.drawable.wuzi_offline);
+				}else if(listB.get(groupPosition).type.equals("装备")){
+					holder.online.setImageResource(R.drawable.zhuangbei_offline);
 				}
 		}
 	
@@ -121,14 +128,7 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 		holder.parentAddress.setText(context
 				.getString(R.string.device_parent_address)
 				+ listB.get(groupPosition).parentAddress);
-		// 在线和不在线颜色不同
-/*		if (!(listB.get(groupPosition).online)) {
-			convertView.setBackgroundColor(this.context.getResources()
-					.getColor(R.color.white));
-		} else {
-			convertView.setBackgroundColor(this.context.getResources()
-					.getColor(R.color.green));
-		}*/
+
 		return convertView;
 	}
 
@@ -146,38 +146,32 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 		holder.id = (TextView) convertView.findViewById(R.id.device_id);
 		holder.parentAddress = (TextView) convertView
 				.findViewById(R.id.parent_address);
-		holder.name.setText("名称:"
-				+ listA.get(groupPosition).get(childPosition).deviceName);
-		/*if ((listA.get(groupPosition).get(childPosition) != null)
-				&& (listA.get(groupPosition).get(childPosition).online)) {
-			holder.online.setText("在线");
-		} else {
-			holder.online.setText("离线");
-		}*/
+		holder.name.setText(listA.get(groupPosition).get(childPosition).deviceName);
 		if ((listA.get(groupPosition).get(childPosition) != null)
 				&& (listA.get(groupPosition).get(childPosition).online)) {
-			if(listA.get(groupPosition).get(childPosition).unread) {
-				holder.online.setImageResource(R.drawable.online);
-			/*	 BadgeView badgeView = new BadgeView(context,holder.online);
-			        badgeView.setText("在线");
-			        //badgeView.setTextSize(5.5f);
-			        //badgeView.setTextColor(Color.DKGRAY);
-			        badgeView.show();*/
-			} else {
-				holder.online.setImageResource(R.drawable.online);
-	/*		 BadgeView badgeView = new BadgeView(context,holder.online);
-		        badgeView.setText("在线");
-		        //badgeView.setTextSize(5.5f);
-		        //badgeView.setTextColor(Color.DKGRAY);
-		        badgeView.show();*/
+			Log.i("deweitype","type is list "+listA.get(groupPosition).get(childPosition).type);
+		    if(listA.get(groupPosition)==null) holder.online.setImageResource(R.drawable.offline);
+		    else if(listA.get(groupPosition).get(childPosition).type == null) holder.online.setImageResource(R.drawable.offline);
+		    else if(listA.get(groupPosition).get(childPosition).type.equals("人")){
+				 holder.online.setImageResource(R.drawable.online);
+		    }else if(listA.get(groupPosition).get(childPosition).type.equals("物资")){
+                 holder.online.setImageResource(R.drawable.wuzi_online);
+			}else if(listA.get(groupPosition).get(childPosition).type.equals("装备")){
+				holder.online.setImageResource(R.drawable.zhuangbei_online);
 			}
+
 		} else {
-			holder.online.setImageResource(R.drawable.offline);
-	/*		 BadgeView badgeView = new BadgeView(context, holder.online);
-		       // badgeView.setText("离线");
-		        badgeView.setTextSize(5.5f);
-		       // badgeView.setTextColor(Color.DKGRAY);
-		        badgeView.show();*/
+			Log.i("deweitype","type is list offline"+listA.get(groupPosition).get(childPosition).type);
+		    if(listA.get(groupPosition).get(childPosition)==null) holder.online.setImageResource(R.drawable.offline);
+		    else if(listA.get(groupPosition).get(childPosition).type == null) holder.online.setImageResource(R.drawable.offline);
+		    else if(listA.get(groupPosition).get(childPosition).type.equals("人")){
+				 holder.online.setImageResource(R.drawable.offline);
+		    }else if(listA.get(groupPosition).get(childPosition).type.equals("物资")){
+                 holder.online.setImageResource(R.drawable.wuzi_offline);
+			}else if(listA.get(groupPosition).get(childPosition).type.equals("装备")){
+				holder.online.setImageResource(R.drawable.zhuangbei_offline);
+			}
+
 		}
 		holder.address.setText(context.getString(R.string.device_address)
 				+ listA.get(groupPosition).get(childPosition).deviceAddress);
@@ -189,13 +183,13 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 				.getString(R.string.device_parent_address)
 				+ listA.get(groupPosition).get(childPosition).parentAddress);
 		// 在线和不在线颜色不同
-		if (!(listA.get(groupPosition).get(childPosition).online)) {
+/*		if (!(listA.get(groupPosition).get(childPosition).online)) {
 			convertView.setBackgroundColor(this.context.getResources()
 					.getColor(R.color.white));
-		} else {
-			convertView.setBackgroundColor(this.context.getResources()
-					.getColor(R.color.green));
-		}
+		} else {*/
+/*			convertView.setBackgroundColor(this.context.getResources()
+					.getColor(R.color.green));*/
+
 		return convertView;
 	}
 

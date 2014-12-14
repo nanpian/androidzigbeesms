@@ -56,7 +56,7 @@ public class DeviceListAdapter extends BaseAdapter {
 		holder.id = (TextView) convertView.findViewById(R.id.device_id);
 		holder.parentAddress = (TextView) convertView
 				.findViewById(R.id.parent_address);
-        holder.name.setText("名称:"+list.get(position).deviceName);
+        holder.name.setText(list.get(position).deviceName);
         if((list.get(position)!=null)&&(list.get(position).online)) {
         	holder.online.setImageResource(R.drawable.online);
         } else {

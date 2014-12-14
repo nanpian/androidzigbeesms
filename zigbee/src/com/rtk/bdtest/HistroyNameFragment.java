@@ -39,13 +39,15 @@ public class HistroyNameFragment extends Fragment {
 	 * 
 	 * @see android.support.v4.app.Fragment#onActivityCreated(android.os.Bundle)
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-
+        Log.i(Tag,"oncreate");
 		smsHelper = new SmsHelper(getActivity());
 		histroyNameList = getNameList();
 		if (histroyNameList != null) {
+			Log.i(Tag,"xxxxxxx");
 			historyNameAdater = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, histroyNameList);
 			ListView listView = (ListView) getActivity().findViewById(R.id.history_device_list);
 			listView.setAdapter(historyNameAdater);
@@ -89,7 +91,9 @@ public class HistroyNameFragment extends Fragment {
 			while (cursor.moveToNext()) {
 				String name = cursor.getString(1);
 				Log.i(Tag,"the name is "+ name);
-	            if(!nameList.contains(name))nameList.add(name);
+				if(name!=null) {
+	                if(!nameList.contains(name))nameList.add(name);
+				}
 			}
 			if (nameList == null)
 				return null;

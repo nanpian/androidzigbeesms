@@ -223,16 +223,16 @@ public class FragmentList2 extends Fragment {
 							ContentValues values = new ContentValues();
 							values.put("name", data.substring(4));
 							values.put("id", data.substring(0, 4));
-							ZigbeeSharedPreference  zSp = new ZigbeeSharedPreference(getActivity());
+							ZigbeeSharedPreference zSp = new ZigbeeSharedPreference(getActivity());
 							String selfId = zSp.getSeflId();
-							if(bindId.equals(selfId)) {
-								Log.i(Tag,"self id is "+ selfId);
-							    String selection = "id= '" + data.substring(0, 4) + "'";
-							    getActivity().getContentResolver().update(PersonProvider.CONTENT_URI, values, selection, null);
+							if (bindId.equals(selfId)) {
+								Log.i(Tag, "self id is " + selfId);
+								String selection = "id= '" + data.substring(0, 4) + "'";
+								getActivity().getContentResolver().update(PersonProvider.CONTENT_URI, values, selection, null);
 							} else {
 								values.put("beizhu", "others");
-							    String selection = "id= '" + data.substring(0, 4) + "'";
-							    getActivity().getContentResolver().update(PersonProvider.CONTENT_URI, values, selection, null);
+								String selection = "id= '" + data.substring(0, 4) + "'";
+								getActivity().getContentResolver().update(PersonProvider.CONTENT_URI, values, selection, null);
 							}
 						} else {
 							Log.i(Tag, "receive insert bind info from B the name " + data.substring(4));
@@ -240,16 +240,17 @@ public class FragmentList2 extends Fragment {
 							ContentValues values = new ContentValues();
 							values.put("name", data.substring(4));
 							values.put("id", data.substring(0, 4));
-							ZigbeeSharedPreference  zSp = new ZigbeeSharedPreference(getActivity());
+							ZigbeeSharedPreference zSp = new ZigbeeSharedPreference(getActivity());
 							String selfId = zSp.getSeflId();
-							if(bindId.equals(selfId)) {
-								Log.i(Tag,"self id is "+ selfId);
-							    getActivity().getContentResolver().insert(PersonProvider.CONTENT_URI, values);
+							if (bindId.equals(selfId)) {
+								Log.i(Tag, "self id is " + selfId);
+								getActivity().getContentResolver().insert(PersonProvider.CONTENT_URI, values);
 							} else {
 								values.put("beizhu", "others");
-							    getActivity().getContentResolver().insert(PersonProvider.CONTENT_URI, values);
+								getActivity().getContentResolver().insert(PersonProvider.CONTENT_URI, values);
 							}
-							//getActivity().getContentResolver().insert(PersonProvider.CONTENT_URI, values);
+							// getActivity().getContentResolver().insert(PersonProvider.CONTENT_URI,
+							// values);
 						}
 					}
 
@@ -285,9 +286,9 @@ public class FragmentList2 extends Fragment {
 				}
 			} else if (intent.getAction().equals("ACTION_GET_SELF_INFO")) {
 				padinfo = intent.getExtras().getString("self_data");
-				ZigbeeSharedPreference  zSp = new ZigbeeSharedPreference(getActivity());
+				ZigbeeSharedPreference zSp = new ZigbeeSharedPreference(getActivity());
 				zSp.setSelfData(padinfo);
-				zSp.setSelfId(padinfo.substring(10,14));
+				zSp.setSelfId(padinfo.substring(10, 14));
 				Log.i(Tag, "Receive get self info  intent , the data is " + padinfo);
 
 				notifyDeviceB1(padinfo);
@@ -477,12 +478,12 @@ public class FragmentList2 extends Fragment {
 
 	public void notifyDeviceList(String data) {
 		try {
-			Log.i(Tag,"notify device list" +data);
+			Log.i(Tag, "notify device list" + data);
 			boolean isContain = false;
 			if (devices.size() <= 0)
 				Toast.makeText(getActivity(), "未导入战士文件或者导入错误", Toast.LENGTH_SHORT);
 			for (int i = 0; i < devices.size(); i++) {
-				Log.i(Tag,"notify device list deviceid " + devices.get(i).deviceID + " xintiao deviceid" + data.substring(12, 16));
+				Log.i(Tag, "notify device list deviceid " + devices.get(i).deviceID + " xintiao deviceid" + data.substring(12, 16));
 				if (devices.get(i).deviceID.equals(data.substring(12, 16))) {
 					isContain = true;
 					devices.get(i).deviceID = data.substring(12, 16);
@@ -503,7 +504,7 @@ public class FragmentList2 extends Fragment {
 			}
 
 			if (!isContain) {
-				Log.i(Tag,"notify device list a1");
+				Log.i(Tag, "notify device list a1");
 				Device devicetmp = new Device();
 				devicetmp.deviceAddress = data.substring(6, 10);
 				devicetmp.deviceID = data.substring(10, 14);
@@ -664,6 +665,7 @@ public class FragmentList2 extends Fragment {
 
 	// 更新人员姓名列表
 	Runnable runnableUI2 = new Runnable() {
+		@SuppressWarnings("null")
 		@Override
 		public void run() {
 			// 更新界面
@@ -671,6 +673,41 @@ public class FragmentList2 extends Fragment {
 				Log.i(Tag, "notify the new data changed listener!");
 				Cursor cursor = null;
 				try {
+					/*
+					 * String selection = "id= '" + deviceId + "'"; Cursor
+					 * cursor = null; try { cursor =
+					 * getActivity().getContentResolver
+					 * ().query(PersonProvider.CONTENT_URI, null, selection,
+					 * null, null)
+					 */
+					Cursor cursor1 = null;
+					String beizhu = "others";
+					String selection = "beizhu<> '" + beizhu + "'";
+					if (HasInitSelf) {
+						ArrayList<String> nameAlist = new ArrayList<String>();
+						cursor1 = getActivity().getContentResolver().query(PersonProvider.CONTENT_URI, null, selection, null, null);
+						try {
+							while (cursor1.moveToNext()) {
+								if ((selfpadId != null) && (cursor.getString(2).equals(selfpadId)))
+									continue;
+								nameAlist.add(cursor.getString(1));
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						} finally {
+							cursor1.close();
+						}
+						if(nameAlist!=null && nameAlist.size()>0) {
+							for(int k=0;k<devices.size();k++) {
+								if(nameAlist.contains(devices.get(k).deviceName)) continue;
+								else  {
+									devices.remove(k);
+									k=k-1;
+								}
+							}
+						}
+					}
+
 					cursor = getActivity().getContentResolver().query(PersonProvider.CONTENT_URI, null, null, null, null);
 					deviceB1tmp = null;
 					deviceBtmp = null;
@@ -691,20 +728,38 @@ public class FragmentList2 extends Fragment {
 									Log.i(Tag, "the a2 id is " + cursor.getString(2));
 									String bindName = cursor.getString(1);
 									String bindId = cursor.getString(2);
-									updateA2(bindId, bindName);
+									String type = cursor.getString(3);
+									Log.i(Tag,"type is" + type);
+									updateA2(bindId, bindName,type);
 								} else if (isCotainInA1(cursor.getString(2))) {
 									Log.i(Tag, "the a1 id is " + cursor.getString(2));
 									String bindName = cursor.getString(1);
 									String bindId = cursor.getString(2);
-									updateA1(bindId, bindName);
-								} else {
+									String type = cursor.getString(3);
+									Log.i(Tag,"type is" + type);
+									updateA1(bindId, bindName,type);
+								} else if (cursor.getString(8).equals("others")) {
 									// 如果不在A1也不再A2上
+									String nametmp = cursor.getString(1);
+									Log.i(Tag, "dewei b2 name is " + nametmp);
+									String bindid = cursor.getString(2);
+									Device devicetmpB = new Device();
+									devicetmpB.deviceName = nametmp;
+									devicetmpB.deviceID = bindid;
+									devicetmpB.online = false;
+									devicetmpB.type = cursor.getString(3);
+									Log.i(Tag,"type is" + devicetmpB.type );
+									devicesB.add(devicetmpB);
+								} else {
+									// 如果不在A1也不再A2上,新增队员，那么有个问题，原来的队员就要删除掉
 									String nametmp = cursor.getString(1);
 									Log.i(Tag, "dewei dewei name is " + nametmp);
 									String bindid = cursor.getString(2);
 									Device devicetmp = new Device();
 									devicetmp.deviceName = nametmp;
 									devicetmp.deviceID = bindid;
+									devicetmp.type = cursor.getString(3);
+									Log.i(Tag,"type is" + devicetmp.type);
 									devices.add(devicetmp);
 								}
 							}
@@ -722,23 +777,26 @@ public class FragmentList2 extends Fragment {
 		}
 	};
 
-	public void updateA2(String bindId, String bindName) {
+	public void updateA2(String bindId, String bindName, String type) {
 		if (HasInitSelf) {
 			if (devicesB.size() > 0) {
 				for (int i = 0; i < devicesB.size(); i++) {
 					if (devicesB.get(i).deviceID.equals(bindId))
 						devicesB.get(i).setDeviceName(bindName);
+					    devicesB.get(i).setDeviceType(type);
 				}
 			}
 		}
 	}
 
-	public void updateA1(String bindId, String bindName) {
+	public void updateA1(String bindId, String bindName, String type) {
 		if (HasInitSelf) {
+			Log.i(Tag,"tye is " + type);
 			if (devices.size() > 0) {
 				for (int i = 0; i < devices.size(); i++) {
 					if (devices.get(i).deviceID.equals(bindId))
 						devices.get(i).setDeviceName(bindName);
+					    devices.get(i).setDeviceType(type);
 				}
 			}
 		}
@@ -887,6 +945,17 @@ public class FragmentList2 extends Fragment {
 				FragmentManager rightfm = getActivity().getSupportFragmentManager();
 				Fragment rfm = rightfm.findFragmentById(R.id.detail_container);
 				if (rfm instanceof MapActivity) {
+					String name2 = devicesB.get(groupPosition).deviceAddress;
+					MapActivity rfma = (MapActivity) rfm;
+					if (groupPosition == 0) {
+						try {
+						 rfma.setCenterIn(name2);
+						 Toast.makeText(getActivity(), "找到地址"+name2, Toast.LENGTH_SHORT).show();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+					/*
 					mInput2 = new EditText(getActivity());
 					mInput2.setMaxLines(4);
 					String name2 = devicesB.get(groupPosition).deviceName;
@@ -917,13 +986,13 @@ public class FragmentList2 extends Fragment {
 							fragmentTransaction.replace(R.id.detail_container, detailFragment);
 							fragmentTransaction.commit();
 						} else {
-							/*
+							
 							 * Toast.makeText(getActivity(), "无未读信息！",
 							 * Toast.LENGTH_LONG).show();
-							 */
+							 
 						}
 					}
-				} else if (rfm instanceof HistoryActivity) {
+				*/} else if (rfm instanceof HistoryActivity) {
 					String name2 = devicesB.get(groupPosition).deviceName;
 					HistoryActivity rfma = (HistoryActivity) rfm;
 					if (groupPosition == 0) {

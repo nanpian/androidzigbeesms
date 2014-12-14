@@ -622,7 +622,7 @@ public class MainActivity extends FragmentActivity implements BindActivity.OnBin
 
 			Fragment listFragment = new HistroyNameFragment();
 			listFragment.setArguments(arguments);
-			fragmentTransaction.replace(R.id.list_container, listFragment);
+			fragmentTransaction.add(R.id.list_container, listFragment);
 			
 			fragmentTransaction.addToBackStack(null);
 			fragmentTransaction.commit();

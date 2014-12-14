@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BaiduMap.OnMapClickListener;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.InfoWindow;
+import com.baidu.mapapi.map.MapPoi;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
@@ -198,6 +200,26 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 		}
 
 	};
+	
+	public synchronized void setCenterIn(String addrname) {
+		Marker markertmp = null;
+		if (gpsdevices != null) {
+			for (int k = 0; k < gpsdevices.size(); k++) {
+				if (addrname.equals(gpsdevices.get(k).getDeviceAddress())) {
+					markertmp = gpsdevices.get(k).gpsMarker;
+					break;
+				}
+			}
+			LatLng temp = markertmp.getPosition();
+			if(temp!=null) {
+			MapStatus mMapStatusx = new MapStatus.Builder().target(temp).build();
+			// 定义MapStatusUpdate对象，以便描述地图状态将要发生的变化
+			MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mMapStatusx);
+			// 改变地图状态
+			mBaiduMap.setMapStatus(mMapStatusUpdate);
+			}
+		}
+	}
 
 	private BroadcastReceiver receiver = new BroadcastReceiver() {
 
@@ -363,6 +385,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 
 		}
 	};
+	private MapStatus mMapStatus;
 
 	public void importFromSDCard(View view) {
 		int num = mOffline.importOfflineData();
@@ -387,17 +410,35 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 		mBaiduMap = mMapView.getMap();
 		LatLng cenpt = new LatLng(32.05253311, 118.80744145);
 		// 定义地图状态
-		MapStatus mMapStatus = new MapStatus.Builder().target(cenpt).zoom(13).build();
+		mMapStatus = new MapStatus.Builder().target(cenpt).zoom(13).build();
 		// 定义MapStatusUpdate对象，以便描述地图状态将要发生的变化
 		MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mMapStatus);
 		// 改变地图状态
 		mBaiduMap.setMapStatus(mMapStatusUpdate);
 
 		initOverlay();
+		
+		mBaiduMap.setOnMapClickListener(new OnMapClickListener(){
+
+			@Override
+			public void onMapClick(LatLng arg0) {
+				// TODO Auto-generated method stub
+				mBaiduMap.hideInfoWindow();
+			}
+
+			@Override
+			public boolean onMapPoiClick(MapPoi arg0) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+			
+		}) ;
+			
 
 		mBaiduMap.setOnMarkerClickListener(new OnMarkerClickListener() {
 			public boolean onMarkerClick(final Marker marker) {
 				mMarkerSelf.setVisible(true);
+				isVisble = true;
 				Button button = new Button(getActivity());
 				button.setBackgroundResource(R.drawable.popup);
 				OnInfoWindowClickListener listener = null;

@@ -32,8 +32,8 @@ public class HistoryActivity extends Fragment {
 	protected static final int MENU_ROM = 2;
 	private SmsHelper smsHelper;
 	private ArrayAdapter historyAdater;
-	public static ArrayList<String> list;
-	public static ArrayList<Integer> list2;
+	public static ArrayList<String> list = new ArrayList<String>();
+	public static ArrayList<Integer> list2 = new ArrayList<Integer>();
 	private static List<Map<Integer, String>> listems = new ArrayList<Map<Integer, String>>();
 	public static HistoryActivity instance;
 
@@ -53,8 +53,7 @@ public class HistoryActivity extends Fragment {
 		String username = bundle.getString("record_name", null);
 		Log.i(Tag, "The argument issend is " + isSend);
 		Log.i(Tag, "The argument name is " + username);
-		list = new ArrayList<String>();
-		list2 = new ArrayList<Integer>();
+
 		smsHelper = new SmsHelper(getActivity());
 		list.clear();
 		list2.clear();
@@ -71,53 +70,29 @@ public class HistoryActivity extends Fragment {
 				String time = cursor.getString(2);
 				String text = cursor.getString(4);
 				list.add("姓名:" + name + "  时间:" + time + " 内容:" + text);
+				Log.i(Tag,"姓名:" + name + "  时间:" + time + " 内容:" + text);
 				list2.add(idc);
-				// listems.add(idc)
 			}
 		}
-		/*
-		 * if (isSend) { Cursor cursor = null; if (username != null) { cursor =
-		 * smsHelper.select(username , "true"); } else { cursor =
-		 * smsHelper.selectsend("true"); } if (cursor != null) { while
-		 * (cursor.moveToNext()) { String name = cursor.getString(1); String
-		 * time = cursor.getString(2); String text = cursor.getString(4);
-		 * list.add("姓名:" + name + "  时间:" + time + " 内容:" + text); } } } else {
-		 * Cursor cursor = null; if (username != null) { cursor =
-		 * smsHelper.select(username , "false"); } else { cursor =
-		 * smsHelper.selectsend("false"); } if (cursor != null) { while
-		 * (cursor.moveToNext()) { String name = cursor.getString(1); String
-		 * time = cursor.getString(2); String text = cursor.getString(4);
-		 * list.add("姓名:" + name + "  时间:" + time + " 内容:" + text); } } }
-		 */
-		// if(list.size()==0) {
-		// smsHelper.insert("张三", "201210121", "你好测试信息", "true");
-		// smsHelper.insert("张三", "201210121", "你好测试信息2", "false");
-		// smsHelper.insert("李四", "201210121", "你好测试信息", "false");
-		// smsHelper.insert("李四", "201210121", "你好测试信息22222", "true");
-		// }
-		/*
-		 * if(isSend) { Cursor cursor = smsHelper.selectsend("true");
-		 * while(cursor.moveToNext()) { String name = cursor.getString(1);
-		 * String time = cursor.getString(2); String text = cursor.getString(4);
-		 * list.add("姓名:"+name+"  时间:"+time +" 内容:"+text); } } else { Cursor
-		 * cursor = smsHelper.selectsend("false"); while(cursor.moveToNext()) {
-		 * String name = cursor.getString(1); String time = cursor.getString(2);
-		 * String text = cursor.getString(4); list.add("姓名:"+name+"  时间:"+time
-		 * +" 内容:"+text); } } }
-		 */
 
 		LinearLayout layout = (LinearLayout) getActivity().findViewById(R.id.detail_container);
+        if(list!=null){
+        	Log.i(Tag,"dddd1");
+		    historyAdater = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, list);
+		    Log.i(Tag,"dddd2");
+			ListView listView = (ListView) getActivity().findViewById(R.id.fragment_detail);
+			Log.i(Tag,"dddd3");
+			listView.setAdapter(historyAdater);
+			Log.i(Tag,"dddd4");
+			listView.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
+				@Override
+				public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+					menu.add(Menu.NONE, MENU_ROM, 0, "删除");
+				}
+			});
+        }
 
-		historyAdater = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, list);
 
-		ListView listView = (ListView) getActivity().findViewById(R.id.fragment_detail);
-		listView.setAdapter(historyAdater);
-		listView.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
-			@Override
-			public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-				menu.add(Menu.NONE, MENU_ROM, 0, "删除");
-			}
-		});
 
 	}
 
