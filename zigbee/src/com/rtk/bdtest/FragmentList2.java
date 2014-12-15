@@ -642,30 +642,8 @@ public class FragmentList2 extends Fragment {
 		return inflater.inflate(R.layout.fragment_list_layout2, container, false);
 	}
 
-	// 构建Runnable对象，在runnable中更新listview界面
-	/*
-	 * Runnable runnableUI = new Runnable() {
-	 * 
-	 * @Override public void run() { // 更新界面 Log.i(Tag,
-	 * "notify the new data changed listener!"); if ((!isBind) &&
-	 * (namelist.size() > 0)) { devices.clear(); Iterator it =
-	 * namelist.iterator(); while (it.hasNext()) { String nametmp1 = (String)
-	 * it.next(); Log.i(Tag, "The name is " + nametmp1); Cursor cursor =
-	 * dbDeviceHelper.select(nametmp1); Device devicetmp = new Device();
-	 * Log.d(Tag, "Start to update listview data"); if (cursor.moveToFirst()) {
-	 * String nametmp = cursor.getString(2); String bindid =
-	 * cursor.getString(3); devicetmp.deviceID = bindid; Log.i(Tag,
-	 * "notice!the database data name is " + nametmp + " binded id is " +
-	 * bindid); } else { Log.i(Tag, "no data from database!"); }
-	 * devicetmp.deviceName = nametmp1; // devicetmp.online = false;
-	 * devices.add(devicetmp); } } adapter.notifyDataSetChanged(); }
-	 * 
-	 * };
-	 */
-
 	// 更新人员姓名列表
 	Runnable runnableUI2 = new Runnable() {
-		@SuppressWarnings("null")
 		@Override
 		public void run() {
 			// 更新界面
@@ -682,15 +660,18 @@ public class FragmentList2 extends Fragment {
 					 */
 					Cursor cursor1 = null;
 					String beizhu = "others";
-					String selection = "beizhu<> '" + beizhu + "'";
+					String selection = "beizhu!= '" + beizhu + "'";
 					if (HasInitSelf) {
 						ArrayList<String> nameAlist = new ArrayList<String>();
 						cursor1 = getActivity().getContentResolver().query(PersonProvider.CONTENT_URI, null, selection, null, null);
 						try {
+							Log.i(Tag,"test remove, enter 1");
 							while (cursor1.moveToNext()) {
-								if ((selfpadId != null) && (cursor.getString(2).equals(selfpadId)))
-									continue;
-								nameAlist.add(cursor.getString(1));
+								Log.i(Tag,"test remove,enter 2");
+								Log.i(Tag,"test remove,selfid is "+ selfpadId + "  this bind id is " +cursor1.getString(2));
+								if ((selfpadId != null) && (cursor1.getString(2).equals(selfpadId)))continue;
+								nameAlist.add(cursor1.getString(1));
+								Log.i(Tag,"test remove , add this " + cursor1.getString(1));
 							}
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -699,12 +680,17 @@ public class FragmentList2 extends Fragment {
 						}
 						if(nameAlist!=null && nameAlist.size()>0) {
 							for(int k=0;k<devices.size();k++) {
-								if(nameAlist.contains(devices.get(k).deviceName)) continue;
-								else  {
+								if(nameAlist.contains(devices.get(k).deviceName)) {
+									Log.i(Tag,"test remove,contain this "+ devices.get(k).deviceName);
+									continue;
+								} else  {
+									Log.i(Tag,"test remove,remove this " + devices.get(k).deviceName);
 									devices.remove(k);
 									k=k-1;
 								}
 							}
+							//devicesA.set(0, devices);
+							adapter.notifyDataSetChanged();
 						}
 					}
 
