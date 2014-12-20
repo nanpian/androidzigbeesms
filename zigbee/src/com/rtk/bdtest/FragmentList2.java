@@ -213,11 +213,11 @@ public class FragmentList2 extends Fragment {
 					getActivity().sendBroadcast(smsintent);
 				} else if (typetmp2.equals("09")) {
 					Toast.makeText(getActivity(), "收到队长绑定信息！", Toast.LENGTH_SHORT);
-					
-					//收到队长绑定信息时，将所有其他队长的信息清掉
-					String[] removeSection = {"others"};
+
+					// 收到队长绑定信息时，将所有其他队长的信息清掉
+					String[] removeSection = { "others" };
 					getActivity().getContentResolver().delete(PersonProvider.CONTENT_URI, "beizhu!=?", removeSection);
-					
+
 					String bindName = data.substring(4);
 					String bindId = data.substring(0, 4);
 					Log.i(Tag, "receive bind info from B    " + data + "  bind name is " + bindName + "bindId is " + bindId);
@@ -498,8 +498,8 @@ public class FragmentList2 extends Fragment {
 					devices.get(i).online = true;
 					devices.get(i).count = 5;
 					// 如果终端父亲地址不等于路由地址，则后面加上附地址
-					if(!devices.get(i).parentAddress.equals(selfpadAddress)) {
-						devices.get(i).deviceName += "("+devices.get(i).parentAddress+")";
+					if (!devices.get(i).parentAddress.equals(selfpadAddress)) {
+						devices.get(i).deviceName += "(" + devices.get(i).parentAddress + ")";
 					}
 					/*
 					 * if (devices.get(i).parentAddress.equals(selfpadAddress))
@@ -673,31 +673,44 @@ public class FragmentList2 extends Fragment {
 						ArrayList<String> nameAlist = new ArrayList<String>();
 						cursor1 = getActivity().getContentResolver().query(PersonProvider.CONTENT_URI, null, selection, null, null);
 						try {
-							Log.i(Tag,"test remove, enter 1");
+							Log.i(Tag, "test remove, enter 1");
 							while (cursor1.moveToNext()) {
-								Log.i(Tag,"test remove,enter 2");
-								Log.i(Tag,"test remove,selfid is "+ selfpadId + "  this bind id is " +cursor1.getString(2));
-								if ((selfpadId != null) && (cursor1.getString(2).equals(selfpadId)))continue;
+								Log.i(Tag, "test remove,enter 2");
+								Log.i(Tag, "test remove,selfid is " + selfpadId + "  this bind id is " + cursor1.getString(2));
+								if ((selfpadId != null) && (cursor1.getString(2).equals(selfpadId)))
+									continue;
 								nameAlist.add(cursor1.getString(1));
-								Log.i(Tag,"test remove , add this " + cursor1.getString(1));
+								Log.i(Tag, "test remove , add this " + cursor1.getString(1));
 							}
 						} catch (Exception e) {
 							e.printStackTrace();
 						} finally {
 							cursor1.close();
 						}
-						if(nameAlist!=null && nameAlist.size()>0) {
-							for(int k=0;k<devices.size();k++) {
-								if(nameAlist.contains(devices.get(k).deviceName)) {
-									Log.i(Tag,"test remove,contain this "+ devices.get(k).deviceName);
+						if (nameAlist != null && nameAlist.size() > 0) {
+							for (int k = 0; k < devices.size(); k++) {
+								if (nameAlist.contains(devices.get(k).deviceName)) {
+									Log.i(Tag, "test remove,contain this " + devices.get(k).deviceName);
 									continue;
-								} else  {
-									Log.i(Tag,"test remove,remove this " + devices.get(k).deviceName);
-									devices.remove(k);
-									k=k-1;
+								} else {
+									// 删除的前提是这个设备不是未知匿名设备，要保留匿名设备
+									if ((devices.get(k).deviceName != null) && (!devices.get(k).deviceName.equals("匿名"))) {
+										Log.i(Tag, "test remove,remove this " + devices.get(k).deviceName);
+										devices.remove(k);
+										k = k - 1;
+									}
 								}
 							}
-							//devicesA.set(0, devices);
+							// devicesA.set(0, devices);
+							adapter.notifyDataSetChanged();
+						} else {
+							// 如果nameAlist为null，说明没有编辑队员中，没有队员，那么将devices全清掉,匿名设备不用清除
+							for (int k = 0; k < devices.size(); k++) { 
+								if ((devices.get(k).deviceName != null) && (!devices.get(k).deviceName.equals("匿名"))) {
+									devices.remove(k);
+									k = k-1;
+								}
+							}
 							adapter.notifyDataSetChanged();
 						}
 					}
@@ -723,15 +736,15 @@ public class FragmentList2 extends Fragment {
 									String bindName = cursor.getString(1);
 									String bindId = cursor.getString(2);
 									String type = cursor.getString(3);
-									Log.i(Tag,"type is" + type);
-									updateA2(bindId, bindName,type);
+									Log.i(Tag, "type is" + type);
+									updateA2(bindId, bindName, type);
 								} else if (isCotainInA1(cursor.getString(2))) {
 									Log.i(Tag, "the a1 id is " + cursor.getString(2));
 									String bindName = cursor.getString(1);
 									String bindId = cursor.getString(2);
 									String type = cursor.getString(3);
-									Log.i(Tag,"type is" + type);
-									updateA1(bindId, bindName,type);
+									Log.i(Tag, "type is" + type);
+									updateA1(bindId, bindName, type);
 								} else if (cursor.getString(8).equals("others")) {
 									// 如果不在A1也不再A2上
 									String nametmp = cursor.getString(1);
@@ -742,7 +755,7 @@ public class FragmentList2 extends Fragment {
 									devicetmpB.deviceID = bindid;
 									devicetmpB.online = false;
 									devicetmpB.type = cursor.getString(3);
-									Log.i(Tag,"type is" + devicetmpB.type );
+									Log.i(Tag, "type is" + devicetmpB.type);
 									devicesB.add(devicetmpB);
 								} else {
 									// 如果不在A1也不再A2上,新增队员，那么有个问题，原来的队员就要删除掉
@@ -753,7 +766,7 @@ public class FragmentList2 extends Fragment {
 									devicetmp.deviceName = nametmp;
 									devicetmp.deviceID = bindid;
 									devicetmp.type = cursor.getString(3);
-									Log.i(Tag,"type is" + devicetmp.type);
+									Log.i(Tag, "type is" + devicetmp.type);
 									devices.add(devicetmp);
 								}
 							}
@@ -777,7 +790,7 @@ public class FragmentList2 extends Fragment {
 				for (int i = 0; i < devicesB.size(); i++) {
 					if (devicesB.get(i).deviceID.equals(bindId))
 						devicesB.get(i).setDeviceName(bindName);
-					    devicesB.get(i).setDeviceType(type);
+					devicesB.get(i).setDeviceType(type);
 				}
 			}
 		}
@@ -785,12 +798,12 @@ public class FragmentList2 extends Fragment {
 
 	public void updateA1(String bindId, String bindName, String type) {
 		if (HasInitSelf) {
-			Log.i(Tag,"tye is " + type);
+			Log.i(Tag, "tye is " + type);
 			if (devices.size() > 0) {
 				for (int i = 0; i < devices.size(); i++) {
 					if (devices.get(i).deviceID.equals(bindId))
 						devices.get(i).setDeviceName(bindName);
-					    devices.get(i).setDeviceType(type);
+					devices.get(i).setDeviceType(type);
 				}
 			}
 		}
@@ -943,50 +956,52 @@ public class FragmentList2 extends Fragment {
 					MapActivity rfma = (MapActivity) rfm;
 					if (groupPosition == 0) {
 						try {
-						 rfma.setCenterIn(name2);
-						 Toast.makeText(getActivity(), "找到地址"+name2, Toast.LENGTH_SHORT).show();
+							rfma.setCenterIn(name2);
+							Toast.makeText(getActivity(), "找到地址" + name2, Toast.LENGTH_SHORT).show();
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
 					}
 					/*
-					mInput2 = new EditText(getActivity());
-					mInput2.setMaxLines(4);
-					String name2 = devicesB.get(groupPosition).deviceName;
-					AlertDialog dialog2 = new AlertDialog.Builder(getActivity()).setTitle("给" + name2 + "发送短信息:").setView(mInput2).setPositiveButton("发送", new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							String sms = mInput2.getText().toString();
-							String destAddr = devicesB.get(groupPosition).deviceAddress;
-							String destId = devicesB.get(groupPosition).deviceID;
-							MainActivity.instance.sendSMS(sms, destAddr, destId);
-							Date tmpDate = new Date();
-							SimpleDateFormat formatt = new SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒");
-							String xx = formatt.format(tmpDate);
-							smsHelper.insert(devicesB.get(groupPosition).deviceName, xx, sms, "true");
-						}
-					}).setNegativeButton(R.string.cancel, null).create();
-					if (!(groupPosition == 0)) {
-						dialog2.show();
-					} else {
-						if (devicesB.get(groupPosition).unread) {
-							// devicesB.get(groupPosition).unread = false;
-							Bundle arguments2 = new Bundle();
-							arguments2.putBoolean("issend", false);
-							Fragment detailFragment = new HistoryActivity();
-							detailFragment.setArguments(arguments2);
-							final FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-							final FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-							fragmentTransaction.replace(R.id.detail_container, detailFragment);
-							fragmentTransaction.commit();
-						} else {
-							
-							 * Toast.makeText(getActivity(), "无未读信息！",
-							 * Toast.LENGTH_LONG).show();
-							 
-						}
-					}
-				*/} else if (rfm instanceof HistoryActivity) {
+					 * mInput2 = new EditText(getActivity());
+					 * mInput2.setMaxLines(4); String name2 =
+					 * devicesB.get(groupPosition).deviceName; AlertDialog
+					 * dialog2 = new
+					 * AlertDialog.Builder(getActivity()).setTitle("给" + name2 +
+					 * "发送短信息:").setView(mInput2).setPositiveButton("发送", new
+					 * DialogInterface.OnClickListener() {
+					 * 
+					 * @Override public void onClick(DialogInterface dialog, int
+					 * which) { String sms = mInput2.getText().toString();
+					 * String destAddr =
+					 * devicesB.get(groupPosition).deviceAddress; String destId
+					 * = devicesB.get(groupPosition).deviceID;
+					 * MainActivity.instance.sendSMS(sms, destAddr, destId);
+					 * Date tmpDate = new Date(); SimpleDateFormat formatt = new
+					 * SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒"); String xx =
+					 * formatt.format(tmpDate);
+					 * smsHelper.insert(devicesB.get(groupPosition).deviceName,
+					 * xx, sms, "true"); } }).setNegativeButton(R.string.cancel,
+					 * null).create(); if (!(groupPosition == 0)) {
+					 * dialog2.show(); } else { if
+					 * (devicesB.get(groupPosition).unread) { //
+					 * devicesB.get(groupPosition).unread = false; Bundle
+					 * arguments2 = new Bundle();
+					 * arguments2.putBoolean("issend", false); Fragment
+					 * detailFragment = new HistoryActivity();
+					 * detailFragment.setArguments(arguments2); final
+					 * FragmentManager fragmentManager =
+					 * getActivity().getSupportFragmentManager(); final
+					 * FragmentTransaction fragmentTransaction =
+					 * fragmentManager.beginTransaction();
+					 * fragmentTransaction.replace(R.id.detail_container,
+					 * detailFragment); fragmentTransaction.commit(); } else {
+					 * 
+					 * Toast.makeText(getActivity(), "无未读信息！",
+					 * Toast.LENGTH_LONG).show();
+					 * 
+					 * } }
+					 */} else if (rfm instanceof HistoryActivity) {
 					String name2 = devicesB.get(groupPosition).deviceName;
 					HistoryActivity rfma = (HistoryActivity) rfm;
 					if (groupPosition == 0) {
