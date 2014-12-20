@@ -97,6 +97,7 @@ public class FragmentList2 extends Fragment {
 	private SmsHelper smsHelper;
 	private boolean isFirstTime = true;
 	private boolean isFirstTime2 = true;
+	private static boolean hasInitSystem =false;;
 
 	private ContentObserver PersonObserver = new ContentObserver(new Handler()) {
 		public void onChange(boolean selfChange) {
@@ -217,7 +218,7 @@ public class FragmentList2 extends Fragment {
 
 					// 收到队长绑定信息时，将所有其他队长的信息清掉
 					String[] removeSection = { "others" };
-					getActivity().getContentResolver().delete(PersonProvider.CONTENT_URI, "beizhu!=?", removeSection);
+					getActivity().getContentResolver().delete(PersonProvider.CONTENT_URI, "beizhu=?", removeSection);
 
 					String bindName = data.substring(4);
 					String bindId = data.substring(0, 4);
@@ -500,7 +501,8 @@ public class FragmentList2 extends Fragment {
 					devices.get(i).count = 5;
 					// 如果终端父亲地址不等于路由地址，则后面加上附地址
 					if (!devices.get(i).parentAddress.equals(selfpadAddress)) {
-						devices.get(i).deviceName += "(" + devices.get(i).parentAddress + ")";
+						if(devices.get(i).deviceName!=null && (!devices.get(i).deviceName.contains("(")) )
+						devices.get(i).deviceName = devices.get(i).deviceName +"(" + devices.get(i).parentAddress + ")";
 					}
 					/*
 					 * if (devices.get(i).parentAddress.equals(selfpadAddress))
@@ -653,6 +655,7 @@ public class FragmentList2 extends Fragment {
 
 	// 更新人员姓名列表
 	Runnable runnableUI2 = new Runnable() {
+
 		@Override
 		public void run() {
 			// 更新界面
@@ -776,6 +779,8 @@ public class FragmentList2 extends Fragment {
 					} else {
 						Log.i(Tag, "The B1 has not instanted!");
 					}
+					
+					hasInitSystem = true;
 				} catch (Exception e) {
 					e.printStackTrace();
 				} finally {

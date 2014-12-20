@@ -190,8 +190,10 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 					typetmp = smsIntent.getExtras().getString("smsType");
 					if (gpsdevices!=null) {
 						for (int k= 0;k <gpsdevices.size();k ++) {
+							if(gpsdevices.get(k).deviceID!=null && Idtmp!=null) { 
 							if (gpsdevices.get(k).deviceID.equals(Idtmp)) {
 								nametmp = gpsdevices.get(k).deviceName;
+							}
 							}
 						}
 					}
@@ -471,6 +473,8 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 				Fragment lfm = rightfm.findFragmentById(R.id.list_container);
 				if (((FragmentList2) lfm).devicesB.size() > 0) {
 					gpsdevices = ((FragmentList2) lfm).devicesB;
+				} else {
+					return true;
 				}
 				Log.i(Tag, "receive sms map content" + smsdata);
 				synchronized (this) {
@@ -494,34 +498,8 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 									button.setText("无未读短信");
 								}
 							} else {
-								Log.i(Tag, "gps device is unread xxxx ");
-								final String name2 = gpsdevices.get(i).deviceName;
-								final String addrtmp = gpsdevices.get(i).deviceAddress;
-								final String idtmp = gpsdevices.get(i).deviceID;
-								button.setText("发送短信");
-								button.setOnClickListener(new OnClickListener() {
-									@Override
-									public void onClick(View arg0) {
-										final EditText mInput2 = new EditText(getActivity());
-										mInput2.setMaxLines(4);
-										new AlertDialog.Builder(getActivity()).setTitle("给" + name2 + "发送短信息:").setView(mInput2).setPositiveButton("发送", new DialogInterface.OnClickListener() {
-											private SmsHelper smsHelper;
-
-											@Override
-											public void onClick(DialogInterface dialog, int which) {
-												String sms = mInput2.getText().toString();
-												String destAddr = addrtmp;
-												String destId = idtmp;
-												MainActivity.instance.sendSMS(sms, destAddr, destId);
-												Date tmpDate = new Date();
-												SimpleDateFormat formatt = new SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒");
-												String xx = formatt.format(tmpDate);
-												smsHelper = new SmsHelper(getActivity());
-												smsHelper.insert(name2, xx, sms, "true");
-											}
-										}).setNegativeButton(R.string.cancel, null).create().show();
-									}
-								});
+								Log.i(Tag, "dewei click on 01");
+								 button.setText("向他发送短信？");
 							}
 							Log.i(Tag, "dewei dewei click click");
 							listener = new OnInfoWindowClickListener() {
@@ -533,6 +511,12 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 											mBaiduMap.hideInfoWindow();
 											break;
 											// }
+										} else {
+											if ((gpsdevices.get(i).gpsMarker != null) && (marker == gpsdevices.get(i).gpsMarker)) {
+											    showSendDialog(i);
+												mBaiduMap.hideInfoWindow();
+												break;
+											}
 										}
 									}
 								}
@@ -550,6 +534,35 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 				return true;
 			}
 		});
+	}
+	
+	private void showSendDialog(int i) {
+		Log.i(Tag, "gps device is unread xxxx ");
+		try {
+		final String name2 = gpsdevices.get(i).deviceName;
+		final String addrtmp = gpsdevices.get(i).deviceAddress;
+		final String idtmp = gpsdevices.get(i).deviceID;
+				final EditText mInput2 = new EditText(getActivity());
+				mInput2.setMaxLines(4);
+				new AlertDialog.Builder(getActivity()).setTitle("给" + name2 + "发送短信息:").setView(mInput2).setPositiveButton("发送", new DialogInterface.OnClickListener() {
+					private SmsHelper smsHelper;
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						String sms = mInput2.getText().toString();
+						String destAddr = addrtmp;
+						String destId = idtmp;
+						MainActivity.instance.sendSMS(sms, destAddr, destId);
+						Date tmpDate = new Date();
+						SimpleDateFormat formatt = new SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒");
+						String xx = formatt.format(tmpDate);
+						smsHelper = new SmsHelper(getActivity());
+						smsHelper.insert(name2, xx, sms, "true");
+					}
+				}).setNegativeButton(R.string.cancel, null).create().show();
+		} catch (Exception e) {
+			Log.i(Tag,"exception eeeeee");
+			e.printStackTrace();
+		}
 	}
 
 	private void showAnswerDialog() {
