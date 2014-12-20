@@ -558,9 +558,7 @@ public class ZigbeeSerivce extends Service {
 			if (EnableDES) {
 				Log.i(Tag,"the long sms data is "+ temp);
 				 String xx = new String(temp);
-				 Base64 xx2 = new Base64();
-				 
-				byte[] temp2 = xx2.decode(xx);
+				byte[] temp2 = Base64.decode(xx);
 			    DesCrypt DesCryptInstance = new DesCrypt();
 			    byte[] smsdatatmp;
 			    if(((ZigbeeApplication) getApplication()).getKey()!=null) {

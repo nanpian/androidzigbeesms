@@ -72,14 +72,17 @@ public class MainActivity extends FragmentActivity implements BindActivity.OnBin
 		if (mTimer == null) {
 			mTimer = new Timer();
 		}
-		if (mTimerTask == null) {
 			mTimerTask = new TimerTask() {
 				@Override
 				public void run() {
 					sendData2Zigbee(tmpLongStr);
+					mTimerTask.cancel();
+					mTimer.cancel();
+					mTimerTask = null;
+					mTimer = null;
 				}
 			};
-		}
+
 		if (mTimer != null && mTimerTask != null)
 			mTimer.schedule(mTimerTask, 3000);
 
@@ -269,7 +272,8 @@ public class MainActivity extends FragmentActivity implements BindActivity.OnBin
 					String logstring = CharConverter.byteToHexString(temp, temp.length);
 					Log.i("deweidewei", "dewei send data " + i + " data is" + logstring + " ##########temp is" + temp);
 					tmpLongStr = temp;
-					startDelaySendLongSMS();
+					sendData2Zigbee(tmpLongStr);
+					Thread.sleep(300);
 				}
 			} else {
 				try {

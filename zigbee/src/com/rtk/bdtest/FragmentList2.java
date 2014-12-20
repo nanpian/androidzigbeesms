@@ -97,7 +97,7 @@ public class FragmentList2 extends Fragment {
 	private SmsHelper smsHelper;
 	private boolean isFirstTime = true;
 	private boolean isFirstTime2 = true;
-	private static boolean hasInitSystem =false;;
+	private static boolean hasInitSystem = false;;
 
 	private ContentObserver PersonObserver = new ContentObserver(new Handler()) {
 		public void onChange(boolean selfChange) {
@@ -128,8 +128,8 @@ public class FragmentList2 extends Fragment {
 					}
 				}
 			}
-            //心跳为2s*5
-			mHandler.sendEmptyMessageDelayed(MSG_REDUCE_DEVICE_COUNT, 2 * 1000);
+			// 心跳为2s*5
+			mHandler.sendEmptyMessageDelayed(MSG_REDUCE_DEVICE_COUNT, 3 * 1000);
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
@@ -448,7 +448,7 @@ public class FragmentList2 extends Fragment {
 			boolean isContain = false;
 			data = data.substring(2, data.length());
 			Device deviceB = new Device();
-			deviceB.deviceName = "协调器" + data.substring(6, 10);
+			deviceB.deviceName = "协调器";
 			deviceB.deviceID = data.substring(10, 14);
 			deviceB.online = true;
 			deviceB.count = 5;
@@ -456,7 +456,7 @@ public class FragmentList2 extends Fragment {
 				if (devicesB.get(i).deviceName != null) {
 					if (devicesB.get(i).deviceName.contains("协调器")) {
 						isContain = true;
-						devicesB.get(i).deviceName = "协调器" + data.substring(6, 10);
+						devicesB.get(i).deviceName = "协调器";
 						devicesB.get(i).deviceID = data.substring(10, 14);
 						devicesB.get(i).deviceAddress = data.substring(6, 10);
 						devicesB.get(i).count = 5;
@@ -470,7 +470,7 @@ public class FragmentList2 extends Fragment {
 				Device deviceB2 = new Device();
 				deviceB2.count = 5;
 				deviceB2.online = true;
-				deviceB2.deviceName = "协调器" + data.substring(6, 10);
+				deviceB2.deviceName = "协调器" ;
 				deviceB2.deviceAddress = data.substring(6, 10);
 				deviceB2.deviceID = data.substring(10, 14);
 				devicesB.add(deviceB2);
@@ -501,8 +501,20 @@ public class FragmentList2 extends Fragment {
 					devices.get(i).count = 5;
 					// 如果终端父亲地址不等于路由地址，则后面加上附地址
 					if (!devices.get(i).parentAddress.equals(selfpadAddress)) {
-						if(devices.get(i).deviceName!=null && (!devices.get(i).deviceName.contains("(")) )
-						devices.get(i).deviceName = devices.get(i).deviceName +"(" + devices.get(i).parentAddress + ")";
+						if (devices.get(i).deviceName != null && (!devices.get(i).deviceName.contains("("))) {
+							// devices.get(i).deviceName =
+							// devices.get(i).deviceName + "(" +
+							// devices.get(i).parentAddress + ")";
+							//devices.get(i).deviceName = devices.get(i).deviceName +"*其他父地址*";
+							String paddr = devices.get(i).parentAddress;
+							if (devicesB != null) {
+								for (int z = 0; z < devicesB.size(); z++) {
+									if (devicesB.get(z).deviceAddress != null && devicesB.get(z).deviceName != null && devicesB.get(z).deviceAddress.equals(paddr)) {
+										devices.get(i).deviceName = devices.get(i).deviceName + "(" + devicesB.get(z).deviceName + ")";
+									}
+								}
+							}
+						}
 					}
 					/*
 					 * if (devices.get(i).parentAddress.equals(selfpadAddress))
@@ -525,13 +537,13 @@ public class FragmentList2 extends Fragment {
 				Log.i(Tag, "notify device list a1 selfpadaddress" + selfpadAddress);
 				devicetmp.deviceName = "匿名";
 				if (devicetmp.parentAddress.equals(selfpadAddress)) {
-					Log.i(Tag,"notify device list a11");
+					Log.i(Tag, "notify device list a11");
 					devicetmp.online = true;
 					devicetmp.count = 5;
 					devices.add(devicetmp);
 
 				}
-				//devicesA.set(0, devices);
+				// devicesA.set(0, devices);
 				adapter.notifyDataSetChanged();
 
 			}
@@ -623,7 +635,7 @@ public class FragmentList2 extends Fragment {
 	void getSelfInfo() {
 		MainActivity.instance.getselfInfo();
 		Log.i(Tag, "get self address and is!");
-		mHandler.sendEmptyMessageDelayed(MSG_GET_SELF_ID, 10 * 1000);
+		mHandler.sendEmptyMessageDelayed(MSG_GET_SELF_ID, 4 * 1000);
 	}
 
 	@Override
@@ -782,7 +794,7 @@ public class FragmentList2 extends Fragment {
 					} else {
 						Log.i(Tag, "The B1 has not instanted!");
 					}
-					
+
 					hasInitSystem = true;
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -945,7 +957,12 @@ public class FragmentList2 extends Fragment {
 							String sms = mInputGroup.getText().toString();
 							String destAddr = devicesB.get(group).deviceAddress;
 							String destId = devicesB.get(group).deviceID;
-							MainActivity.instance.sendSMS(sms, destAddr, destId);
+							try {
+								MainActivity.instance.sendLongSms(sms, destAddr, destId, null);
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 							Date tmpDate = new Date();
 							SimpleDateFormat formatt = new SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒");
 							String xx = formatt.format(tmpDate);
