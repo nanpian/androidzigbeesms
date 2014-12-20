@@ -518,17 +518,20 @@ public class FragmentList2 extends Fragment {
 				Log.i(Tag, "notify device list a1");
 				Device devicetmp = new Device();
 				devicetmp.deviceAddress = data.substring(6, 10);
-				devicetmp.deviceID = data.substring(10, 14);
-				devicetmp.deviceType = data.substring(4, 6);
-				devicetmp.parentAddress = data.substring(14, 18);
+				devicetmp.deviceID = data.substring(12, 16);
+				devicetmp.deviceType = data.substring(6, 8);
+				devicetmp.parentAddress = data.substring(16, 20);
+				Log.i(Tag, "notify device list a1 parentaddress" + devicetmp.parentAddress);
+				Log.i(Tag, "notify device list a1 selfpadaddress" + selfpadAddress);
 				devicetmp.deviceName = "匿名";
 				if (devicetmp.parentAddress.equals(selfpadAddress)) {
+					Log.i(Tag,"notify device list a11");
 					devicetmp.online = true;
 					devicetmp.count = 5;
 					devices.add(devicetmp);
 
 				}
-				devicesA.set(0, devices);
+				//devicesA.set(0, devices);
 				adapter.notifyDataSetChanged();
 
 			}

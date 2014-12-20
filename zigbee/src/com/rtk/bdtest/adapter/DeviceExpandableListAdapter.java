@@ -151,7 +151,7 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 				&& (listA.get(groupPosition).get(childPosition).online)) {
 			Log.i("deweitype","type is list "+listA.get(groupPosition).get(childPosition).type);
 		    if(listA.get(groupPosition)==null) holder.online.setImageResource(R.drawable.offline);
-		    else if(listA.get(groupPosition).get(childPosition).type == null) holder.online.setImageResource(R.drawable.offline);
+		    else if(listA.get(groupPosition).get(childPosition).type == null) holder.online.setImageResource(R.drawable.online);
 		    else if(listA.get(groupPosition).get(childPosition).type.equals("人")){
 				 holder.online.setImageResource(R.drawable.online);
 		    }else if(listA.get(groupPosition).get(childPosition).type.equals("物资")){
