@@ -14,7 +14,7 @@
         android:id="@+id/settings2"
         android:orderInCategory="100"
         android:showAsAction="never"
-        android:title="查看历史记录"/>
+        android:title="查看历史记录"/> -
 <!--     <item
         android:id="@+id/settings3"
         android:orderInCategory="100"

@@ -106,11 +106,14 @@ public class LoginActivity extends Activity {
 						Intent intent = new Intent();
 						intent.setClass(LoginActivity.this,MainActivity.class);
 						startActivity(intent);
+						//退出登录界面
+						finish();
 					} else {
 						Toast.makeText(LoginActivity.this, "用户名密码错误，请重新输入", 1000).show();
+						return;
 					}
 				} else {
-					Toast.makeText(LoginActivity.this, "用户名密码为空！", Toast.LENGTH_SHORT).show();
+					Toast.makeText(LoginActivity.this, "用户名密码错误！", Toast.LENGTH_SHORT).show();
 				}
 			}	
 		});

@@ -563,13 +563,13 @@ public class ZigbeeSerivce extends Service {
 				byte[] temp2 = xx2.decode(xx);
 			    DesCrypt DesCryptInstance = new DesCrypt();
 			    byte[] smsdatatmp;
-/*			    if(((ZigbeeApplication) getApplication()).getKey()!=null) {
+			    if(((ZigbeeApplication) getApplication()).getKey()!=null) {
 			    	String key = (String) ((ZigbeeApplication) getApplication()).getKey();
 				     smsdatatmp = DesCryptInstance.decrypt(temp2, key);
-			    } else {*/
+			    } else {
 				     smsdatatmp = DesCryptInstance.decrypt(temp2, ("hellomys"));
 				     Log.i(Tag,"sms desecret is " + CharConverter.byteToHexString(smsdatatmp,smsdatatmp.length));
-			  //  }
+			    }
                // smsutf8 = new String(smsdatatmp,"utf-8");
 				     smsutf8 = new String(smsdatatmp);
 			} else {

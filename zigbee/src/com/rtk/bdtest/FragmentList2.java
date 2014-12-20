@@ -213,6 +213,11 @@ public class FragmentList2 extends Fragment {
 					getActivity().sendBroadcast(smsintent);
 				} else if (typetmp2.equals("09")) {
 					Toast.makeText(getActivity(), "收到队长绑定信息！", Toast.LENGTH_SHORT);
+					
+					//收到队长绑定信息时，将所有其他队长的信息清掉
+					String[] removeSection = {"others"};
+					getActivity().getContentResolver().delete(PersonProvider.CONTENT_URI, "beizhu!=?", removeSection);
+					
 					String bindName = data.substring(4);
 					String bindId = data.substring(0, 4);
 					Log.i(Tag, "receive bind info from B    " + data + "  bind name is " + bindName + "bindId is " + bindId);
@@ -492,7 +497,10 @@ public class FragmentList2 extends Fragment {
 					// 显示在线
 					devices.get(i).online = true;
 					devices.get(i).count = 5;
-					// 如果终端父亲地址等于路由地址，则显示在线
+					// 如果终端父亲地址不等于路由地址，则后面加上附地址
+					if(!devices.get(i).parentAddress.equals(selfpadAddress)) {
+						devices.get(i).deviceName += "("+devices.get(i).parentAddress+")";
+					}
 					/*
 					 * if (devices.get(i).parentAddress.equals(selfpadAddress))
 					 * { devices.get(i).online = true; devicesA.set(0, devices);

@@ -646,7 +646,7 @@ public class MainActivity extends FragmentActivity implements BindActivity.OnBin
 		 * fragmentTransaction.addToBackStack(null);
 		 * fragmentTransaction.commit(); } break;
 		 */
-		case R.id.settings4: {
+/*		case R.id.settings4: {
 			LinearLayout lf1 = (LinearLayout) findViewById(R.id.list_container);
 			lf1.setVisibility(View.VISIBLE);
 			Fragment detailFragment = new MapActivity();
@@ -656,8 +656,8 @@ public class MainActivity extends FragmentActivity implements BindActivity.OnBin
 			fragmentTransaction.replace(R.id.list_container, listFragment);
 			fragmentTransaction.replace(R.id.detail_container, detailFragment);
 			fragmentTransaction.commit();
-		}
-			break;
+		}*/
+			/*break;*/
 		case R.id.settings5: {
 			LinearLayout lf1 = (LinearLayout) findViewById(R.id.list_container);
 			lf1.setVisibility(View.VISIBLE);
