@@ -127,8 +127,8 @@ public class FragmentList2 extends Fragment {
 					}
 				}
 			}
-
-			mHandler.sendEmptyMessageDelayed(MSG_REDUCE_DEVICE_COUNT, 8 * 1000);
+            //心跳为2s*5
+			mHandler.sendEmptyMessageDelayed(MSG_REDUCE_DEVICE_COUNT, 2 * 1000);
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();

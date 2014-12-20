@@ -71,6 +71,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 	private String addrtmp;
 	private String Idtmp;
 	private String typetmp;
+	private String nametmp;
 	// 默认南京经纬度
 	private static double[] jingwei = { 0, 0 };
 	public static ArrayList<Device> gpsdevices;
@@ -101,16 +102,19 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
-			gpsHandler.sendEmptyMessage(MSG_UPDATE_SMS);
-
-			if (isVisble) {
-				isVisble = false;
+			if (gpsdevices != null && gpsdevices.get(0) != null && gpsdevices.get(0).unread) {
+				gpsHandler.sendEmptyMessage(MSG_UPDATE_SMS);
+				if (isVisble) {
+					isVisble = false;
+				} else {
+					isVisble = true;
+				}
+				if (gpsdevices.get(0).unread) {
+					Log.i(Tag, "gps device is unread, so should flash!");
+					gpsHandler.postDelayed(markeFlashRunnable, 500);
+				}
 			} else {
-				isVisble = true;
-			}
-			if (gpsdevices.get(0).unread) {
-				Log.i(Tag, "gps device is unread, so should flash!");
-				gpsHandler.postDelayed(markeFlashRunnable, 500);
+				mMarkerSelf.setVisible(true);
 			}
 		}
 
@@ -184,6 +188,13 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 					addrtmp = smsIntent.getExtras().getString("smsSourAddr");
 					Idtmp = smsIntent.getExtras().getString("smsSourId");
 					typetmp = smsIntent.getExtras().getString("smsType");
+					if (gpsdevices!=null) {
+						for (int k= 0;k <gpsdevices.size();k ++) {
+							if (gpsdevices.get(k).deviceID.equals(Idtmp)) {
+								nametmp = gpsdevices.get(k).deviceName;
+							}
+						}
+					}
 					// Message smsMessage = new Message();
 					// smsMessage.what = MSG_UPDATE_SMS;
 					// gpsMessage.obj = jingwei;
@@ -202,17 +213,23 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 	};
 	
 	public synchronized boolean  setCenterIn(String addrname) {
+		try {
 		Marker markertmp = null;
+		Log.i("centerin", "enter 1");
 		if (gpsdevices != null) {
 			for (int k = 0; k < gpsdevices.size(); k++) {
 				if (addrname.equals(gpsdevices.get(k).getDeviceAddress())) {
 					markertmp = gpsdevices.get(k).gpsMarker;
+					Log.i("centerin", "enter 2");
 					break;
 				}
 			}
 			if (markertmp==null) return false;
+			Log.i("centerin", "enter 3");
 			LatLng temp = markertmp.getPosition();
+			Log.i("centerin", "enter 4");
 			if(temp!=null) {
+		    Log.i("centerin", "enter 5");
 			MapStatus mMapStatusx = new MapStatus.Builder().target(temp).build();
 			// 定义MapStatusUpdate对象，以便描述地图状态将要发生的变化
 			MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mMapStatusx);
@@ -221,6 +238,12 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 			return true;
 			} else return false;
 		} else {
+			return false;
+		}
+		} catch (Exception e ) {
+
+			Log.i("centerin", "enter exception");
+			e.printStackTrace();
 			return false;
 		}
 	}
@@ -441,8 +464,6 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 
 		mBaiduMap.setOnMarkerClickListener(new OnMarkerClickListener() {
 			public boolean onMarkerClick(final Marker marker) {
-				mMarkerSelf.setVisible(true);
-				isVisble = true;
 				Button button = new Button(getActivity());
 				button.setBackgroundResource(R.drawable.popup);
 				OnInfoWindowClickListener listener = null;
@@ -460,13 +481,13 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 						}
 						if ((gpsdevices.get(i).gpsMarker != null) && (marker == gpsdevices.get(i).gpsMarker)) {
 							if (i == 0) {
-								Log.i(Tag, "dewei click");
-								mMarkerSelf.setVisible(true);
+								Log.i(Tag, "dewei click on 0");
 								if (gpsdevices.get(i).unread) {
-									button.setText("来自" + Idtmp + "短信内容: " + smsdata);
+									button.setText("来自" + nametmp + "短信内容: " + smsdata);
 									// gpsHandler.removeCallbacks(markeFlashRunnable);
 									gpsdevices.get(i).unread = false;
-									mMarkerSelf.setVisible(true);
+									isVisble = true;
+									gpsHandler.sendEmptyMessage(MSG_UPDATE_SMS);
 									Log.i(Tag, "gps device is unread " + gpsdevices.get(i).unread);
 								} else {
 									Log.i(Tag, "dewei gps");
