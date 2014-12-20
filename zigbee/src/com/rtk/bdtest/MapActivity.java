@@ -201,7 +201,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 
 	};
 	
-	public synchronized void setCenterIn(String addrname) {
+	public synchronized boolean  setCenterIn(String addrname) {
 		Marker markertmp = null;
 		if (gpsdevices != null) {
 			for (int k = 0; k < gpsdevices.size(); k++) {
@@ -210,6 +210,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 					break;
 				}
 			}
+			if (markertmp==null) return false;
 			LatLng temp = markertmp.getPosition();
 			if(temp!=null) {
 			MapStatus mMapStatusx = new MapStatus.Builder().target(temp).build();
@@ -217,7 +218,10 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 			MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mMapStatusx);
 			// 改变地图状态
 			mBaiduMap.setMapStatus(mMapStatusUpdate);
-			}
+			return true;
+			} else return false;
+		} else {
+			return false;
 		}
 	}
 

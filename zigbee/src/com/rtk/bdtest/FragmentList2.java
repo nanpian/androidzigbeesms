@@ -26,6 +26,7 @@ import com.rtk.bdtest.util.Device;
 import com.rtk.bdtest.util.gpsDevice;
 
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
@@ -705,10 +706,10 @@ public class FragmentList2 extends Fragment {
 							adapter.notifyDataSetChanged();
 						} else {
 							// 如果nameAlist为null，说明没有编辑队员中，没有队员，那么将devices全清掉,匿名设备不用清除
-							for (int k = 0; k < devices.size(); k++) { 
+							for (int k = 0; k < devices.size(); k++) {
 								if ((devices.get(k).deviceName != null) && (!devices.get(k).deviceName.equals("匿名"))) {
 									devices.remove(k);
-									k = k-1;
+									k = k - 1;
 								}
 							}
 							adapter.notifyDataSetChanged();
@@ -918,12 +919,33 @@ public class FragmentList2 extends Fragment {
 				ExpandableListView.ExpandableListContextMenuInfo info = (ExpandableListView.ExpandableListContextMenuInfo) menuInfo;
 				// menuinfo该对象提供了选中对象的附加信息
 				int type = ExpandableListView.getPackedPositionType(info.packedPosition);
-				int group = ExpandableListView.getPackedPositionGroup(info.packedPosition);
+				final int group = ExpandableListView.getPackedPositionGroup(info.packedPosition);
 				int child = ExpandableListView.getPackedPositionChild(info.packedPosition);
 				System.out.println("LongClickListener*type-------------------------" + type);
 				System.out.println("LongClickListener*group-------------------------" + group);
 				System.out.println("LongClickListener*child-------------------------" + child);
 				if (type == 0) {// 分组长按事件
+					final EditText mInputGroup = new EditText(getActivity());
+					mInputGroup.setMaxLines(4);
+					String namettmp = devicesB.get(group).deviceName;
+					if (group == 0)
+						return;
+					AlertDialog dilalog = new AlertDialog.Builder(getActivity()).setTitle("发送短信").setView(mInputGroup).setPositiveButton("发送", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface arg0, int arg1) {
+							// TODO Auto-generated method stub
+							String sms = mInputGroup.getText().toString();
+							String destAddr = devicesB.get(group).deviceAddress;
+							String destId = devicesB.get(group).deviceID;
+							MainActivity.instance.sendSMS(sms, destAddr, destId);
+							Date tmpDate = new Date();
+							SimpleDateFormat formatt = new SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒");
+							String xx = formatt.format(tmpDate);
+							smsHelper.insert(devicesB.get(group).deviceName, xx, sms, "true");
+						}
+					}).setNegativeButton("取消", null).create();
+					dilalog.show();
+
 					// menu.add(Menu.NONE, MENU_MODIFY, 0, "修改备注名");
 				} else if (type == 1) {// 长按好友列表项
 					menu.add(Menu.NONE, MENU_MODIFY, 0, "修改备注名");
@@ -954,14 +976,17 @@ public class FragmentList2 extends Fragment {
 				if (rfm instanceof MapActivity) {
 					String name2 = devicesB.get(groupPosition).deviceAddress;
 					MapActivity rfma = (MapActivity) rfm;
-					if (groupPosition == 0) {
-						try {
-							rfma.setCenterIn(name2);
+					try {
+						boolean isCentered = rfma.setCenterIn(name2);
+						if (isCentered = true) {
 							Toast.makeText(getActivity(), "找到地址" + name2, Toast.LENGTH_SHORT).show();
-						} catch (Exception e) {
-							e.printStackTrace();
+						} else {
+							Toast.makeText(getActivity(), "没有找到地址", Toast.LENGTH_SHORT).show();
 						}
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
+
 					/*
 					 * mInput2 = new EditText(getActivity());
 					 * mInput2.setMaxLines(4); String name2 =
