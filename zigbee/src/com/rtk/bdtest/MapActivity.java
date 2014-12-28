@@ -74,7 +74,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 	private String nametmp;
 	// 默认南京经纬度
 	private static double[] jingwei = { 0, 0 };
-	public static ArrayList<Device> gpsdevices;
+	public static ArrayList<Device> gpsdevices = new ArrayList<Device>();
 
 	private static BitmapDescriptor bdC = BitmapDescriptorFactory.fromResource(R.drawable.icon_markb);
 
@@ -173,6 +173,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 
 	private BroadcastReceiver receiverSms = new BroadcastReceiver() {
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public void onReceive(Context arg0, Intent smsIntent) {
 			// TODO Auto-generated method stub
@@ -188,10 +189,19 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 					addrtmp = smsIntent.getExtras().getString("smsSourAddr");
 					Idtmp = smsIntent.getExtras().getString("smsSourId");
 					typetmp = smsIntent.getExtras().getString("smsType");
+	/*			FragmentManager rightfm = getActivity().getSupportFragmentManager();
+					Fragment lfm = rightfm.findFragmentById(R.id.list_container);
+					if (((FragmentList2) lfm).devicesB.size() > 0) {
+						gpsdevices.clear();
+						gpsdevices = (ArrayList<Device>) ((FragmentList2) lfm).devicesB.clone();
+					}*/
 					if (gpsdevices!=null) {
 						for (int k= 0;k <gpsdevices.size();k ++) {
-							if(gpsdevices.get(k).deviceID!=null && Idtmp!=null) { 
-							if (gpsdevices.get(k).deviceID.equals(Idtmp)) {
+							Log.i(Tag, "gps device id is " +gpsdevices.get(k).deviceID  + "  Idtmp is" + Idtmp);
+							Log.i(Tag, "gps address is " + gpsdevices.get(k).deviceAddress + "Addrtmp is" + addrtmp);
+							if (gpsdevices.get(k).deviceAddress ==null) continue;
+							if(gpsdevices.get(k).deviceAddress!=null && addrtmp!=null) { 
+							if (gpsdevices.get(k).deviceAddress.equals(addrtmp)) {
 								nametmp = gpsdevices.get(k).deviceName;
 							}
 							}
@@ -549,6 +559,15 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						String sms = mInput2.getText().toString();
+						if(sms!=null) {
+							Toast.makeText(getActivity(), "输入不能为空", Toast.LENGTH_SHORT).show();
+							return;
+						}
+						if (sms.length()>20) {
+							Toast.makeText(getActivity(), "输入长度不能超过20个字符", Toast.LENGTH_SHORT).show();
+							return;
+						}
+						
 						String destAddr = addrtmp;
 						String destId = idtmp;
 						MainActivity.instance.sendSMS(sms, destAddr, destId);
@@ -576,21 +595,41 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 			new AlertDialog.Builder(getActivity()).setTitle("回复短信:").setView(mInput2).setPositiveButton("发送", new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface arg0, int arg1) {
+					try {
 					String sms = mInput2.getText().toString();
 					String destAddr = addrtmp;
 					String destId = Idtmp;
-
+					if (sms==null) {
+						Toast.makeText(getActivity(), "输入不能为空", Toast.LENGTH_SHORT).show();
+						return ;
+					}
+					if (sms.length()>20) {
+						Toast.makeText(getActivity(), "输入长度不能超过20个字符", Toast.LENGTH_SHORT).show();
+						return;
+					}
 					Date tmpDate = new Date();
 					SimpleDateFormat formatt = new SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒");
 					String xx = formatt.format(tmpDate);
 					SmsHelper smsHelper;
 					smsHelper = new SmsHelper(getActivity());
+	/*				FragmentManager rightfm = getActivity().getSupportFralfgmentManager();
+					Fragment lfm = rightfm.findFragmentById(R.id.list_container);
+					if (((FragmentList2) lfm).devicesB.size() > 0) {
+						gpsdevices = ((FragmentList2) lfm).devicesB;
+					} */
 					for (int i = 0; i < gpsdevices.size(); i++) {
+						if (gpsdevices.get(i).getDeviceID() == null) continue;
+						Log.i(Tag,"gpsdevice deviceid" + gpsdevices.get(i).getDeviceID());
 						if (gpsdevices.get(i).getDeviceID().equals(destId)) {
 							smsHelper.insert(gpsdevices.get(i).getDeviceName(), xx, sms, "true");
 						}
 					}
+					Log.i(Tag, "Track the sms huifu function ,the dest addr is" + destAddr + " the desit id is " +destId);
 					MainActivity.instance.sendSMS(sms, destAddr, destId);
+				}  catch (Exception e ) {
+					Log.i(Tag,"Exception" );
+					e.printStackTrace();
+				}
 				}
 
 			}).setNegativeButton(R.string.cancel, null).create().show();

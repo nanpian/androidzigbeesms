@@ -542,7 +542,7 @@ public class ZigbeeSerivce extends Service {
 			// 收到短信息处理！
 			String smsReceive = listBuffer2.get(i).substring(30,
 					listBuffer2.get(i).length());
-			Log.i(Tag, "smsdata is " + smsReceive + "addr" + smsSourAddr
+			Log.i(Tag, "smsdata is test " + smsReceive + "addr" + smsSourAddr
 					+ "id " + smsSourId + " content" + smsReceive + "type is "
 					+ type);
 			byte[] bytes = CharConverter.hexStringToBytes(smsReceive);
@@ -556,7 +556,7 @@ public class ZigbeeSerivce extends Service {
 		try {
 			String smsutf8 = "解码错误";
 			if (EnableDES) {
-				Log.i(Tag,"the long sms data is "+ temp);
+				Log.i(Tag,"sms data is test the long sms data is "+ temp);
 				 String xx = new String(temp);
 				byte[] temp2 = Base64.decode(xx);
 			    DesCrypt DesCryptInstance = new DesCrypt();

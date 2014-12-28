@@ -78,6 +78,7 @@ public class FragmentList2 extends Fragment {
 	private ExpandableListView deviceList;
 	private ArrayList<String> namelist = new ArrayList();
 	public ArrayList<Device> devices;
+	public ArrayList<Device> devicesNull = new ArrayList<Device>();
 	public Device deviceBtmp;
 	public Device deviceB1tmp;
 	public static boolean HasInitSelf = false;
@@ -128,6 +129,18 @@ public class FragmentList2 extends Fragment {
 					}
 				}
 			}
+
+			// 未知设备栏
+			if ((null != devicesNull) && (devicesNull.size() > 0)) {
+				for (int i = 0; i < devicesNull.size(); i++) {
+					devicesNull.get(i).count--;
+					if (devicesNull.get(i).count <= 0) {
+						devicesNull.get(i).online = false;
+						adapter.notifyDataSetChanged();
+					}
+				}
+			}
+
 			// 心跳为2s*5
 			mHandler.sendEmptyMessageDelayed(MSG_REDUCE_DEVICE_COUNT, 3 * 1000);
 		} catch (Exception e) {
@@ -173,7 +186,7 @@ public class FragmentList2 extends Fragment {
 				if (typetmp2 == null)
 					typetmp2 = "01";
 
-				Log.i(Tag, "zhudewei jiema " + typetmp2 + " fff " + data + "addr" + addrtmp);
+				Log.i(Tag, "zhudewei jiema " + typetmp2 + " fff " + data + "addr" + addrtmp + "Idtmp is" + Idtmp);
 				for (int i = 0; i < devicesB.size(); i++) {
 					if (devicesB.get(i).deviceAddress != null) {
 						if (devicesB.get(i).deviceAddress.equals(addrtmp)) {
@@ -408,10 +421,15 @@ public class FragmentList2 extends Fragment {
 	private void notifiyDeviceB2(String data) {
 		boolean isContain = false;
 		data = data.substring(2, data.length());
+		Log.i(Tag, "notifyDeviceB2 is aaaa " + data.substring(10, 14));
 		try {
 			for (int i = 0; i < devicesB.size(); i++) {
+				Log.i(Tag, "notifyDeviceB2 is " + devicesB.get(i).deviceID);
+				if (devicesB.get(i).deviceID == null)
+					continue;
 				if (devicesB.get(i).deviceID.equals(data.substring(10, 14))) {
 					isContain = true;
+					Log.i(Tag, "notifyDeviceB2 is " + data.substring(10, 14));
 					devicesB.get(i).deviceAddress = data.substring(6, 10);
 					devicesB.get(i).deviceID = data.substring(10, 14);
 					devicesB.get(i).count = 5;
@@ -448,21 +466,49 @@ public class FragmentList2 extends Fragment {
 			boolean isContain = false;
 			data = data.substring(2, data.length());
 			Device deviceB = new Device();
-			deviceB.deviceName = "协调器";
+			// deviceB.deviceName = "协调器";
 			deviceB.deviceID = data.substring(10, 14);
+			Log.i(Tag, "devicec id is " + deviceB.deviceID);
+			Log.i(Tag, "devicec data is " + data.substring(10, 14));
 			deviceB.online = true;
 			deviceB.count = 5;
 			for (int i = 0; i < devicesB.size(); i++) {
-				if (devicesB.get(i).deviceName != null) {
-					if (devicesB.get(i).deviceName.contains("协调器")) {
-						isContain = true;
-						devicesB.get(i).deviceName = "协调器";
-						devicesB.get(i).deviceID = data.substring(10, 14);
-						devicesB.get(i).deviceAddress = data.substring(6, 10);
-						devicesB.get(i).count = 5;
-						devicesB.get(i).online = true;
-						adapter.notifyDataSetChanged();
-					}
+				if (i == 1) {
+					isContain = true;
+					Log.i(Tag, "devicec contain is " + devicesB.get(i).deviceID);
+					devicesB.get(i).deviceID = data.substring(10, 14);
+					devicesB.get(i).deviceAddress = data.substring(6, 10);
+					devicesB.get(i).count = 5;
+					devicesB.get(i).online = true;
+					adapter.notifyDataSetChanged();
+				}
+				if (devicesB.get(i).deviceName != null) {/*
+														 * if
+														 * (devicesB.get(i).deviceID
+														 * .
+														 * equals(data.substring
+														 * (10, 14))) {
+														 * isContain = true;
+														 * Log.i(Tag,
+														 * "devicec contain is "
+														 * +
+														 * devicesB.get(i).deviceID
+														 * ); devicesB.get(i).
+														 * deviceName = "协调器";
+														 * devicesB
+														 * .get(i).deviceID =
+														 * data.substring(10,
+														 * 14); devicesB.get(i).
+														 * deviceAddress =
+														 * data.substring(6,
+														 * 10);
+														 * devicesB.get(i).count
+														 * = 5;
+														 * devicesB.get(i).online
+														 * = true; adapter.
+														 * notifyDataSetChanged
+														 * (); }
+														 */
 				}
 			}
 
@@ -470,7 +516,7 @@ public class FragmentList2 extends Fragment {
 				Device deviceB2 = new Device();
 				deviceB2.count = 5;
 				deviceB2.online = true;
-				deviceB2.deviceName = "协调器" ;
+				deviceB2.deviceName = "协调器";
 				deviceB2.deviceAddress = data.substring(6, 10);
 				deviceB2.deviceID = data.substring(10, 14);
 				devicesB.add(deviceB2);
@@ -489,8 +535,27 @@ public class FragmentList2 extends Fragment {
 			boolean isContain = false;
 			if (devices.size() <= 0)
 				Toast.makeText(getActivity(), "未导入战士文件或者导入错误", Toast.LENGTH_SHORT);
+			// 未知设备栏
+			if (devicesNull != null && devicesNull.size() > 0) {
+				for (int k = 0; k < devicesNull.size(); k++) {
+					if (devicesNull.get(k).deviceID != null) {
+						Log.i(Tag,"devicesNull test id is " + devicesNull.get(k).deviceID);
+						if (devicesNull.get(k).deviceID.equals(data.substring(12, 16))) {
+							isContain = true;
+							devicesNull.get(k).deviceID = data.substring(12, 16);
+							devicesNull.get(k).deviceType = data.substring(6, 8);
+							devices.get(k).parentAddress = data.substring(16, 20);
+							// 显示在线
+							devicesNull.get(k).online = true;
+							devicesNull.get(k).count = 5;
+						}
+					}
+				}
+			}
+
 			for (int i = 0; i < devices.size(); i++) {
 				Log.i(Tag, "notify device list deviceid " + devices.get(i).deviceID + " xintiao deviceid" + data.substring(12, 16));
+
 				if (devices.get(i).deviceID.equals(data.substring(12, 16))) {
 					isContain = true;
 					devices.get(i).deviceID = data.substring(12, 16);
@@ -505,7 +570,8 @@ public class FragmentList2 extends Fragment {
 							// devices.get(i).deviceName =
 							// devices.get(i).deviceName + "(" +
 							// devices.get(i).parentAddress + ")";
-							//devices.get(i).deviceName = devices.get(i).deviceName +"*其他父地址*";
+							// devices.get(i).deviceName =
+							// devices.get(i).deviceName +"*其他父地址*";
 							String paddr = devices.get(i).parentAddress;
 							if (devicesB != null) {
 								for (int z = 0; z < devicesB.size(); z++) {
@@ -540,8 +606,10 @@ public class FragmentList2 extends Fragment {
 					Log.i(Tag, "notify device list a11");
 					devicetmp.online = true;
 					devicetmp.count = 5;
-					devices.add(devicetmp);
-
+					devicesNull.add(devicetmp);
+					// 增加在未知设备栏
+					// 未知设备栏
+					// devicesB.add(devicetmp);
 				}
 				// devicesA.set(0, devices);
 				adapter.notifyDataSetChanged();
@@ -677,7 +745,7 @@ public class FragmentList2 extends Fragment {
 			synchronized (this) {
 				Log.i(Tag, "notify the new data changed listener!");
 				Cursor cursor = null;
-				try {
+				//try {
 					/*
 					 * String selection = "id= '" + deviceId + "'"; Cursor
 					 * cursor = null; try { cursor =
@@ -750,6 +818,12 @@ public class FragmentList2 extends Fragment {
 								if ((selfpadId != null) && (cursor.getString(2).equals(selfpadId))) {
 									Log.i(Tag, "the self id is " + cursor.getString(2));
 									devicesB.get(0).deviceName = cursor.getString(1);
+								} else if (cursor.getString(2).equals("-001")) {
+									// -001是协调器
+									Log.i(Tag, "the a2 id is " + cursor.getString(2));
+									String bindName = cursor.getString(1) + "(协调器)";
+									String type = cursor.getString(3);
+									updateC1(null, bindName, null);
 								} else if (isContainInA2(cursor.getString(2))) {
 									Log.i(Tag, "the a2 id is " + cursor.getString(2));
 									String bindName = cursor.getString(1);
@@ -796,11 +870,11 @@ public class FragmentList2 extends Fragment {
 					}
 
 					hasInitSystem = true;
-				} catch (Exception e) {
-					e.printStackTrace();
-				} finally {
-					cursor.close();
-				}
+			//	} catch (Exception e) {
+			//		e.printStackTrace();
+			//	} finally {
+			//		cursor.close();
+			//	}
 			}
 		}
 	};
@@ -809,9 +883,23 @@ public class FragmentList2 extends Fragment {
 		if (HasInitSelf) {
 			if (devicesB.size() > 0) {
 				for (int i = 0; i < devicesB.size(); i++) {
+					if (devicesB.get(i).deviceID == null) continue;
 					if (devicesB.get(i).deviceID.equals(bindId))
 						devicesB.get(i).setDeviceName(bindName);
 					devicesB.get(i).setDeviceType(type);
+				}
+			}
+		}
+	}
+
+	public void updateC1(String bindId, String bindName, String type) {
+		if (HasInitSelf) {
+			if (devicesB.size() > 0) {
+				for (int i = 0; i < devicesB.size(); i++) {
+					if (devicesB.get(i).deviceName.contains("协调器")) {
+						devicesB.get(i).setDeviceName(bindName);
+						devicesB.get(i).setDeviceType(type);
+					}
 				}
 			}
 		}
@@ -925,10 +1013,25 @@ public class FragmentList2 extends Fragment {
 		Device deviceC1 = new Device();
 		deviceC1.deviceName = "协调器";
 		devicesB.add(deviceC1);
+
+		Device devicesC2 = new Device();
+		devicesC2.deviceID = "****";
+		devicesC2.deviceName = "未知设备栏";
+		devicesB.add(devicesC2);
+
 		dbDeviceHelper = new DbDeviceHelper(getActivity());
 		deviceList = (ExpandableListView) getActivity().findViewById(R.id.groupdevice);
 		devices = new ArrayList<Device>();
 		devicesA.add(devices);
+
+		devicesA.add(null);
+
+		// 未知设备栏
+/*		Device Devicetmpxxx = new Device();
+		Devicetmpxxx.deviceName = "test";
+		devicesNull.add(Devicetmpxxx);*/
+		devicesA.add(devicesNull);
+
 		adapter = new DeviceExpandableListAdapter(getActivity(), devicesB, devicesA);
 		deviceList.setAdapter(adapter);
 
@@ -957,6 +1060,14 @@ public class FragmentList2 extends Fragment {
 							String sms = mInputGroup.getText().toString();
 							String destAddr = devicesB.get(group).deviceAddress;
 							String destId = devicesB.get(group).deviceID;
+							if (sms==null) {
+								Toast.makeText(getActivity(), "输入不能为空", Toast.LENGTH_SHORT).show();
+								return ;
+							}
+							if (sms.length()>20) {
+								Toast.makeText(getActivity(), "输入长度不能超过20个字符", Toast.LENGTH_SHORT).show();
+								return;
+							}
 							try {
 								MainActivity.instance.sendLongSms(sms, destAddr, destId, null);
 							} catch (InterruptedException e) {
