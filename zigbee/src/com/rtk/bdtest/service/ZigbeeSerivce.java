@@ -17,16 +17,20 @@ import com.rtk.bdtest.ZigbeeApplication;
 import com.rtk.bdtest.util.Base64;
 import com.rtk.bdtest.util.DesCrypt;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.Service;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
 //import android.util.Base64;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /*
  * 问题：1.平板路由设备如何得到其他平板设备以及协调器的心跳
@@ -86,6 +90,7 @@ public class ZigbeeSerivce extends Service {
 	private static final int MSG_SEND_SMS = 18;
 	private static final int MSG_SEND_GPS_TOALL = 19;
 	private static final int MSG_GET_SELF_INFO = 20;
+	private static final int MSG_SHOW_KEY_FAIL =30;
 
 	public static final int crcStartIndex = 90;
 	public static final int crcLength = 4;
@@ -257,6 +262,19 @@ public class ZigbeeSerivce extends Service {
 				break;
 			case MSG_SHOW_VERIFY_DIALOG:
 				break;
+			case MSG_SHOW_KEY_FAIL:
+				Toast.makeText(getApplicationContext(), "密钥已过期，请更新密钥", Toast.LENGTH_LONG).show();
+/*				new AlertDialog.Builder(getApplicationContext())  
+		         .setTitle("错误")  
+		        .setMessage("密钥已过期，请更新密钥")   
+		        .setPositiveButton("确定",   
+		        new DialogInterface.OnClickListener(){  
+		                  public void onClick(DialogInterface dialoginterface, int i){   
+		                                 //按钮事件   
+		                            Toast.makeText(getApplicationContext(), "确定",Toast.LENGTH_LONG).show();  
+		                              }   
+		                      }).setCancelable(true).show(); */
+				break;
 			case MSG_SEND_LOCATION_TO_ZIGBEE:
 				break;
 			case MSG_GET_SELF_INFO:
@@ -387,10 +405,16 @@ public class ZigbeeSerivce extends Service {
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					Message message = new Message();
+					message.what = MSG_SHOW_KEY_FAIL;
+					handler.sendMessage(message);
+                    return;
+				} finally {
+					//Toast.makeText(getApplicationContext(), "密钥已过期，请更新密钥", Toast.LENGTH_LONG).show();
 				}
 			    smsReceive = new String(smsdatatmp);
 			} 
-//String smsutf8 = new String(temp, "utf-8");
+            //String smsutf8 = new String(temp, "utf-8");
 			String smsutf8 = smsReceive;
 			Log.i(Tag, "the sms utf8 is" + smsutf8);
 			// 收到短信息，发送广播给activity，分两种情况处理，第一种是gps信息，第二种是普通短信息！！！！！！！
