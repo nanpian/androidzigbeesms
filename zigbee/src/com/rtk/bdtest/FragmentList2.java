@@ -276,10 +276,21 @@ public class FragmentList2 extends Fragment {
 
 				} else if (typetmp2.equals("0B")) {
 					Log.i(Tag, "receive A query bind info from B" + data);
-					String bindName = data.substring(4);
-					String bindId = data.substring(0, 4);
-					Toast.makeText(getActivity(), "查询成功,收到队员绑定信息！", Toast.LENGTH_SHORT);
-					if (isContainInSQL(bindId)) {
+
+					String nameNull = data.substring(4);
+					String idNull = data.substring(0, 4);
+					Toast.makeText(getActivity(), "查询成功,ID为" +idNull + 
+							",名称为"+nameNull, Toast.LENGTH_SHORT).show();
+					if (devicesNull!=null && devicesNull.size()>0) {
+						for (int k=0; k < devicesNull.size(); k++) {
+							if (idNull==null)break;
+							if(idNull.equals(devicesNull.get(k).deviceName)) {
+								devicesNull.get(k).deviceName = nameNull;
+								adapter.notifyDataSetChanged();
+							}
+						}
+					}
+/*					if (isContainInSQL(bindId)) {
 						ContentValues values = new ContentValues();
 						values.put("name", data.substring(4));
 						values.put("id", data.substring(0, 4));
@@ -290,7 +301,7 @@ public class FragmentList2 extends Fragment {
 						values.put("name", data.substring(4));
 						values.put("id", data.substring(0, 4));
 						getActivity().getContentResolver().insert(PersonProvider.CONTENT_URI, values);
-					}
+					}*/
 				}
 			} else if (intent.getAction().equals("ACTION_NOTIFY_DEVICE")) {
 				String data = intent.getExtras().getString("zigbee_devicelist");
@@ -745,7 +756,7 @@ public class FragmentList2 extends Fragment {
 			synchronized (this) {
 				Log.i(Tag, "notify the new data changed listener!");
 				Cursor cursor = null;
-				//try {
+				try {
 					/*
 					 * String selection = "id= '" + deviceId + "'"; Cursor
 					 * cursor = null; try { cursor =
@@ -870,11 +881,11 @@ public class FragmentList2 extends Fragment {
 					}
 
 					hasInitSystem = true;
-			//	} catch (Exception e) {
-			//		e.printStackTrace();
-			//	} finally {
-			//		cursor.close();
-			//	}
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					cursor.close();
+				}
 			}
 		}
 	};
@@ -945,6 +956,23 @@ public class FragmentList2 extends Fragment {
 				for (int i = 0; i < devices.size(); i++) {
 					if (devices.get(i).deviceID.equals(bindid)) {
 						Log.i(Tag, "is equal a1");
+						return true;
+					}
+				}
+			}
+		} else
+			return false;
+		return false;
+	}
+	
+	boolean isCotainInWeizhi(String bindid) {
+		if (HasInitSelf) {
+			Log.i(Tag, "enter is containinweizhi");
+			if (devicesNull!=null && devicesNull.size() > 0) {
+				for (int i = 0; i < devicesNull.size(); i++) {
+					if (devicesNull.get(i).deviceID==null)continue;
+					if (devicesNull.get(i).deviceID.equals(bindid)) {
+						Log.i(Tag, "is equal weizhi");
 						return true;
 					}
 				}
@@ -1084,9 +1112,16 @@ public class FragmentList2 extends Fragment {
 
 					// menu.add(Menu.NONE, MENU_MODIFY, 0, "修改备注名");
 				} else if (type == 1) {// 长按好友列表项
-					menu.add(Menu.NONE, MENU_MODIFY, 0, "修改备注名");
-					menu.add(Menu.NONE, MENU_QUERY, 1, "查询");
+					//如果是本组平板
+					if (group == 0) {
+						menu.add(Menu.NONE, MENU_MODIFY, 0, "修改备注名");
+						idxx = child;
+					}
+					//如果在未知设备栏
+					if (group == 2) {
+					   menu.add(Menu.NONE, MENU_QUERY, 1, "查询");
 					idxx = child;
+					}
 				}
 			}
 
