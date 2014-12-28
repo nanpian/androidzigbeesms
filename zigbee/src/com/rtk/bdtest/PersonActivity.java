@@ -62,9 +62,7 @@ public class PersonActivity extends Fragment {
 	private static final String[] typelist ={"人","装备","物资"};   
 	private static final String[] ranklist = {"团长","营长","班长","队员"};
 	private static final String[] joblist = {"团长","营长","班长","队员"};
-	private String[] name = { "xxxxx", "yyyy", "hello", "zdsfdsf" };
 
-	private String[] desc = { "sdfsdf", "dsfdsf", "dsefrwer", "sdfwer" };
 	private Spinner spinnertype;
 	private Spinner spinnerrank;
 	private Spinner spinnerjob;
@@ -128,9 +126,9 @@ public class PersonActivity extends Fragment {
 				"The dest lat lng is " + sourceLatLng.latitude + "dest xxxx lng"
 						+ sourceLatLng.longitude, Toast.LENGTH_LONG).show();
 
-
+		String[] selectSection = { "others" };
 		Cursor cursor = getActivity().getContentResolver().query(
-				PersonProvider.CONTENT_URI, null, null, null, null);
+				PersonProvider.CONTENT_URI, null, "beizhu!=?", selectSection, null);
 		if (cursor != null) {
 			listems = new ArrayList<Map<String, Object>>();
 			while (cursor.moveToNext()) {
@@ -142,6 +140,7 @@ public class PersonActivity extends Fragment {
 				String year = cursor.getString(6);
 				String sex = cursor.getString(7);
 				String beizhu = cursor.getString(8);
+				if(beizhu!=null && beizhu.contains("others"))continue;
 				Map<String, Object> listem = new HashMap<String, Object>();
 				listem.put("name", name);
 				listem.put("id", id);

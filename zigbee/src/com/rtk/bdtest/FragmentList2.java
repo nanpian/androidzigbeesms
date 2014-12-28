@@ -471,6 +471,7 @@ public class FragmentList2 extends Fragment {
 				deviceB2.online = true;
 				deviceB2.deviceID = data.substring(10, 14);
 				deviceB2.deviceAddress = data.substring(6, 10);
+				//devicesB.add(object)
 				devicesB.add(deviceB2);
 				adapter.notifyDataSetChanged();
 			}
