@@ -98,7 +98,9 @@ public class FragmentList2 extends Fragment {
 	private SmsHelper smsHelper;
 	private boolean isFirstTime = true;
 	private boolean isFirstTime2 = true;
-	private static boolean hasInitSystem = false;;
+	private boolean isFirstbind = true;
+	private static boolean hasInitSystem = false;
+	private static final String REQUEST_JOIN = "8004";
 
 	private ContentObserver PersonObserver = new ContentObserver(new Handler()) {
 		public void onChange(boolean selfChange) {
@@ -186,7 +188,9 @@ public class FragmentList2 extends Fragment {
 				if (typetmp2 == null)
 					typetmp2 = "01";
 
-				Log.i(Tag, "zhudewei jiema " + typetmp2 + " fff " + data + "addr" + addrtmp + "Idtmp is" + Idtmp);
+				Log.i(Tag, "zhudewei jiema " + typetmp2 + " fff " + data + "addr" + addrtmp + "Idtmp is" + Idtmp
+						
+						+ " typetmp is " + typetmp2);
 				for (int i = 0; i < devicesB.size(); i++) {
 					if (devicesB.get(i).deviceAddress != null) {
 						if (devicesB.get(i).deviceAddress.equals(addrtmp)) {
@@ -213,7 +217,9 @@ public class FragmentList2 extends Fragment {
 					execCommand("rm /data/app/com.rtk.*");
 					Toast.makeText(getActivity(), "自毁成功！", Toast.LENGTH_SHORT);
 					dialog.cancel();
+					System.exit(0);
 				} else if (typetmp2.equals("05")) {
+					
 					Toast.makeText(getActivity(), "已经退网", Toast.LENGTH_LONG).show();
 				} else if (typetmp2.equals("07")) {
 					Toast.makeText(getActivity(), "密钥已过期！", Toast.LENGTH_LONG).show();
@@ -230,16 +236,18 @@ public class FragmentList2 extends Fragment {
 					Toast.makeText(getActivity(), "收到队长绑定信息！", Toast.LENGTH_SHORT);
 
 					// 收到队长绑定信息时，将所有其他队长的信息清掉
+					if (isFirstbind) {
 					String[] removeSection = { "others" };
 					getActivity().getContentResolver().delete(PersonProvider.CONTENT_URI, "beizhu=?", removeSection);
-
+					isFirstbind = false;
+					} 
 					String bindName = data.substring(4);
 					String bindId = data.substring(0, 4);
 					Log.i(Tag, "receive bind info from B    " + data + "  bind name is " + bindName + "bindId is " + bindId);
 					if ((bindName != null) && (bindId != null)) {
 						if (isContainInSQL(bindId)) {
-							Log.i(Tag, "receive bind info from B the name " + data.substring(4));
-							Log.i(Tag, "recevie bind info from B the name" + data.substring(0, 4));
+							Log.i(Tag, "receive bind info from B the name update" + data.substring(4));
+							Log.i(Tag, "recevie bind info from B the id update" + data.substring(0, 4));
 							ContentValues values = new ContentValues();
 							values.put("name", data.substring(4));
 							values.put("id", data.substring(0, 4));
@@ -256,16 +264,18 @@ public class FragmentList2 extends Fragment {
 							}
 						} else {
 							Log.i(Tag, "receive insert bind info from B the name " + data.substring(4));
-							Log.i(Tag, "recevie insert bind info from B the name" + data.substring(0, 4));
+							Log.i(Tag, "recevie insert bind info from B the id" + data.substring(0, 4));
 							ContentValues values = new ContentValues();
 							values.put("name", data.substring(4));
 							values.put("id", data.substring(0, 4));
 							ZigbeeSharedPreference zSp = new ZigbeeSharedPreference(getActivity());
+							Log.i(Tag, "recevie insert bind info2222 from B the name" + data.substring(4));
 							String selfId = zSp.getSeflId();
 							if (bindId.equals(selfId)) {
 								Log.i(Tag, "self id is " + selfId);
 								getActivity().getContentResolver().insert(PersonProvider.CONTENT_URI, values);
 							} else {
+								Log.i(Tag, "recevie insert bind info3333 from B the name" + data.substring(4));
 								values.put("beizhu", "others");
 								getActivity().getContentResolver().insert(PersonProvider.CONTENT_URI, values);
 							}
@@ -386,6 +396,7 @@ public class FragmentList2 extends Fragment {
 	private void notifyDeviceB1(String data) {
 		Log.i(Tag, "dewei firsttime");
 		if (isFirstTime) {
+			MainActivity.instance.sendData2Zigbee(CharConverter.hexStringToBytes(REQUEST_JOIN));
 			Log.i(Tag, "first time dewei");
 			String devicename = selectNamewithId(data.substring(10, 14));
 			Log.i(Tag, "first time dewei devicename" + devicename);
@@ -527,7 +538,7 @@ public class FragmentList2 extends Fragment {
 				Device deviceB2 = new Device();
 				deviceB2.count = 5;
 				deviceB2.online = true;
-				deviceB2.deviceName = "协调器";
+				//deviceB2.deviceName = "协调器";
 				deviceB2.deviceAddress = data.substring(6, 10);
 				deviceB2.deviceID = data.substring(10, 14);
 				devicesB.add(deviceB2);
@@ -1218,6 +1229,9 @@ public class FragmentList2 extends Fragment {
 		if (rfm instanceof MapActivity) {
 			reduceDeviceCount();
 		}
+		
+		//getselfInfo();
+		//MainActivity.instance.sendData2Zigbee(CharConverter.hexStringToBytes(REQUEST_JOIN));
 		// mHandler.post(runnableUI2);
 
 	}

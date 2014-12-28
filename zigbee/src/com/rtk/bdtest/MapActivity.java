@@ -341,6 +341,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 						Log.i(Tag,"dewei address");
 						if (gpsdevices.size() > 0) {
 							for (int i = 0; i < gpsdevices.size(); i++) {
+								if (gpsdevices.get(i).getDeviceAddress()==null)continue;
 								if (gpsdevices.get(i).getDeviceAddress().equals(deviceAddress)) {
 									otherName = gpsdevices.get(i).getDeviceName();
 								}
@@ -403,9 +404,10 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 								if (gpsdevices.get(i).deviceAddress != null) {
 									if (gpsdevices.get(i).deviceAddress.equals(deviceAddress)) {
 										gpsdevices.get(i).gpsMarker = mMarkerSelf2;
-										MarkerOptions selfgps11 = new MarkerOptions().position(desLatLng).title("自己").icon(BitmapDescriptorFactory.fromBitmap(getBitMap(gpsdevices.get(i).deviceName))).perspective(false).anchor(0.5f, 0.5f)
-												.zIndex(7);
-										mMarkerSelf2 = (Marker) (mBaiduMap.addOverlay(selfgps11));
+										//MarkerOptions selfgps11 = new MarkerOptions().position(desLatLng).title("自己").icon(BitmapDescriptorFactory.fromBitmap(getBitMap(gpsdevices.get(i).deviceName))).perspective(false).anchor(0.5f, 0.5f)
+										//		.zIndex(7);
+										//mMarkerSelf2 = (Marker) (mBaiduMap.addOverlay(selfgps11));
+										mMarkerSelf2.setIcon(BitmapDescriptorFactory.fromBitmap(getBitMap(gpsdevices.get(i).deviceName)));
 									}
 								}
 							}
