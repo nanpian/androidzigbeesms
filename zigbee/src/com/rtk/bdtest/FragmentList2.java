@@ -294,7 +294,7 @@ public class FragmentList2 extends Fragment {
 					if (devicesNull!=null && devicesNull.size()>0) {
 						for (int k=0; k < devicesNull.size(); k++) {
 							if (idNull==null)break;
-							if(idNull.equals(devicesNull.get(k).deviceName)) {
+							if(idNull.equals(devicesNull.get(k).deviceID)) {
 								devicesNull.get(k).deviceName = nameNull;
 								adapter.notifyDataSetChanged();
 							}
@@ -1274,9 +1274,9 @@ public class FragmentList2 extends Fragment {
 			dialog2.show();
 			break;
 		case MENU_QUERY:
-			if (devices != null) {
-				if (devices.get(idxx) != null) {
-					String idSend = devices.get(idxx).deviceID;
+			if (devicesNull != null) {
+				if (devicesNull.get(idxx) != null) {
+					String idSend = devicesNull.get(idxx).deviceID;
 					Toast.makeText(getActivity(), "查询设备id为" + idSend + "的名称", Toast.LENGTH_SHORT).show();
 					MainActivity.instance.sendQuerySMS(idSend, "0000", "FFFF");
 				}
