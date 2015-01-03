@@ -9,5 +9,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
     </ExpandableListView>
+         <ExpandableListView
+        android:id="@+id/groupdevice2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+    </ExpandableListView>
 
 </LinearLayout>
