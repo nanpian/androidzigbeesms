@@ -336,7 +336,7 @@ public class FragmentList2 extends Fragment {
 					notifiyDeviceC1(data);
 				else if (type.equals("02"))
 					notifiyDeviceB2(data);
-				else {
+				else if(type.equals("04")){
 					notifyDeviceList(data);
 				}
 			} else if (intent.getAction().equals("ACTION_GET_SELF_INFO")) {
@@ -1087,7 +1087,7 @@ public class FragmentList2 extends Fragment {
 
 		Device devicesC2 = new Device();
 		devicesC2.deviceID = "****";
-		devicesC2.deviceName = "未知设备栏";
+		devicesC2.deviceName = "未知设备";
 		devicesWeizhi.add(devicesC2);
 
 		dbDeviceHelper = new DbDeviceHelper(getActivity());
@@ -1117,12 +1117,12 @@ public class FragmentList2 extends Fragment {
 		adpaterWeizhi = new DeviceExpandableListAdapter(getActivity(), devicesWeizhi, devicesWeizhiList);
 		weizhiDeviceList.setAdapter(adpaterWeizhi);
 
-		Device deviceweizhi1 = new Device();
+/*		Device deviceweizhi1 = new Device();
 		deviceweizhi1.deviceName = "xxx";
 		deviceweizhi1.online = true;
 		deviceweizhi1.count = 3;
 		deviceweizhi1.deviceID = "7777";
-		devicesWeizhiZi.add(deviceweizhi1);
+		devicesWeizhiZi.add(deviceweizhi1);*/
 		weizhiDeviceList.setOnCreateContextMenuListener( new OnCreateContextMenuListener() {
 			@Override
 			public void onCreateContextMenu(ContextMenu menu, View arg1, ContextMenuInfo menuInfo) {

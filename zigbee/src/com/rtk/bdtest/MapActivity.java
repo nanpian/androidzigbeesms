@@ -173,7 +173,6 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 
 	private BroadcastReceiver receiverSms = new BroadcastReceiver() {
 
-		@SuppressWarnings("unchecked")
 		@Override
 		public void onReceive(Context arg0, Intent smsIntent) {
 			// TODO Auto-generated method stub
@@ -371,17 +370,17 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 						converter.coord(jingwei2);
 
 						LatLng desLatLng = converter.convert();
-						OverlayOptions selfgps;
+						OverlayOptions selfgps2;
 						Log.i(Tag, "The destinationssssss convert gps lat is " + desLatLng.latitude + " the lng is " + desLatLng.longitude);
 						if (mMarkerSelf2 == null) {
 							if (otherName == null) {
-								selfgps = new MarkerOptions().position(desLatLng).title("自己").icon(BitmapDescriptorFactory.fromBitmap(getBitMap(""))).perspective(false).anchor(0.5f, 0.5f)
+								selfgps2 = new MarkerOptions().position(desLatLng).title("xx").icon(BitmapDescriptorFactory.fromBitmap(getBitMap(""))).perspective(false).anchor(0.5f, 0.5f)
 										.zIndex(7);
 							} else {
-								selfgps = new MarkerOptions().position(desLatLng).title("自己").icon(BitmapDescriptorFactory.fromBitmap(getBitMap(otherName))).perspective(false).anchor(0.5f, 0.5f)
+								selfgps2 = new MarkerOptions().position(desLatLng).title("xx").icon(BitmapDescriptorFactory.fromBitmap(getBitMap(otherName))).perspective(false).anchor(0.5f, 0.5f)
 										.zIndex(7);
 							}
-							mMarkerSelf2 = (Marker) (mBaiduMap.addOverlay(selfgps));
+							mMarkerSelf2 = (Marker) (mBaiduMap.addOverlay(selfgps2));
 
 							for (int i = 0; i < gpsdevices.size(); i++) {
 								if (gpsdevices.get(i).deviceAddress != null) {
@@ -436,7 +435,7 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 		} else {
 			msg = String.format("成功导入 %d 个离线包，可以在下载管理查看", num);
 		}
-		Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT);
+		//Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT);
 	}
 
 	@Override
@@ -665,12 +664,17 @@ public class MapActivity extends Fragment implements MKOfflineMapListener {
 		CoordinateConverter converter = new CoordinateConverter();
 		converter.from(CoordType.GPS);
 		LatLng sourceLatLng = new LatLng(32.05253311, 118.80744145);
+		LatLng sourceLatLng2 = new LatLng(32.05253311, 118.80944145);
 		// sourceLatLng待转换坐标
 		converter.coord(sourceLatLng);
 		LatLng desLatLng = converter.convert();
-
+		
+		OverlayOptions ooC2 = new MarkerOptions().position(sourceLatLng2).title("xx").icon(BitmapDescriptorFactory.fromBitmap(getBitMap("其他"))).perspective(false).anchor(0.5f, 0.5f).zIndex(7);
+		mMarkerSelf2 =  (Marker) (mBaiduMap.addOverlay(ooC2));
+		
 		OverlayOptions ooC = new MarkerOptions().position(desLatLng).title("自己").icon(BitmapDescriptorFactory.fromBitmap(getBitMap("自己"))).perspective(false).anchor(0.5f, 0.5f).zIndex(7);
 		mMarkerSelf = (Marker) (mBaiduMap.addOverlay(ooC));
+
 		// mMarkerSelf11 = (Marker)mBaiduMap.addOverlay(textOption);
 
 	}

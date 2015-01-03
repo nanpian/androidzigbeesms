@@ -96,7 +96,7 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 				.findViewById(R.id.parent_address);
 		holder.name.setText( listB.get(groupPosition).deviceName);
 	    Log.i("adapter","groupview ,group name is" + listB.get(groupPosition).deviceName);
-		if (listB.get(groupPosition).deviceName.contains("未知设备栏")) {
+		if (listB.get(groupPosition).deviceName.contains("未知设备")) {
 			holder.online.setImageResource(R.drawable.weizhi);
 		}
 		if ((listB.get(groupPosition) != null)
@@ -122,7 +122,7 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter {
 				}else if(listB.get(groupPosition).type.equals("装备")){
 					holder.online.setImageResource(R.drawable.zhuangbei_offline);
 				}
-				if (listB.get(groupPosition).deviceName.contains("未知设备栏")) {
+				if (listB.get(groupPosition).deviceName.contains("未知设备")) {
 					holder.online.setImageResource(R.drawable.weizhi);
 					holder.id.setVisibility(View.INVISIBLE);
 				}

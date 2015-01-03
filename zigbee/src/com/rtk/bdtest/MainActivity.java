@@ -413,6 +413,7 @@ public class MainActivity extends FragmentActivity implements BindActivity.OnBin
 	public void sendData2Zigbee(byte[] tmp111) {
 		Log.i(Tag, "send data2 zigbee!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		hexStringToBytesF = tmp111;
+		if(hexStringToBytesF==null)return;
 		zigbeeService.sendData2Zigbee(hexStringToBytesF);
 		try {
 			Thread.sleep(500);

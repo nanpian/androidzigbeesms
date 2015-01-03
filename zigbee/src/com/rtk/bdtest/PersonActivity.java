@@ -740,8 +740,11 @@ public class PersonActivity extends Fragment {
 			// 此处可以进行相应的业务处理
 			Log.i("PersonProvider", "observer find it!!!");
 			listems.clear();
+/*			Cursor cursor = getActivity().getContentResolver().query(
+					PersonProvider.CONTENT_URI, null, null, null, null);*/
+			String[] selectSection = { "others" };
 			Cursor cursor = getActivity().getContentResolver().query(
-					PersonProvider.CONTENT_URI, null, null, null, null);
+					PersonProvider.CONTENT_URI, null, "beizhu!=?", selectSection, null);
 			if (cursor != null) {
 				while (cursor.moveToNext()) {
 					String name = cursor.getString(1);
