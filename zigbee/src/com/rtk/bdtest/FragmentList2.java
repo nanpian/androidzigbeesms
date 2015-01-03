@@ -1227,13 +1227,18 @@ public class FragmentList2 extends Fragment {
 				Fragment rfm = rightfm.findFragmentById(R.id.detail_container);
 				if (rfm instanceof MapActivity) {
 					String name2 = devicesB.get(groupPosition).deviceAddress;
+					String devicename = devicesB.get(groupPosition).deviceName;
 					MapActivity rfma = (MapActivity) rfm;
 					try {
+						if(name2==null) {
+							Toast.makeText(getActivity(), "没有找到"+devicename, Toast.LENGTH_SHORT).show();
+							return false;
+						}
 						boolean isCentered = rfma.setCenterIn(name2);
 						if (isCentered = true) {
-							Toast.makeText(getActivity(), "找到地址" + name2, Toast.LENGTH_SHORT).show();
+							Toast.makeText(getActivity(), "找到" + devicename+",地址为"+name2, Toast.LENGTH_SHORT).show();
 						} else {
-							Toast.makeText(getActivity(), "没有找到地址", Toast.LENGTH_SHORT).show();
+							Toast.makeText(getActivity(), "没有找到"+devicename, Toast.LENGTH_SHORT).show();
 						}
 					} catch (Exception e) {
 						e.printStackTrace();

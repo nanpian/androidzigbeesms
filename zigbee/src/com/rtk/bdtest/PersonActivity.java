@@ -106,7 +106,7 @@ public class PersonActivity extends Fragment {
 			}
         	
         });
-		// 将GPS设备采集的原始GPS坐标转换成百度坐标
+/*		// 将GPS设备采集的原始GPS坐标转换成百度坐标
 		CoordinateConverter converter = new CoordinateConverter();
 		converter.from(CoordType.GPS);
 		double[] jingweitest2 = {118.48446487,32.031519864};
@@ -124,7 +124,7 @@ public class PersonActivity extends Fragment {
 		Toast.makeText(
 				getActivity(),
 				"The dest lat lng is " + sourceLatLng.latitude + "dest xxxx lng"
-						+ sourceLatLng.longitude, Toast.LENGTH_LONG).show();
+						+ sourceLatLng.longitude, Toast.LENGTH_LONG).show();*/
 
 		String[] selectSection = { "others" };
 		Cursor cursor = getActivity().getContentResolver().query(
